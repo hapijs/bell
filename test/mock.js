@@ -215,26 +215,41 @@ internals.V2.prototype.stop = function (callback) {
 
 exports.override = function (uri, payload) {
 
-    internals.nippleGet = Nipple.get;
-    Nipple.get = function (dest) {
+    var override = function (method) {
 
-        var options = arguments.length === 3 ? arguments[1] : {};
-        var callback = arguments.length === 3 ? arguments[2] : arguments[1];
+        return function (dest) {
 
-        if (dest.indexOf(uri) === 0) {
-            if (payload instanceof Error) {
-                return Hoek.nextTick(callback)(null, { statusCode: 400 }, JSON.stringify({ message: payload.message }));
+            var options = arguments.length === 3 ? arguments[1] : {};
+            var callback = arguments.length === 3 ? arguments[2] : arguments[1];
+
+            if (dest.indexOf(uri) === 0) {
+                if (payload instanceof Error) {
+                    return Hoek.nextTick(callback)(null, { statusCode: 400 }, JSON.stringify({ message: payload.message }));
+                }
+
+                if (payload === null) {
+                    return Hoek.nextTick(callback)(Boom.internal('unknown'));
+                }
+
+                return Hoek.nextTick(callback)(null, { statusCode: 200 }, typeof payload === 'string' ? payload : JSON.stringify(payload));
             }
 
-            return Hoek.nextTick(callback)(null, { statusCode: 200 }, JSON.stringify(payload));
+            return internals.nipple[method].apply(null, arguments);
         }
-
-        return internals.nippleGet.apply(null, arguments);
     };
+
+    internals.nipple = {
+        get: Nipple.get,
+        post: Nipple.post
+    };
+
+    Nipple.get = override('get');
+    Nipple.post = override('post');
 };
 
 
 exports.clear = function (uri) {
 
-    Nipple.get = internals.nippleGet;
+    Nipple.get = internals.nipple.get;
+    Nipple.post = internals.nipple.post;
 };
