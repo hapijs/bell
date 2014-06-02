@@ -1,0 +1,39 @@
+{
+  "name": "bell",
+  "description": "Third-party login plugin for hapi",
+  "version": "0.0.0",
+  "repository": "git://github.com/spumko/bell",
+  "main": "index",
+  "keywords": [
+    "hapi",
+    "login",
+    "authentication",
+    "oauth",
+    "openid",
+    "plugin"
+  ],
+  "engines": {
+    "node": ">=0.10.22"
+  },
+  "dependencies": {
+    "hoek": "2.x.x",
+    "boom": "2.x.x",
+    "oauth": "0.9.x"
+  },
+  "peerDependencies": {
+    "hapi": ">=2.x.x"
+  },
+  "devDependencies": {
+    "hapi": "6.x.x",
+    "lab": "3.x.x"
+  },
+  "scripts": {
+    "test": "make test-cov"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "http://github.com/spumko/bell/raw/master/LICENSE"
+    }
+  ]
+}
