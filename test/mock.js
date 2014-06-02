@@ -6,6 +6,7 @@ var Lab = require('lab');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
 var Nipple = require('nipple');
+var Boom = require('boom');
 
 
 // Declare internals
@@ -21,7 +22,9 @@ var after = Lab.after;
 var describe = Lab.experiment;
 
 
-exports.V1 = internals.V1 = function () {
+exports.V1 = internals.V1 = function (fail) {
+
+    fail = fail || {};
 
     this.tokens = {};
 
@@ -33,6 +36,10 @@ exports.V1 = internals.V1 = function () {
             config: {
                 bind: this,
                 handler: function (request, reply) {
+
+                    if (fail.temporary) {
+                        return reply(Boom.badRequest());
+                    }
 
                     var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_callback).to.exist;
@@ -67,7 +74,8 @@ exports.V1 = internals.V1 = function () {
                     token.authorized = true;
                     token.verifier = '123';
 
-                    reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier);
+                    var extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
+                    reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
                 }
             }
         },
@@ -77,6 +85,10 @@ exports.V1 = internals.V1 = function () {
             config: {
                 bind: this,
                 handler: function (request, reply) {
+
+                    if (fail.token) {
+                        return reply(Boom.badRequest());
+                    }
 
                     var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     var token = this.tokens[header.oauth_token];
@@ -210,6 +222,10 @@ exports.override = function (uri, payload) {
         var callback = arguments.length === 3 ? arguments[2] : arguments[1];
 
         if (dest.indexOf(uri) === 0) {
+            if (payload instanceof Error) {
+                return Hoek.nextTick(callback)(null, { statusCode: 400 }, JSON.stringify({ message: payload.message }));
+            }
+
             return Hoek.nextTick(callback)(null, { statusCode: 200 }, JSON.stringify(payload));
         }
 

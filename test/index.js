@@ -73,7 +73,7 @@ describe('Bell', function () {
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                    expect(res.result.status).to.equal('authenticated');
+                                    expect(res.result.provider).to.equal('custom');
                                     mock.stop(done);
                                 });
                             });
@@ -134,7 +134,7 @@ describe('Bell', function () {
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                    expect(res.result.status).to.equal('authenticated');
+                                    expect(res.result.provider).to.equal('custom');
                                     mock.stop(done);
                                 });
                             });
