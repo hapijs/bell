@@ -10,7 +10,9 @@
     "authentication",
     "oauth",
     "openid",
-    "plugin"
+    "plugin",
+    "twitter",
+    "facebook"
   ],
   "engines": {
     "node": ">=0.10.22"
@@ -18,6 +20,8 @@
   "dependencies": {
     "hoek": "2.x.x",
     "boom": "2.x.x",
+    "cryptiles": "2.x.x",
+    "nipple": "2.x.x",
     "oauth": "0.9.x"
   },
   "peerDependencies": {
