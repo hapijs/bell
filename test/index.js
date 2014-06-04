@@ -2,7 +2,9 @@
 
 var Lab = require('lab');
 var Hapi = require('hapi');
+var Hoek = require('hoek');
 var Bell = require('../');
+var Providers = require('../lib/providers');
 var Mock = require('./mock');
 
 
@@ -134,6 +136,159 @@ describe('Bell', function () {
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                     expect(res.result.status).to.equal('authenticated');
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it('overrides cookie name', function (done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: provider,
+                    cookie: 'ring'
+                });
+
+                server.route({
+                    method: 'GET',
+                    path: '/',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/', function (res) {
+
+                    expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+
+                    server.inject(res.headers.location, function (res) {
+
+                        expect(res.headers['set-cookie'][0]).to.contain('ring=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+    });
+
+    it('overrides internal endpoint path', function (done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: provider,
+                    path: '/somewhere/else'
+                });
+
+                server.route({
+                    method: 'GET',
+                    path: '/',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/', function (res) {
+
+                    expect(res.headers.location).to.equal('http://localhost:80/somewhere/else?next=%2F');
+                    mock.stop(done);
+                });
+            });
+        });
+    });
+
+    it('authenticates with mock Twitter', function (done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                var orig = Providers.twitter;
+                Providers.twitter = Hoek.clone(orig);
+                Hoek.merge(Providers.twitter, provider);
+                delete Providers.twitter.profile;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'twitter'
+                });
+
+                server.route({
+                    method: 'GET',
+                    path: '/',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/', function (res) {
+
+                    expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+
+                    server.inject(res.headers.location, function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result.status).to.equal('authenticated');
+
+                                    Providers.twitter = orig;
                                     mock.stop(done);
                                 });
                             });
