@@ -4,6 +4,8 @@ var Querystring = require('querystring');
 var Hawk = require('hawk');
 var Lab = require('lab');
 var Hapi = require('hapi');
+var Hoek = require('hoek');
+var Nipple = require('nipple');
 
 
 // Declare internals
@@ -86,6 +88,11 @@ exports.V1 = internals.V1 = function () {
                         oauth_token: 'final',
                         oauth_token_secret: 'secret'
                     };
+
+                    if (header.oauth_consumer_key === 'twitter') {
+                        payload.user_id = '1234567890';
+                        payload.screen_name = 'Steve Stevens';
+                    }
 
                     reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
@@ -191,4 +198,27 @@ internals.V2.prototype.start = function (callback) {
 internals.V2.prototype.stop = function (callback) {
 
     this.server.stop(callback);
+};
+
+
+exports.override = function (uri, payload) {
+
+    internals.nippleGet = Nipple.get;
+    Nipple.get = function (dest) {
+
+        var options = arguments.length === 3 ? arguments[1] : {};
+        var callback = arguments.length === 3 ? arguments[2] : arguments[1];
+
+        if (dest.indexOf(uri) === 0) {
+            return Hoek.nextTick(callback)(null, { statusCode: 200 }, JSON.stringify(payload));
+        }
+
+        return internals.nippleGet.apply(null, arguments);
+    };
+};
+
+
+exports.clear = function (uri) {
+
+    Nipple.get = internals.nippleGet;
 };

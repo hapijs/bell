@@ -231,7 +231,7 @@ describe('Bell', function () {
         });
     });
 
-    it('authenticates with mock Twitter', function (done) {
+    it('authenticates with mock Twitter', { parallel: false }, function (done) {
 
         var mock = new Mock.V1();
         mock.start(function (provider) {
@@ -241,15 +241,18 @@ describe('Bell', function () {
 
                 expect(err).to.not.exist;
 
-                var orig = Providers.twitter;
-                Providers.twitter = Hoek.clone(orig);
+                var origProvider = Providers.twitter;
+                Providers.twitter = Hoek.clone(origProvider);
                 Hoek.merge(Providers.twitter, provider);
-                delete Providers.twitter.profile;
+
+                Mock.override('https://api.twitter.com/1.1/users/show.json', {
+                    property: 'something'
+                });
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
                     isSecure: false,
-                    clientId: 'test',
+                    clientId: 'twitter',
                     clientSecret: 'secret',
                     provider: 'twitter'
                 });
@@ -286,9 +289,22 @@ describe('Bell', function () {
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                    expect(res.result.status).to.equal('authenticated');
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'twitter',
+                                        status: 'authenticated',
+                                        token: 'final',
+                                        secret: 'secret',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'Steve Stevens',
+                                            raw: {
+                                                property: 'something'
+                                            }
+                                        }
+                                    });
 
-                                    Providers.twitter = orig;
+                                    Providers.twitter = origProvider;
+                                    Mock.clear();
                                     mock.stop(done);
                                 });
                             });

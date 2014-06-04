@@ -26,8 +26,7 @@
     "hoek": "2.x.x",
     "boom": "2.x.x",
     "cryptiles": "2.x.x",
-    "nipple": "2.x.x",
-    "oauth": "0.9.x"
+    "nipple": "2.x.x"
   },
   "peerDependencies": {
     "hapi": ">=2.x.x"
