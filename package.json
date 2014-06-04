@@ -9,10 +9,15 @@
     "login",
     "authentication",
     "oauth",
-    "openid",
     "plugin",
     "twitter",
-    "facebook"
+    "facebook",
+    "google",
+    "yahoo",
+    "live",
+    "windows",
+    "microsoft",
+    "github"
   ],
   "engines": {
     "node": ">=0.10.22"
@@ -29,6 +34,7 @@
   },
   "devDependencies": {
     "hapi": "6.x.x",
+    "hawk": "2.x.x",
     "lab": "3.x.x"
   },
   "scripts": {
