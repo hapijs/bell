@@ -42,7 +42,7 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/door', function (res) {
+                server.inject('/bell/twitter', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -65,7 +65,7 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/door?next=http', function (res) {
+                server.inject('/bell/twitter?next=http', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -88,7 +88,7 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/door?oauth_token=123', function (res) {
+                server.inject('/bell/twitter?oauth_token=123', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -111,7 +111,7 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/door?oauth_token=123&oauth_verifier=123', function (res) {
+                server.inject('/bell/twitter?oauth_token=123&oauth_verifier=123', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -137,7 +137,7 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/door?next=%2F', function (res) {
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
 
                         expect(res.statusCode).to.equal(500);
                         mock.stop(done);
@@ -164,7 +164,7 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/door?next=%2F', function (res) {
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, function (res) {
@@ -199,12 +199,12 @@ describe('Bell', function () {
                         providerParams: { special: true }
                     });
 
-                    server.inject('http://localhost:80/bell/door?next=%2F', function (res) {
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
 
                         expect(res.headers.location).to.equal(mock.uri + '/auth?special=true&oauth_token=1');
                         mock.server.inject(res.headers.location, function (res) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123&extra=true');
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/custom?oauth_token=1&oauth_verifier=123&extra=true');
                             mock.stop(done);
                         });
                     });
@@ -249,7 +249,7 @@ describe('Bell', function () {
 
                     server.inject('/', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                        expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?next=%2F');
 
                         server.inject(res.headers.location, function (res) {
 
@@ -258,7 +258,7 @@ describe('Bell', function () {
 
                             mock.server.inject(res.headers.location, function (res) {
 
-                                expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123');
+                                expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?oauth_token=1&oauth_verifier=123');
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -293,14 +293,14 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/door?next=%2F', function (res) {
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
                         mock.server.inject(res.headers.location, function (res) {
 
-                            server.inject({ url: 'http://localhost:80/bell/door?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: 'http://localhost:80/bell/custom?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
                                 mock.stop(done);

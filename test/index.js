@@ -55,7 +55,7 @@ describe('Bell', function () {
 
                 server.inject('/', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
 
                     server.inject(res.headers.location, function (res) {
 
@@ -64,7 +64,7 @@ describe('Bell', function () {
 
                         mock.server.inject(res.headers.location, function (res) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123');
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/custom?oauth_token=1&oauth_verifier=123');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -116,16 +116,16 @@ describe('Bell', function () {
 
                 server.inject('/', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
 
                     server.inject(res.headers.location, function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fdoor&state=');
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
 
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/door?code=1&state=');
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/custom?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -178,7 +178,7 @@ describe('Bell', function () {
 
                 server.inject('/', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
 
                     server.inject(res.headers.location, function (res) {
 

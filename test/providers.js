@@ -24,9 +24,626 @@ var it = Lab.test;
 
 describe('Bell', function () {
 
+    describe('#facebook', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.facebook);
+                    Hoek.merge(Providers.facebook, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        first_name: 'steve',
+                        last_name: 'smith',
+                        email: 'steve@example.com'
+                    };
+
+                    Mock.override('https://graph.facebook.com/me', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'facebook',
+                        clientSecret: 'secret',
+                        provider: 'facebook'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'facebook',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            email: 'steve@example.com',
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.facebook = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('#github', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.github);
+                    Hoek.merge(Providers.github, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        login: 'steve',
+                        name: 'steve',
+                        email: 'steve@example.com'
+                    };
+
+                    Mock.override('https://api.github.com/user', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'github',
+                        clientSecret: 'secret',
+                        provider: 'github'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/github?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=github&response_type=code&scope=user%3Aemail&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fgithub&state=');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/github?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'github',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            email: 'steve@example.com',
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.github = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('#google', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.google);
+                    Hoek.merge(Providers.google, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        given_name: 'steve',
+                        family_name: 'smith',
+                        email: 'steve@example.com'
+                    };
+
+                    Mock.override('https://www.googleapis.com/oauth2/v1/userinfo', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'google',
+                        clientSecret: 'secret',
+                        provider: 'google'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/google?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=google&response_type=code&scope=openid%20email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fgoogle&state=');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/google?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'google',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            email: 'steve@example.com',
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.google = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('#live', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.live);
+                    Hoek.merge(Providers.live, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        first_name: 'steve',
+                        last_name: 'smith',
+                        emails: {
+                            preferred: 'steve@example.com',
+                            account: 'steve@example.net'
+                        }
+                    };
+
+                    Mock.override('https://apis.live.net/v5.0/me', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'live',
+                        clientSecret: 'secret',
+                        provider: 'live'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/live?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/live?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'live',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            email: 'steve@example.com',
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.live = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock (no preferred email)', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.live);
+                    Hoek.merge(Providers.live, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        first_name: 'steve',
+                        last_name: 'smith',
+                        emails: {
+                            account: 'steve@example.net'
+                        }
+                    };
+
+                    Mock.override('https://apis.live.net/v5.0/me', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'live',
+                        clientSecret: 'secret',
+                        provider: 'live'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/live?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/live?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'live',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            email: 'steve@example.net',
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.live = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock (no emails)', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.live);
+                    Hoek.merge(Providers.live, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        first_name: 'steve',
+                        last_name: 'smith'
+                    };
+
+                    Mock.override('https://apis.live.net/v5.0/me', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'live',
+                        clientSecret: 'secret',
+                        provider: 'live'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/live?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/live?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'live',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.live = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock (empty email)', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.live);
+                    Hoek.merge(Providers.live, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        username: 'steve',
+                        name: 'steve',
+                        first_name: 'steve',
+                        last_name: 'smith',
+                        emails: {}
+                    };
+
+                    Mock.override('https://apis.live.net/v5.0/me', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'live',
+                        clientSecret: 'secret',
+                        provider: 'live'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/live?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('http://localhost:80/bell/live?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'live',
+                                        token: '456',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'steve',
+                                            displayName: 'steve',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.live = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
     describe('#twitter', function () {
 
-        it('authenticates with mock Twitter', { parallel: false }, function (done) {
+        it('authenticates with mock', { parallel: false }, function (done) {
 
             var mock = new Mock.V1();
             mock.start(function (provider) {
@@ -63,43 +680,38 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('/', function (res) {
+                    server.inject('http://localhost:80/bell/twitter?next=%2F', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (res) {
 
-                            var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                            expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?oauth_token=1&oauth_verifier=123');
 
-                            mock.server.inject(res.headers.location, function (res) {
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123');
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                                    expect(res.headers.location).to.equal('http://localhost:80/');
-
-                                    server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                        expect(res.result).to.deep.equal({
-                                            provider: 'twitter',
-                                            token: 'final',
-                                            secret: 'secret',
-                                            profile: {
-                                                id: '1234567890',
-                                                username: 'Steve Stevens',
-                                                raw: {
-                                                    property: 'something'
-                                                }
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'twitter',
+                                        token: 'final',
+                                        secret: 'secret',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'Steve Stevens',
+                                            raw: {
+                                                property: 'something'
                                             }
-                                        });
-
-                                        Providers.twitter = origProvider;
-                                        Mock.clear();
-                                        mock.stop(done);
+                                        }
                                     });
+
+                                    Providers.twitter = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
                                 });
                             });
                         });
@@ -108,7 +720,7 @@ describe('Bell', function () {
             });
         });
 
-        it('authenticates with mock Twitter (without extended profile)', { parallel: false }, function (done) {
+        it('authenticates with mock (without extended profile)', { parallel: false }, function (done) {
 
             var mock = new Mock.V1();
             mock.start(function (provider) {
@@ -142,39 +754,122 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('/', function (res) {
+                    server.inject('http://localhost:80/bell/twitter?next=%2F', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/door?next=%2F');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (res) {
 
-                            var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                            expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?oauth_token=1&oauth_verifier=123');
 
-                            mock.server.inject(res.headers.location, function (res) {
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                expect(res.headers.location).to.equal('http://localhost:80/bell/door?oauth_token=1&oauth_verifier=123');
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
 
                                 server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                                    expect(res.headers.location).to.equal('http://localhost:80/');
-
-                                    server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                        expect(res.result).to.deep.equal({
-                                            provider: 'twitter',
-                                            token: 'final',
-                                            secret: 'secret',
-                                            profile: {
-                                                id: '1234567890',
-                                                username: 'Steve Stevens'
-                                            }
-                                        });
-
-                                        Providers.twitter = origProvider;
-                                        mock.stop(done);
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'twitter',
+                                        token: 'final',
+                                        secret: 'secret',
+                                        profile: {
+                                            id: '1234567890',
+                                            username: 'Steve Stevens'
+                                        }
                                     });
+
+                                    Providers.twitter = origProvider;
+                                    mock.stop(done);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('#yahoo', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var origProvider = Hoek.clone(Providers.yahoo);
+                    Hoek.merge(Providers.yahoo, provider);
+
+                    var profile = {
+                        profile: {
+                            guid: '1234567890',
+                            givenName: 'steve',
+                            familyName: 'smith'
+                        }
+                    };
+
+                    Mock.override('https://social.yahooapis.com/v1/user/', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'yahoo',
+                        clientSecret: 'secret',
+                        provider: 'yahoo'
+                    });
+
+                    server.route({
+                        method: 'GET',
+                        path: '/',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('http://localhost:80/bell/yahoo?next=%2F', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.equal('http://localhost:80/bell/yahoo?oauth_token=1&oauth_verifier=123');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                                expect(res.headers.location).to.equal('http://localhost:80/');
+
+                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                    expect(res.result).to.deep.equal({
+                                        provider: 'yahoo',
+                                        token: 'final',
+                                        secret: 'secret',
+                                        profile: {
+                                            id: '1234567890',
+                                            displayName: 'steve smith',
+                                            name: {
+                                                first: 'steve',
+                                                last: 'smith'
+                                            },
+                                            raw: profile
+                                        }
+                                    });
+
+                                    Providers.yahoo = origProvider;
+                                    Mock.clear();
+                                    mock.stop(done);
                                 });
                             });
                         });
