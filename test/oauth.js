@@ -311,4 +311,109 @@ describe('Bell', function () {
             });
         });
     });
+
+    describe('#v2', function () {
+
+        it('errors on missing next hop', function (done) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'github'
+                });
+
+                server.inject('/bell/github', function (res) {
+
+                    expect(res.statusCode).to.equal(500);
+                    done();
+                });
+            });
+        });
+
+        it('errors on absolute next hop', function (done) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'github'
+                });
+
+                server.inject('/bell/github?next=http', function (res) {
+
+                    expect(res.statusCode).to.equal(500);
+                    done();
+                });
+            });
+        });
+
+        it('authenticates an endpoint with provider parameters', function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true }
+                    });
+
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
+        it('authenticates an endpoint with custom scope', function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        scope: ['a']
+                    });
+
+                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&scope=a&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+    });
 });
