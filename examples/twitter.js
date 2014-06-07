@@ -1,14 +1,11 @@
 // Load modules
 
 var Hapi = require('hapi');
-var Hoek = require('hoek');
 var Bell = require('../');
 
 
-var server = new Hapi.Server(8000, { location: 'http://localhost:8000' });      // Change localhost to your domain
+var server = new Hapi.Server(8000);
 server.pack.register(Bell, function (err) {
-
-    Hoek.assert(!err);
 
     server.auth.strategy('twitter', 'bell', {
         provider: 'twitter',
@@ -25,13 +22,14 @@ server.pack.register(Bell, function (err) {
             auth: 'twitter',
             handler: function (request, reply) {
 
-                reply(request.auth.credentials);
+                delete request.auth.credentials.profile.raw;
+                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
             }
         }
     });
+
     server.start(function (err) {
 
-        Hoek.assert(!err);
         console.log('Server started at:', server.info.uri);
     });
 });
