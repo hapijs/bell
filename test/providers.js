@@ -81,6 +81,7 @@ describe('Bell', function () {
                                     provider: 'facebook',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -161,6 +162,7 @@ describe('Bell', function () {
                                     provider: 'github',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -238,6 +240,7 @@ describe('Bell', function () {
                                     provider: 'google',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -322,6 +325,7 @@ describe('Bell', function () {
                                     provider: 'live',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -402,6 +406,7 @@ describe('Bell', function () {
                                     provider: 'live',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -479,6 +484,7 @@ describe('Bell', function () {
                                     provider: 'live',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -557,6 +563,7 @@ describe('Bell', function () {
                                     provider: 'live',
                                     token: '456',
                                     refreshToken: undefined,
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'steve',
@@ -631,6 +638,7 @@ describe('Bell', function () {
                                     provider: 'twitter',
                                     token: 'final',
                                     secret: 'secret',
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'Steve Stevens',
@@ -696,6 +704,7 @@ describe('Bell', function () {
                                     provider: 'twitter',
                                     token: 'final',
                                     secret: 'secret',
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         username: 'Steve Stevens'
@@ -768,6 +777,7 @@ describe('Bell', function () {
                                     provider: 'yahoo',
                                     token: 'final',
                                     secret: 'secret',
+                                    query: {},
                                     profile: {
                                         id: '1234567890',
                                         displayName: 'steve smith',

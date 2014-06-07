@@ -53,7 +53,7 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login', function (res) {
+                server.inject('/login?next=%2Fhome', function (res) {
 
                     var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
@@ -65,6 +65,7 @@ describe('Bell', function () {
                         server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                             expect(res.result.provider).to.equal('custom');
+                            expect(res.result.query.next).to.equal('/home');
                             mock.stop(done);
                         });
                     });
