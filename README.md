@@ -48,9 +48,10 @@ server.pack.register(require('bell'), function (err) {
             auth: 'twitter',
             handler: function (request, reply) {
 
-                // Perform any account lookup or registration,
-                // setup local session, and redirect to the application.
-                // The third-party credentials are stored in request.auth.credentials
+                // Perform any account lookup or registration, setup local session,
+                // and redirect to the application. The third-party credentials are
+                // stored in request.auth.credentials. Any query parameters from
+                // the initial request are passed back via request.auth.credentials.query.
                 return reply.redirect('/home');
             }
         }
