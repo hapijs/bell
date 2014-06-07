@@ -28,52 +28,6 @@ describe('Bell', function () {
 
     describe('#v1', function () {
 
-        it('errors on missing next hop', function (done) {
-
-            var server = new Hapi.Server('localhost');
-            server.pack.register(Bell, function (err) {
-
-                expect(err).to.not.exist;
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'password',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'twitter'
-                });
-
-                server.inject('/bell/twitter', function (res) {
-
-                    expect(res.statusCode).to.equal(500);
-                    done();
-                });
-            });
-        });
-
-        it('errors on absolute next hop', function (done) {
-
-            var server = new Hapi.Server('localhost');
-            server.pack.register(Bell, function (err) {
-
-                expect(err).to.not.exist;
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'password',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'twitter'
-                });
-
-                server.inject('/bell/twitter?next=http', function (res) {
-
-                    expect(res.statusCode).to.equal(500);
-                    done();
-                });
-            });
-        });
-
         it('errors on missing oauth_verifier', function (done) {
 
             var server = new Hapi.Server('localhost');
@@ -89,7 +43,19 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/twitter?oauth_token=123', function (res) {
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?oauth_token=123', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -112,7 +78,19 @@ describe('Bell', function () {
                     provider: 'twitter'
                 });
 
-                server.inject('/bell/twitter?oauth_token=123&oauth_verifier=123', function (res) {
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?oauth_token=123&oauth_verifier=123', function (res) {
 
                     expect(res.statusCode).to.equal(500);
                     done();
@@ -138,7 +116,19 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
 
                         expect(res.statusCode).to.equal(500);
                         mock.stop(done);
@@ -165,7 +155,19 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, function (res) {
@@ -200,12 +202,24 @@ describe('Bell', function () {
                         providerParams: { special: true }
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
 
                         expect(res.headers.location).to.equal(mock.uri + '/auth?special=true&oauth_token=1');
                         mock.server.inject(res.headers.location, function (res) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/bell/custom?oauth_token=1&oauth_verifier=123&extra=true');
+                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
                             mock.stop(done);
                         });
                     });
@@ -237,8 +251,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -248,27 +262,22 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('/', function (res) {
+                    server.inject('/login', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?next=%2F');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (res) {
 
-                            var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                            expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            mock.server.inject(res.headers.location, function (res) {
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                                expect(res.headers.location).to.equal('http://localhost:80/bell/twitter?oauth_token=1&oauth_verifier=123');
+                                expect(res.statusCode).to.equal(500);
 
-                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                    expect(res.statusCode).to.equal(500);
-
-                                    Providers.twitter = origProvider;
-                                    Mock.clear();
-                                    mock.stop(done);
-                                });
+                                Providers.twitter = origProvider;
+                                Mock.clear();
+                                mock.stop(done);
                             });
                         });
                     });
@@ -294,14 +303,26 @@ describe('Bell', function () {
                         provider: provider
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
                         mock.server.inject(res.headers.location, function (res) {
 
-                            server.inject({ url: 'http://localhost:80/bell/custom?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
                                 mock.stop(done);
@@ -314,52 +335,6 @@ describe('Bell', function () {
     });
 
     describe('#v2', function () {
-
-        it('errors on missing next hop', function (done) {
-
-            var server = new Hapi.Server('localhost');
-            server.pack.register(Bell, function (err) {
-
-                expect(err).to.not.exist;
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'password',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'github'
-                });
-
-                server.inject('/bell/github', function (res) {
-
-                    expect(res.statusCode).to.equal(500);
-                    done();
-                });
-            });
-        });
-
-        it('errors on absolute next hop', function (done) {
-
-            var server = new Hapi.Server('localhost');
-            server.pack.register(Bell, function (err) {
-
-                expect(err).to.not.exist;
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'password',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'github'
-                });
-
-                server.inject('/bell/github?next=http', function (res) {
-
-                    expect(res.statusCode).to.equal(500);
-                    done();
-                });
-            });
-        });
 
         it('authenticates an endpoint with provider parameters', function (done) {
 
@@ -380,9 +355,21 @@ describe('Bell', function () {
                         providerParams: { special: true }
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
 
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
                         mock.stop(done);
                     });
                 });
@@ -408,9 +395,21 @@ describe('Bell', function () {
                         scope: ['a']
                     });
 
-                    server.inject('http://localhost:80/bell/custom?next=%2F', function (res) {
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
 
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&scope=a&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        expect(res.headers.location).to.contain('scope=a');
                         mock.stop(done);
                     });
                 });
@@ -439,8 +438,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -450,24 +449,19 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('/', function (res) {
+                    server.inject('/login', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                        server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (res) {
 
-                            var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                            expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            mock.server.inject(res.headers.location, function (res) {
+                            server.inject(res.headers.location, function (res) {
 
-                                expect(res.headers.location).to.contain('http://localhost:80/bell/custom?code=1&state=');
-
-                                server.inject(res.headers.location, function (res) {
-
-                                    expect(res.statusCode).to.equal(500);
-                                    mock.stop(done);
-                                });
+                                expect(res.statusCode).to.equal(500);
+                                mock.stop(done);
                             });
                         });
                     });
@@ -494,8 +488,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -505,24 +499,19 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('/', function (res) {
+                    server.inject('/login', function (res) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                        server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (res) {
 
-                            var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                            expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            mock.server.inject(res.headers.location, function (res) {
+                            server.inject({ url: res.headers.location + 'xx', headers: { cookie: cookie } }, function (res) {
 
-                                expect(res.headers.location).to.contain('http://localhost:80/bell/custom?code=1&state=');
-
-                                server.inject({ url: res.headers.location + 'xx', headers: { cookie: cookie } }, function (res) {
-
-                                    expect(res.statusCode).to.equal(500);
-                                    mock.stop(done);
-                                });
+                                expect(res.statusCode).to.equal(500);
+                                mock.stop(done);
                             });
                         });
                     });
@@ -554,8 +543,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -565,14 +554,10 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
-
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -611,8 +596,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -622,14 +607,11 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -668,8 +650,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -679,14 +661,11 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -725,8 +704,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -736,14 +715,11 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -782,8 +758,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -793,14 +769,11 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
@@ -839,8 +812,8 @@ describe('Bell', function () {
                     });
 
                     server.route({
-                        method: 'GET',
-                        path: '/',
+                        method: '*',
+                        path: '/login',
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
@@ -850,14 +823,11 @@ describe('Bell', function () {
                         }
                     });
 
-                    server.inject('http://localhost:80/bell/facebook?next=%2F', function (res) {
+                    server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=facebook&response_type=code&scope=email&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Ffacebook&state=');
 
                         mock.server.inject(res.headers.location, function (res) {
-
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/facebook?code=1&state=');
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 

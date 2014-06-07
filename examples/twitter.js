@@ -16,13 +16,12 @@ server.pack.register(Bell, function (err) {
     });
 
     server.route({
-        method: 'GET',
-        path: '/',
+        method: '*',
+        path: '/bell/door',
         config: {
             auth: 'twitter',
             handler: function (request, reply) {
 
-                delete request.auth.credentials.profile.raw;
                 reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
             }
         }

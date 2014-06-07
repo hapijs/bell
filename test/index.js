@@ -42,8 +42,8 @@ describe('Bell', function () {
                 });
 
                 server.route({
-                    method: 'GET',
-                    path: '/',
+                    method: '*',
+                    path: '/login',
                     config: {
                         auth: 'custom',
                         handler: function (request, reply) {
@@ -53,30 +53,19 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/', function (res) {
+                server.inject('/login', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
+                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                    server.inject(res.headers.location, function (res) {
+                    mock.server.inject(res.headers.location, function (res) {
 
-                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+                        expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/bell/custom?oauth_token=1&oauth_verifier=123');
-
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                                expect(res.headers.location).to.equal('http://localhost:80/');
-
-                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                    expect(res.result.provider).to.equal('custom');
-                                    mock.stop(done);
-                                });
-                            });
+                            expect(res.result.provider).to.equal('custom');
+                            mock.stop(done);
                         });
                     });
                 });
@@ -103,8 +92,8 @@ describe('Bell', function () {
                 });
 
                 server.route({
-                    method: 'GET',
-                    path: '/',
+                    method: '*',
+                    path: '/login',
                     config: {
                         auth: 'custom',
                         handler: function (request, reply) {
@@ -114,30 +103,19 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/', function (res) {
+                server.inject('/login', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
+                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                    server.inject(res.headers.location, function (res) {
+                    mock.server.inject(res.headers.location, function (res) {
 
-                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fbell%2Fcustom&state=');
+                        expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
-                            expect(res.headers.location).to.contain('http://localhost:80/bell/custom?code=1&state=');
-
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                                expect(res.headers.location).to.equal('http://localhost:80/');
-
-                                server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                    expect(res.result.provider).to.equal('custom');
-                                    mock.stop(done);
-                                });
-                            });
+                            expect(res.result.provider).to.equal('custom');
+                            mock.stop(done);
                         });
                     });
                 });
@@ -165,8 +143,8 @@ describe('Bell', function () {
                 });
 
                 server.route({
-                    method: 'GET',
-                    path: '/',
+                    method: '*',
+                    path: '/login',
                     config: {
                         auth: 'custom',
                         handler: function (request, reply) {
@@ -176,54 +154,9 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/', function (res) {
+                server.inject('/login', function (res) {
 
-                    expect(res.headers.location).to.equal('http://localhost:80/bell/custom?next=%2F');
-
-                    server.inject(res.headers.location, function (res) {
-
-                        expect(res.headers['set-cookie'][0]).to.contain('ring=');
-                        mock.stop(done);
-                    });
-                });
-            });
-        });
-    });
-
-    it('overrides internal endpoint path', function (done) {
-
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
-
-            var server = new Hapi.Server('localhost');
-            server.pack.register(Bell, function (err) {
-
-                expect(err).to.not.exist;
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'password',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: provider,
-                    path: '/somewhere/else'
-                });
-
-                server.route({
-                    method: 'GET',
-                    path: '/',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/', function (res) {
-
-                    expect(res.headers.location).to.equal('http://localhost:80/somewhere/else?next=%2F');
+                    expect(res.headers['set-cookie'][0]).to.contain('ring=');
                     mock.stop(done);
                 });
             });
