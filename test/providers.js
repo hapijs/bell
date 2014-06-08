@@ -35,8 +35,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.facebook);
-                    Hoek.merge(Bell.providers.facebook, provider);
+                    var custom = Bell.providers.facebook();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -54,7 +54,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
-                        provider: 'facebook'
+                        provider: custom
                     });
 
                     server.route({
@@ -77,7 +77,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'facebook',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -95,7 +95,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -118,8 +117,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.github);
-                    Hoek.merge(Bell.providers.github, provider);
+                    var custom = Bell.providers.github({});
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -135,7 +134,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'github',
                         clientSecret: 'secret',
-                        provider: 'github'
+                        provider: custom
                     });
 
                     server.route({
@@ -158,7 +157,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'github',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -171,7 +170,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.github = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -194,8 +192,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.google);
-                    Hoek.merge(Bell.providers.google, provider);
+                    var custom = Bell.providers.google();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -213,7 +211,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'google',
                         clientSecret: 'secret',
-                        provider: 'google'
+                        provider: custom
                     });
 
                     server.route({
@@ -236,7 +234,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'google',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -253,7 +251,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.google = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -276,8 +273,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.live);
-                    Hoek.merge(Bell.providers.live, provider);
+                    var custom = Bell.providers.live();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -298,7 +295,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'live',
                         clientSecret: 'secret',
-                        provider: 'live'
+                        provider: custom
                     });
 
                     server.route({
@@ -321,7 +318,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'live',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -338,7 +335,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -358,8 +354,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.live);
-                    Hoek.merge(Bell.providers.live, provider);
+                    var custom = Bell.providers.live();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -379,7 +375,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'live',
                         clientSecret: 'secret',
-                        provider: 'live'
+                        provider: custom
                     });
 
                     server.route({
@@ -402,7 +398,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'live',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -419,7 +415,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -439,8 +434,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.live);
-                    Hoek.merge(Bell.providers.live, provider);
+                    var custom = Bell.providers.live();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -457,7 +452,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'live',
                         clientSecret: 'secret',
-                        provider: 'live'
+                        provider: custom
                     });
 
                     server.route({
@@ -480,7 +475,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'live',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -497,7 +492,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -517,8 +511,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.live);
-                    Hoek.merge(Bell.providers.live, provider);
+                    var custom = Bell.providers.live();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -536,7 +530,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'live',
                         clientSecret: 'secret',
-                        provider: 'live'
+                        provider: custom
                     });
 
                     server.route({
@@ -559,7 +553,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'live',
+                                    provider: 'custom',
                                     token: '456',
                                     refreshToken: undefined,
                                     query: {},
@@ -576,7 +570,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -599,8 +592,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.twitter);
-                    Hoek.merge(Bell.providers.twitter, provider);
+                    var custom = Bell.providers.twitter({});
+                    Hoek.merge(custom, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', {
                         property: 'something'
@@ -611,7 +604,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'twitter',
                         clientSecret: 'secret',
-                        provider: 'twitter'
+                        provider: custom
                     });
 
                     server.route({
@@ -634,7 +627,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'twitter',
+                                    provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
                                     query: {},
@@ -648,7 +641,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.twitter = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -668,16 +660,15 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.twitter);
-                    Hoek.merge(Bell.providers.twitter, provider);
+                    var custom = Bell.providers.twitter({ extendedProfile: false });
+                    Hoek.merge(custom, provider);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
                         isSecure: false,
                         clientId: 'twitter',
                         clientSecret: 'secret',
-                        provider: 'twitter',
-                        extendedProfile: false
+                        provider: custom
                     });
 
                     server.route({
@@ -700,7 +691,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'twitter',
+                                    provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
                                     query: {},
@@ -710,7 +701,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.twitter = origProvider;
                                 mock.stop(done);
                             });
                         });
@@ -732,8 +722,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Bell.providers.yahoo);
-                    Hoek.merge(Bell.providers.yahoo, provider);
+                    var custom = Bell.providers.yahoo();
+                    Hoek.merge(custom, provider);
 
                     var profile = {
                         profile: {
@@ -750,7 +740,7 @@ describe('Bell', function () {
                         isSecure: false,
                         clientId: 'yahoo',
                         clientSecret: 'secret',
-                        provider: 'yahoo'
+                        provider: custom
                     });
 
                     server.route({
@@ -773,7 +763,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
-                                    provider: 'yahoo',
+                                    provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
                                     query: {},
@@ -788,7 +778,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Bell.providers.yahoo = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
