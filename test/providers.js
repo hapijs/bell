@@ -5,7 +5,6 @@ var Hapi = require('hapi');
 var Hoek = require('hoek');
 var Bell = require('../');
 var Mock = require('./mock');
-var Providers = require('../lib/providers');
 
 
 // Declare internals
@@ -36,8 +35,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -96,7 +95,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -119,8 +118,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.github);
-                    Hoek.merge(Providers.github, provider);
+                    var origProvider = Hoek.clone(Bell.providers.github);
+                    Hoek.merge(Bell.providers.github, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -172,7 +171,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.github = origProvider;
+                                Bell.providers.github = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -195,8 +194,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.google);
-                    Hoek.merge(Providers.google, provider);
+                    var origProvider = Hoek.clone(Bell.providers.google);
+                    Hoek.merge(Bell.providers.google, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -254,7 +253,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.google = origProvider;
+                                Bell.providers.google = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -277,8 +276,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.live);
-                    Hoek.merge(Providers.live, provider);
+                    var origProvider = Hoek.clone(Bell.providers.live);
+                    Hoek.merge(Bell.providers.live, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -339,7 +338,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.live = origProvider;
+                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -359,8 +358,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.live);
-                    Hoek.merge(Providers.live, provider);
+                    var origProvider = Hoek.clone(Bell.providers.live);
+                    Hoek.merge(Bell.providers.live, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -420,7 +419,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.live = origProvider;
+                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -440,8 +439,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.live);
-                    Hoek.merge(Providers.live, provider);
+                    var origProvider = Hoek.clone(Bell.providers.live);
+                    Hoek.merge(Bell.providers.live, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -498,7 +497,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.live = origProvider;
+                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -518,8 +517,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.live);
-                    Hoek.merge(Providers.live, provider);
+                    var origProvider = Hoek.clone(Bell.providers.live);
+                    Hoek.merge(Bell.providers.live, provider);
 
                     var profile = {
                         id: '1234567890',
@@ -577,7 +576,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.live = origProvider;
+                                Bell.providers.live = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -600,8 +599,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.twitter);
-                    Hoek.merge(Providers.twitter, provider);
+                    var origProvider = Hoek.clone(Bell.providers.twitter);
+                    Hoek.merge(Bell.providers.twitter, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', {
                         property: 'something'
@@ -649,7 +648,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.twitter = origProvider;
+                                Bell.providers.twitter = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -669,8 +668,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.twitter);
-                    Hoek.merge(Providers.twitter, provider);
+                    var origProvider = Hoek.clone(Bell.providers.twitter);
+                    Hoek.merge(Bell.providers.twitter, provider);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
@@ -711,7 +710,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.twitter = origProvider;
+                                Bell.providers.twitter = origProvider;
                                 mock.stop(done);
                             });
                         });
@@ -733,8 +732,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.yahoo);
-                    Hoek.merge(Providers.yahoo, provider);
+                    var origProvider = Hoek.clone(Bell.providers.yahoo);
+                    Hoek.merge(Bell.providers.yahoo, provider);
 
                     var profile = {
                         profile: {
@@ -789,7 +788,7 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Providers.yahoo = origProvider;
+                                Bell.providers.yahoo = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });

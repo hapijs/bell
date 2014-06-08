@@ -6,7 +6,6 @@ var Hoek = require('hoek');
 var Boom = require('boom');
 var Bell = require('../');
 var Mock = require('./mock');
-var Providers = require('../lib/providers');
 var OAuth = require('../lib/oauth');
 
 
@@ -237,8 +236,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.twitter);
-                    Hoek.merge(Providers.twitter, provider);
+                    var origProvider = Hoek.clone(Bell.providers.twitter);
+                    Hoek.merge(Bell.providers.twitter, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', Boom.badRequest());
 
@@ -275,7 +274,7 @@ describe('Bell', function () {
 
                                 expect(res.statusCode).to.equal(500);
 
-                                Providers.twitter = origProvider;
+                                Bell.providers.twitter = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -529,8 +528,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override(provider.token, null);
 
@@ -562,7 +561,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -582,8 +581,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override(provider.token, Boom.badRequest());
 
@@ -616,7 +615,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -636,8 +635,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override(provider.token, '{x');
 
@@ -670,7 +669,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -690,8 +689,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override('https://graph.facebook.com/me', null);
 
@@ -724,7 +723,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -744,8 +743,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override('https://graph.facebook.com/me', Boom.badRequest());
 
@@ -778,7 +777,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -798,8 +797,8 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var origProvider = Hoek.clone(Providers.facebook);
-                    Hoek.merge(Providers.facebook, provider);
+                    var origProvider = Hoek.clone(Bell.providers.facebook);
+                    Hoek.merge(Bell.providers.facebook, provider);
 
                     Mock.override('https://graph.facebook.com/me', '{c');
 
@@ -832,7 +831,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(500);
-                                Providers.facebook = origProvider;
+                                Bell.providers.facebook = origProvider;
                                 Mock.clear();
                                 mock.stop(done);
                             });
@@ -847,7 +846,7 @@ describe('Bell', function () {
 
         it('accepts empty client secret', { parallel: false }, function (done) {
 
-            var client = new OAuth.Client({ provider: Providers.twitter });
+            var client = new OAuth.Client({ provider: Bell.providers.twitter });
             expect(client.settings.clientSecret).to.equal('&');
             done();
         });
@@ -858,7 +857,7 @@ describe('Bell', function () {
 
                 Mock.override('http://example.com/', null);
 
-                var client = new OAuth.Client({ provider: Providers.twitter });
+                var client = new OAuth.Client({ provider: Bell.providers.twitter });
                 client.request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, 'secret', 'type', function (err, payload) {
 
                     expect(err.message).to.equal('unknown');
@@ -871,7 +870,7 @@ describe('Bell', function () {
 
                 Mock.override('http://example.com/', '{x');
 
-                var client = new OAuth.Client({ name: 'prov', provider: Providers.twitter });
+                var client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter });
                 client.request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, 'secret', 'type', function (err, payload) {
 
                     expect(err.message).to.equal('Received invalid payload from prov type endpoint: Unexpected token x');
@@ -902,7 +901,7 @@ describe('Bell', function () {
 
             it('generates RFC 5849 example', function (done) {
 
-                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Providers.twitter });
+                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter });
                 var tokenSecret = 'dh893hdasih9';
 
                 var params = {
@@ -928,7 +927,7 @@ describe('Bell', function () {
 
             it('handles array param with reveresed order', function (done) {
 
-                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Providers.twitter });
+                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter });
                 var tokenSecret = 'dh893hdasih9';
 
                 var params = {
@@ -954,7 +953,7 @@ describe('Bell', function () {
 
             it('handles array param with same value', function (done) {
 
-                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Providers.twitter });
+                var client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter });
                 var tokenSecret = 'dh893hdasih9';
 
                 var params = {
