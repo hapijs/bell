@@ -42,8 +42,8 @@ server.pack.register(require('bell'), function (err) {
     // the database and sets some application state (cookie) with
     // the local application account information.
     server.route({
-        method: '*',            // Must be '*' to handle both GET and POST
-        path: '/login',         // The callback endpoint registered with the provider
+        method: ['GET', 'POST'], // Must handle both GET and POST
+        path: '/login',          // The callback endpoint registered with the provider
         config: {
             auth: 'twitter',
             handler: function (request, reply) {
