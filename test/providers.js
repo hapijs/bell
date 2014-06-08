@@ -117,7 +117,7 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var custom = Bell.providers.github({});
+                    var custom = Bell.providers.github();
                     Hoek.merge(custom, provider);
 
                     var profile = {
@@ -128,6 +128,78 @@ describe('Bell', function () {
                     };
 
                     Mock.override('https://api.github.com/user', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'github',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        id: '1234567890',
+                                        username: 'steve',
+                                        displayName: 'steve',
+                                        email: 'steve@example.com',
+                                        raw: profile
+                                    }
+                                });
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock and custom uri', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.github({ uri: 'http://example.com' });
+                    Hoek.merge(custom, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        login: 'steve',
+                        name: 'steve',
+                        email: 'steve@example.com'
+                    };
+
+                    Mock.override('http://example.com/user', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
@@ -592,7 +664,7 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var custom = Bell.providers.twitter({});
+                    var custom = Bell.providers.twitter();
                     Hoek.merge(custom, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', {

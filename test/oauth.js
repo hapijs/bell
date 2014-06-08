@@ -236,7 +236,7 @@ describe('Bell', function () {
 
                     expect(err).to.not.exist;
 
-                    var custom = Bell.providers.twitter({});
+                    var custom = Bell.providers.twitter();
                     Hoek.merge(custom, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', Boom.badRequest());
