@@ -833,6 +833,59 @@ describe('Bell', function () {
                 });
             });
         });
+
+        it('passes profile get params', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.facebook();
+                    Hoek.merge(custom, provider);
+
+                    Mock.override('https://graph.facebook.com/me', function (uri) {
+
+                        expect(uri).to.equal('https://graph.facebook.com/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102');
+                        Mock.clear();
+                        mock.stop(done);
+                    });
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'facebook',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
+                        });
+                    });
+                });
+            });
+        });
     });
 
     describe('Client', function () {

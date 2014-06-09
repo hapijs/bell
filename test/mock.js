@@ -223,6 +223,10 @@ exports.override = function (uri, payload) {
             var callback = arguments.length === 3 ? arguments[2] : arguments[1];
 
             if (dest.indexOf(uri) === 0) {
+                if (typeof payload === 'function') {
+                    return payload(dest);
+                }
+
                 if (payload instanceof Error) {
                     return Hoek.nextTick(callback)(null, { statusCode: 400 }, JSON.stringify({ message: payload.message }));
                 }
