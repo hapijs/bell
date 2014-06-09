@@ -113,3 +113,57 @@ Each strategy accepts the following optional settings:
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
   The built-in `'github'` provider accepts the `uri` option which allows pointing to a private enterprise installation
   (e.g. `'https://vpn.example.com'`).
+
+### Advance Usage
+
+#### Handling Errors
+
+By default, **bell** will reply back with an internal error (500) on most authentication errors due to the nature of the OAuth protocol.
+There is little that can be done to recover from errors as almost all of them are caused by implementation or deployment issues.
+
+If you would like to display a useful error page instead of the default JSON response, use the **hapi**
+[`onPreResponse`](https://github.com/spumko/hapi/blob/master/docs/Reference.md#error-transformation) extension point to transform the
+error into a useful page or to redirect the user to another destination.
+
+Another way to handle authentication errors is within the route handler. By default, an authentication error will cause the handler to be
+skipped. However, if the authentication mode is set to `'try'` instead of `'required'`, the handler will still be called. In this case,
+the `request.auth.isAuthenticated` must be checked to test if authentication failed. In that case, `request.auth.error` will contain the error.
+
+```javascript
+var Hapi = require('hapi');
+var server = new Hapi.Server(8000);
+
+// Register bell with the server
+server.pack.register(require('bell'), function (err) {
+
+    server.auth.strategy('twitter', 'bell', {
+        provider: 'twitter',
+        password: 'cookie_encryption_password',
+        clientId: 'my_twitter_client_id',
+        clientSecret: 'my_twitter_client_secret'
+    });
+
+    server.route({
+        method: ['GET', 'POST'],
+        path: '/login',
+        config: {
+            auth: {
+                strategy: 'twitter',
+                mode: 'try'
+            },
+            handler: function (request, reply) {
+
+                if (!request.auth.isAuthenticated) {
+                    return reply('Authentication failed due to: ' + request.auth.error.message);
+                }
+
+                return reply.redirect('/home');
+            }
+        }
+    });
+
+    server.start();
+});
+```
+
+
