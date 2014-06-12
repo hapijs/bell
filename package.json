@@ -30,7 +30,7 @@
     "joi": "^4.6.x"
   },
   "peerDependencies": {
-    "hapi": ">=2.x.x"
+    "hapi": ">=6.x.x"
   },
   "devDependencies": {
     "hapi": "6.x.x",
