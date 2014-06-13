@@ -199,7 +199,7 @@ describe('Bell', function () {
                         email: 'steve@example.com'
                     };
 
-                    Mock.override('http://example.com/user', profile);
+                    Mock.override('http://example.com/api/v3/user', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
