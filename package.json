@@ -1,7 +1,7 @@
 {
   "name": "bell",
   "description": "Third-party login plugin for hapi",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "repository": "git://github.com/spumko/bell",
   "main": "index",
   "keywords": [
@@ -17,7 +17,8 @@
     "live",
     "windows",
     "microsoft",
-    "github"
+    "github",
+    "foursquare"
   ],
   "engines": {
     "node": ">=0.10.22"
