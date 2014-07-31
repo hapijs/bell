@@ -226,22 +226,20 @@ describe('Bell', function () {
             });
         });
 
-        it('passes additionalParams', { parallel: false }, function (done) {
+        it('passes profileParams', { parallel: false }, function (done) {
 
-            var mock = new Mock.V2();
+            var mock = new Mock.V1();
             mock.start(function (provider) {
 
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
-
                     expect(err).to.not.exist;
 
-                    var custom = Bell.providers.facebook();
+                    var custom = Bell.providers.twitter();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/me', function (uri) {
-
-                        expect(uri).to.equal('https://graph.facebook.com/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+                    Mock.override('https://api.twitter.com/1.1/users/show.json', function (uri) {
+                        expect(uri).to.equal('https://api.twitter.com/1.1/users/show.json?user_id=1234567890&fields=id%2Cemail');
                         Mock.clear();
                         mock.stop(done);
                     });
@@ -249,11 +247,11 @@ describe('Bell', function () {
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
                         isSecure: false,
-                        clientId: 'facebook',
+                        clientId: 'twitter',
                         clientSecret: 'secret',
                         provider: custom,
-                        additionalParams: {
-                            fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
+                        profileParams: {
+                            fields: 'id,email'
                         }
                     });
 
@@ -940,6 +938,60 @@ describe('Bell', function () {
                         });
                     });
                 });
+            });
+        });
+
+        it('passes profileParams', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.facebook();
+                    Hoek.merge(custom, provider);
+
+                    Mock.override('https://graph.facebook.com/me', function (uri) {
+                        expect(uri).to.equal('https://graph.facebook.com/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+                        Mock.clear();
+                        mock.stop(done);
+                    });
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'facebook',
+                        clientSecret: 'secret',
+                        provider: custom,
+                        profileParams: {
+                            fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
+                        }
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
+                        });
+                    });
+                });                                                                                                                                                                                                                          
             });
         });
     });
