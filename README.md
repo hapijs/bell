@@ -7,6 +7,8 @@ configuration object.
 
 [![Build Status](https://secure.travis-ci.org/spumko/bell.png)](http://travis-ci.org/spumko/bell)
 
+Lead Maintainer: [Eran Hammer](https://github.com/hueniverse)
+
 ### Usage
 
 **bell** works by adding a login endpoint and setting it to use a **bell**-based authentication strategy. **bell** will manage the third-party
