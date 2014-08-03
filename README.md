@@ -1,11 +1,10 @@
-<a href="https://github.com/spumko"><img src="https://raw.github.com/spumko/spumko/master/images/from.png" align="right" /></a>
 ### **bell**
 
-**bell** is a third-party login plugin for [hapi](https://github.com/spumko/hapi). **bell** ships with built-in support for Facebook, GitHub,
+**bell** is a third-party login plugin for [hapi](https://github.com/hapijs/hapi). **bell** ships with built-in support for Facebook, GitHub,
 Google, Twitter, Yahoo, Foursquare, and Windows Live. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple
 configuration object.
 
-[![Build Status](https://secure.travis-ci.org/spumko/bell.png)](http://travis-ci.org/spumko/bell)
+[![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 
 Lead Maintainer: [Eran Hammer](https://github.com/hueniverse)
 
@@ -19,7 +18,7 @@ application.
 **bell** does not maintain a session beyond a temporary state between the authorization flow. If a user authenticated once when accessing the
 endpoint, they will have to authenticate again. This means **bell** cannot be used alone as a login system except for single-page applications
 that require loading a single resource. Once the handler is called, the application must set its own session management. A common solution is to
-combine **bell** with the [**hapi-auth-cookie**](https://github.com/spumko/hapi-auth-cookie) authentication scheme plugin.
+combine **bell** with the [**hapi-auth-cookie**](https://github.com/hapijs/hapi-auth-cookie) authentication scheme plugin.
 
 ```javascript
 var Hapi = require('hapi');
@@ -124,7 +123,7 @@ By default, **bell** will reply back with an internal error (500) on most authen
 There is little that can be done to recover from errors as almost all of them are caused by implementation or deployment issues.
 
 If you would like to display a useful error page instead of the default JSON response, use the **hapi**
-[`onPreResponse`](https://github.com/spumko/hapi/blob/master/docs/Reference.md#error-transformation) extension point to transform the
+[`onPreResponse`](https://github.com/hapijs/hapi/blob/master/docs/Reference.md#error-transformation) extension point to transform the
 error into a useful page or to redirect the user to another destination.
 
 Another way to handle authentication errors is within the route handler. By default, an authentication error will cause the handler to be
