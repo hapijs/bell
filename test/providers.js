@@ -1039,4 +1039,143 @@ describe('Bell', function () {
             });
         });
     });
+
+    describe('#instagram', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.instagram();
+                    Hoek.merge(custom, provider);
+
+                    Mock.override('https://api.instagram.com/v1/users/self', {property: "something"});
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'instagram',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        id: '123456789',
+                                        username: 'stevegraham',
+                                        displayName: 'Steve Graham',
+                                        raw: {
+                                            id: '123456789',
+                                            username: 'stevegraham',
+                                            full_name: 'Steve Graham',
+                                            profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg',
+                                            property: 'something'
+                                        }
+                                    }
+                                });
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock (without extended profile)', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.instagram({ extendedProfile: false });
+                    Hoek.merge(custom, provider);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'instagram',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        id: '123456789',
+                                        username: 'stevegraham',
+                                        displayName: 'Steve Graham',
+                                        raw: {
+                                            id: '123456789',
+                                            username: 'stevegraham',
+                                            full_name: 'Steve Graham',
+                                            profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg'
+                                        }
+                                    }
+                                });
+
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
