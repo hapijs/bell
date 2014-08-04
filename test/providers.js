@@ -1055,7 +1055,12 @@ describe('Bell', function () {
                     var custom = Bell.providers.instagram();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://api.instagram.com/v1/users/self', {property: "something"});
+                    var profile = {
+                        meta: { code: 200 },
+                        data: { property: "something" }
+                    };
+
+                    Mock.override('https://api.instagram.com/v1/users/self', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
@@ -1094,10 +1099,6 @@ describe('Bell', function () {
                                         username: 'stevegraham',
                                         displayName: 'Steve Graham',
                                         raw: {
-                                            id: '123456789',
-                                            username: 'stevegraham',
-                                            full_name: 'Steve Graham',
-                                            profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg',
                                             property: 'something'
                                         }
                                     }
