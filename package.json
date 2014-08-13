@@ -2,7 +2,7 @@
   "name": "bell",
   "description": "Third-party login plugin for hapi",
   "version": "1.1.0",
-  "repository": "git://github.com/spumko/bell",
+  "repository": "git://github.com/hapijs/bell",
   "main": "index",
   "keywords": [
     "hapi",
@@ -44,7 +44,7 @@
   "licenses": [
     {
       "type": "BSD",
-      "url": "http://github.com/spumko/bell/raw/master/LICENSE"
+      "url": "http://github.com/hapijs/bell/raw/master/LICENSE"
     }
   ]
 }
