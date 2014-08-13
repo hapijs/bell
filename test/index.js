@@ -163,4 +163,69 @@ describe('Bell', function () {
             });
         });
     });
+
+    it('allows multiple custom provider names', function (done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom_1', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: Hoek.merge(Hoek.clone(provider), {name: "custom_1"}),
+                    cookie: 'ring_1'
+                });
+
+                server.auth.strategy('custom_2', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: Hoek.merge(Hoek.clone(provider), {name: "custom_2"}),
+                    cookie: 'ring_2'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login_1',
+                    config: {
+                        auth: 'custom_1',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login_2',
+                    config: {
+                        auth: 'custom_2',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login_1', function (res) {
+
+                    expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
+                    server.inject('/login_2', function (res) {
+    
+                        expect(res.headers['set-cookie'][0]).to.contain('ring_2=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+    });
 });
