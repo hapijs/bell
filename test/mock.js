@@ -180,6 +180,15 @@ exports.V2 = internals.V2 = function () {
                         expires_in: 3600
                     };
 
+                    if (code.client_id === 'instagram') {
+                        payload.user = {
+                            id: '123456789',
+                            username: 'stevegraham',
+                            full_name: 'Steve Graham',
+                            profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg'
+                        };
+                    }
+
                     reply(payload);
                 }
             }

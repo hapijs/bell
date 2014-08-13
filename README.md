@@ -1,7 +1,7 @@
 ### **bell**
 
 **bell** is a third-party login plugin for [hapi](https://github.com/hapijs/hapi). **bell** ships with built-in support for Facebook, GitHub,
-Google, Twitter, Yahoo, Foursquare, and Windows Live. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple
+Google, Instagram, Twitter, Yahoo, Foursquare, and Windows Live. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple
 configuration object.
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
@@ -66,7 +66,7 @@ server.pack.register(require('bell'), function (err) {
 ### Options
 
 The `server.auth.strategy()` method requires the following strategy options:
-- `provider` - the name of the third-party provider (`'facebook'`, `'github'`, `'google'`, `'live'`, `'twitter'`, `'yahoo'`, `'foursquare'`)
+- `provider` - the name of the third-party provider (`'facebook'`, `'github'`, `'google'`, `'instagram'`, `'live'`, `'twitter'`, `'yahoo'`, `'foursquare'`)
   or an object containing a custom provider with the following:
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
@@ -114,8 +114,11 @@ Each strategy accepts the following optional settings:
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
   The built-in `'github'` provider accepts the `uri` option which allows pointing to a private enterprise installation
   (e.g. `'https://vpn.example.com'`).
+- `profileParams` - an object of key-value pairs that specify additional URL query parameters to send with the profile request to the provider.
+   The built-in `facebook` provider, for example, could have `fields` specified to determine the fields returned from the user's graph, which would
+   then be available to you in the `auth.credentials.profile.raw` object.
 
-### Advance Usage
+### Advanced Usage
 
 #### Handling Errors
 
