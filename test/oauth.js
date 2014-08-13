@@ -991,7 +991,7 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
                         });
                     });
-                });                                                                                                                                                                                                                          
+                });
             });
         });
     });

@@ -179,7 +179,7 @@ describe('Bell', function () {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), {name: "custom_1"}),
+                    provider: Hoek.merge(Hoek.clone(provider), { name: "custom_1" }),
                     cookie: 'ring_1'
                 });
 
@@ -188,7 +188,7 @@ describe('Bell', function () {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), {name: "custom_2"}),
+                    provider: Hoek.merge(Hoek.clone(provider), { name: "custom_2" }),
                     cookie: 'ring_2'
                 });
 
@@ -220,7 +220,7 @@ describe('Bell', function () {
 
                     expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
                     server.inject('/login_2', function (res) {
-    
+
                         expect(res.headers['set-cookie'][0]).to.contain('ring_2=');
                         mock.stop(done);
                     });
