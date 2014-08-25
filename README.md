@@ -6,7 +6,7 @@ configuration object.
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 
-Lead Maintainer: [Eran Hammer](https://github.com/hueniverse)
+Lead Maintainer: [Wyatt Preul](https://github.com/wpreul)
 
 ### Usage
 
