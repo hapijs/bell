@@ -5,7 +5,7 @@ var Hawk = require('hawk');
 var Lab = require('lab');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
-var Nipple = require('nipple');
+var Wreck = require('wreck');
 var Boom = require('boom');
 
 
@@ -250,17 +250,17 @@ exports.override = function (uri, payload) {
     };
 
     internals.nipple = {
-        get: Nipple.get,
-        post: Nipple.post
+        get: Wreck.get,
+        post: Wreck.post
     };
 
-    Nipple.get = override('get');
-    Nipple.post = override('post');
+    Wreck.get = override('get');
+    Wreck.post = override('post');
 };
 
 
 exports.clear = function (uri) {
 
-    Nipple.get = internals.nipple.get;
-    Nipple.post = internals.nipple.post;
+    Wreck.get = internals.nipple.get;
+    Wreck.post = internals.nipple.post;
 };
