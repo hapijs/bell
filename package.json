@@ -24,11 +24,11 @@
     "node": ">=0.10.30"
   },
   "dependencies": {
-    "hoek": "2.x.x",
     "boom": "2.x.x",
     "cryptiles": "2.x.x",
-    "nipple": "2.x.x",
-    "joi": "^4.6.x"
+    "hoek": "2.x.x",
+    "joi": "^4.6.x",
+    "wreck": "^5.0.1"
   },
   "peerDependencies": {
     "hapi": ">=6.x.x"
