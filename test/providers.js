@@ -1178,4 +1178,89 @@ describe('Bell', function () {
             });
         });
     });
+
+    describe('#vk', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.vk();
+                    Hoek.merge(custom, provider);
+
+                    var profile = {
+                        id: '1234567890',
+                        email: 'steve@example.com',
+                        username: 'steve smith',
+                        response: [
+                            {
+                                first_name: 'steve',
+                                last_name: 'smith'
+                            }
+                        ]
+                    };
+
+                    Mock.override('https://api.vk.com/method/users.get', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'vk',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        "id": undefined,
+                                        "email": undefined,
+                                        "username": 'steve smith',
+                                        "raw": [
+                                            {
+                                                "first_name": 'steve',
+                                                "last_name": 'smith'
+                                            }
+                                        ]
+                                    }
+                                });
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
 });
