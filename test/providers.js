@@ -1178,4 +1178,163 @@ describe('Bell', function () {
             });
         });
     });
+    describe('#bitbucket', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.bitbucket();
+                    Hoek.merge(custom, provider);
+
+                    Mock.override('https://bitbucket.org/api/1.0/user', {
+                        repositories: [{}],
+                        user: {
+                            first_name: 'Steve',
+                            last_name: 'Stevens',
+                            username: 'steve_stevens'
+                        }
+                    });
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'bitbucket',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: 'final',
+                                    secret: 'secret',
+                                    query: {},
+                                    profile: {
+                                        id: 'steve_stevens',
+                                        username: 'steve_stevens',
+                                        displayName: 'Steve Stevens',
+                                        raw: {
+                                            repositories: [{}],
+                                            user: {
+                                                first_name: 'Steve',
+                                                last_name: 'Stevens',
+                                                username: 'steve_stevens'
+                                            }
+                                        }
+                                    }
+                                });
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock (last_name is empty)', { parallel: false }, function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+
+                var server = new Hapi.Server('localhost');
+                server.pack.register(Bell, function (err) {
+
+                    expect(err).to.not.exist;
+
+                    var custom = Bell.providers.bitbucket();
+                    Hoek.merge(custom, provider);
+
+                    Mock.override('https://bitbucket.org/api/1.0/user', {
+                        // source: https://confluence.atlassian.com/display/BITBUCKET/user+Endpoint
+                        repositories: [{}],
+                        user: {
+                            first_name: 'Steve',
+                            last_name: '',
+                            username: 'steve_stevens'
+                        }
+                    });
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'twitter',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: 'final',
+                                    secret: 'secret',
+                                    query: {},
+                                    profile: {
+                                        id: 'steve_stevens',
+                                        username: 'steve_stevens',
+                                        displayName: 'Steve',
+                                        raw: {
+                                            repositories: [{}],
+                                            user: {
+                                                first_name: 'Steve',
+                                                last_name: '',
+                                                username: 'steve_stevens'
+                                            }
+                                        }
+                                    }
+                                });
+
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
