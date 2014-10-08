@@ -74,6 +74,7 @@ The `server.auth.strategy()` method requires the following strategy options:
     - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only).
     - `auth` - the authorization endpoint URI.
     - `token` - the access token endpoint URI.
+    - `version` - the OAuth version.
     - `scope` - an array of scope strings (OAuth 2.0 only).
     - `scopeSeparator` - the scope separator character (OAuth 2.0 only). Only required when a provider has a broken OAuth 2.0 implementation.
       Defaults to space (Facebook and GitHut default to comma).
