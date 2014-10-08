@@ -66,7 +66,7 @@ server.pack.register(require('bell'), function (err) {
 ### Options
 
 The `server.auth.strategy()` method requires the following strategy options:
-- `provider` - the name of the third-party provider (`'facebook'`, `'github'`, `'google'`, `'instagram'`, `'live'`, `'twitter'`, `'yahoo'`, `'foursquare'`)
+- `provider` - the name of the third-party provider (`'facebook'`, `'github'`, `'google'`, `'instagram'`, `'live'`, `'twitter'`, `'yahoo'`, `'foursquare'`, `'bitbucket'`)
   or an object containing a custom provider with the following:
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
