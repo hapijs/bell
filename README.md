@@ -98,7 +98,7 @@ The `server.auth.strategy()` method requires the following strategy options:
 - `clientSecret` - the OAuth client secret (consumer secret).
 
 Each strategy accepts the following optional settings:
-- `cookie` - the name of the cookie used to manage the temporary state. Defaults to `'bell-provider'` where 'provider' is the provier name
+- `cookie` - the name of the cookie used to manage the temporary state. Defaults to `'bell-provider'` where 'provider' is the provider name
   (or `'custom'` for custom providers). For example, the Twitter cookie name defaults to `'bell-twitter'`.
 - `isSecure` - sets the cookie secure flag. Defaults to `true`.
 - `isHttpOnly` - sets the cookie HTTP only flag. Defaults to `true`.
