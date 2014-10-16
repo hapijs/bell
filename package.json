@@ -1,7 +1,7 @@
 {
   "name": "bell",
   "description": "Third-party login plugin for hapi",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "repository": "git://github.com/hapijs/bell",
   "main": "index",
   "keywords": [
@@ -27,8 +27,8 @@
     "boom": "2.x.x",
     "cryptiles": "2.x.x",
     "hoek": "2.x.x",
-    "joi": "^4.6.x",
-    "wreck": "^5.0.1"
+    "joi": "4.x.x",
+    "wreck": "5.x.x"
   },
   "peerDependencies": {
     "hapi": ">=6.x.x"
