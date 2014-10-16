@@ -96,6 +96,41 @@ describe('Bell', function () {
             });
         });
 
+        it('errors on rejected query parameter', function (done) {
+
+            var server = new Hapi.Server('localhost');
+            server.pack.register(Bell, function (err) {
+
+                expect(err).to.not.exist;
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'twitter'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?error=access_denied', function (res) {
+
+                    expect(res.statusCode).to.equal(500);
+                    done();
+                });
+            });
+        });
+
         it('fails getting temporary credentials', function (done) {
 
             var mock = new Mock.V1({ temporary: true });
