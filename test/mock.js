@@ -186,6 +186,11 @@ exports.V2 = internals.V2 = function () {
                             profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg'
                         };
                     }
+                    
+                    if (code.client_id === 'vk') {
+                        payload.user_id = '1234567890';
+                        payload.email = 'steve@example.com';
+                    }
 
                     reply(payload);
                 }
