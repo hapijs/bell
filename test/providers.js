@@ -1405,7 +1405,8 @@ describe('Bell', function () {
                                         }
                                     }
                                 });
-
+                                
+                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
