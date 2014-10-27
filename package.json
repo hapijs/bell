@@ -18,7 +18,8 @@
     "windows",
     "microsoft",
     "github",
-    "foursquare"
+    "foursquare",
+    "vk"
   ],
   "engines": {
     "node": ">=0.10.30"
