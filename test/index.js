@@ -1,5 +1,6 @@
 // Load modules
 
+var Code = require('code');
 var Lab = require('lab');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
@@ -17,7 +18,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.describe;
 var it = lab.it;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Bell', function () {
@@ -30,7 +31,7 @@ describe('Bell', function () {
             var server = new Hapi.Server('localhost');
             server.pack.register(Bell, function (err) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
@@ -81,7 +82,7 @@ describe('Bell', function () {
             var server = new Hapi.Server('localhost');
             server.pack.register(Bell, function (err) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
@@ -131,7 +132,7 @@ describe('Bell', function () {
             var server = new Hapi.Server('localhost');
             server.pack.register(Bell, function (err) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
@@ -171,7 +172,7 @@ describe('Bell', function () {
             var server = new Hapi.Server('localhost');
             server.pack.register(Bell, function (err) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
 
                 server.auth.strategy('custom_1', 'bell', {
                     password: 'password',

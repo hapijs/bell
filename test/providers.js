@@ -1,5 +1,6 @@
 // Load modules
 
+var Code = require('code');
 var Lab = require('lab');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
@@ -17,7 +18,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.describe;
 var it = lab.it;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Bell', function () {
@@ -32,7 +33,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
@@ -114,7 +115,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.github();
                     Hoek.merge(custom, provider);
@@ -186,7 +187,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.github({ uri: 'http://example.com' });
                     Hoek.merge(custom, provider);
@@ -261,7 +262,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.google();
                     Hoek.merge(custom, provider);
@@ -342,7 +343,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.live();
                     Hoek.merge(custom, provider);
@@ -423,7 +424,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.live();
                     Hoek.merge(custom, provider);
@@ -503,7 +504,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.live();
                     Hoek.merge(custom, provider);
@@ -580,7 +581,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.live();
                     Hoek.merge(custom, provider);
@@ -661,7 +662,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.twitter();
                     Hoek.merge(custom, provider);
@@ -729,7 +730,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.twitter({ extendedProfile: false });
                     Hoek.merge(custom, provider);
@@ -791,7 +792,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.yahoo();
                     Hoek.merge(custom, provider);
@@ -869,7 +870,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.foursquare();
                     Hoek.merge(custom, provider);
@@ -957,7 +958,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.foursquare();
                     Hoek.merge(custom, provider);
@@ -1049,7 +1050,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.instagram();
                     Hoek.merge(custom, provider);
@@ -1120,7 +1121,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.instagram({ extendedProfile: false });
                     Hoek.merge(custom, provider);
@@ -1189,7 +1190,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.vk();
                     Hoek.merge(custom, provider);
@@ -1265,7 +1266,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.bitbucket();
                     Hoek.merge(custom, provider);
@@ -1344,7 +1345,7 @@ describe('Bell', function () {
                 var server = new Hapi.Server('localhost');
                 server.pack.register(Bell, function (err) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
 
                     var custom = Bell.providers.bitbucket();
                     Hoek.merge(custom, provider);
