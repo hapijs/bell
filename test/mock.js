@@ -1,6 +1,7 @@
 // Load modules
 
 var Querystring = require('querystring');
+var Code = require('code');
 var Hawk = require('hawk');
 var Lab = require('lab');
 var Hapi = require('hapi');
@@ -17,7 +18,7 @@ var internals = {};
 // Test shortcuts
 
 var lab = exports.lab = Lab.script();
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 exports.V1 = internals.V1 = function (fail) {
@@ -40,7 +41,7 @@ exports.V1 = internals.V1 = function (fail) {
                     }
 
                     var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
-                    expect(header.oauth_callback).to.exist;
+                    expect(header.oauth_callback).to.exist();
 
                     var token = String(Object.keys(this.tokens).length + 1);
                     this.tokens[token] = {
@@ -67,7 +68,7 @@ exports.V1 = internals.V1 = function (fail) {
                 handler: function (request, reply) {
 
                     var token = this.tokens[request.query.oauth_token];
-                    expect(token).to.exist;
+                    expect(token).to.exist();
 
                     token.authorized = true;
                     token.verifier = '123';
@@ -90,7 +91,7 @@ exports.V1 = internals.V1 = function (fail) {
 
                     var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     var token = this.tokens[header.oauth_token];
-                    expect(token).to.exist;
+                    expect(token).to.exist();
                     expect(token.verifier).to.equal(header.oauth_verifier);
                     expect(token.authorized).to.equal(true);
 
@@ -118,7 +119,7 @@ internals.V1.prototype.start = function (callback) {
 
     this.server.start(function (err) {
 
-        expect(err).to.not.exist;
+        expect(err).to.not.exist();
 
         self.uri = self.server.info.uri;
 
@@ -169,7 +170,7 @@ exports.V2 = internals.V2 = function () {
                 handler: function (request, reply) {
 
                     var code = this.codes[request.payload.code];
-                    expect(code).to.exist;
+                    expect(code).to.exist();
                     expect(code.redirect_uri).to.equal(request.payload.redirect_uri);
                     expect(code.client_id).to.equal(request.payload.client_id);
 
@@ -206,7 +207,7 @@ internals.V2.prototype.start = function (callback) {
 
     this.server.start(function (err) {
 
-        expect(err).to.not.exist;
+        expect(err).to.not.exist();
 
         self.uri = self.server.info.uri;
 
