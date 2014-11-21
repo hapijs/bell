@@ -77,7 +77,7 @@ The `server.auth.strategy()` method requires the following strategy options:
     - `version` - the OAuth version.
     - `scope` - an array of scope strings (OAuth 2.0 only).
     - `scopeSeparator` - the scope separator character (OAuth 2.0 only). Only required when a provider has a broken OAuth 2.0 implementation.
-      Defaults to space (Facebook and GitHut default to comma).
+      Defaults to space (Facebook and GitHub default to comma).
     - `headers` - a headers object with additional headers required by the provider (e.g. GitHub required the 'User-Agent' header which is
       set by default).
     - `profile` - a function used to obtain user profile information and normalize it. The function signature is
