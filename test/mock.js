@@ -1,13 +1,13 @@
 // Load modules
 
 var Querystring = require('querystring');
-var Code = require('code');
-var Hawk = require('hawk');
-var Lab = require('lab');
-var Hapi = require('hapi');
-var Hoek = require('hoek');
-var Wreck = require('wreck');
 var Boom = require('boom');
+var Code = require('code');
+var Hapi = require('hapi');
+var Hawk = require('hawk');
+var Hoek = require('hoek');
+var Lab = require('lab');
+var Wreck = require('wreck');
 
 
 // Declare internals
@@ -27,7 +27,8 @@ exports.V1 = internals.V1 = function (fail) {
 
     this.tokens = {};
 
-    this.server = new Hapi.Server(0, 'localhost');
+    this.server = new Hapi.Server();
+    this.server.connection({ host: 'localhost' });
     this.server.route([
         {
             method: 'POST',
@@ -143,7 +144,8 @@ exports.V2 = internals.V2 = function () {
 
     this.codes = {};
 
-    this.server = new Hapi.Server(0, 'localhost');
+    this.server = new Hapi.Server();
+    this.server.connection({ host: 'localhost' });
     this.server.route([
         {
             method: 'GET',
