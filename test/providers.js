@@ -1,10 +1,10 @@
 // Load modules
 
+var Bell = require('../');
 var Code = require('code');
-var Lab = require('lab');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
-var Bell = require('../');
+var Lab = require('lab');
 var Mock = require('./mock');
 
 
@@ -30,8 +30,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -112,8 +113,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -184,8 +186,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -259,8 +262,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -340,8 +344,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -421,8 +426,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -501,8 +507,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -578,8 +585,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -659,8 +667,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -727,8 +736,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -789,8 +799,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -867,8 +878,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -955,8 +967,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -1047,8 +1060,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -1118,8 +1132,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -1187,8 +1202,9 @@ describe('Bell', function () {
             var mock = new Mock.V2();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -1263,8 +1279,9 @@ describe('Bell', function () {
             var mock = new Mock.V1();
             mock.start(function (provider) {
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
@@ -1342,8 +1359,9 @@ describe('Bell', function () {
             mock.start(function (provider) {
 
 
-                var server = new Hapi.Server('localhost');
-                server.pack.register(Bell, function (err) {
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
 
                     expect(err).to.not.exist();
 
