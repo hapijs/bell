@@ -4,8 +4,10 @@ var Hapi = require('hapi');
 var Bell = require('../');
 
 
-var server = new Hapi.Server(8000);
-server.pack.register(Bell, function (err) {
+var server = new Hapi.Server();
+server.connection({ port: 8000 });
+
+server.register(Bell, function (err) {
 
     server.auth.strategy('twitter', 'bell', {
         provider: 'twitter',
