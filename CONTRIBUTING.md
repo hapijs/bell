@@ -14,7 +14,7 @@ Code changes are welcome and should follow the guidelines below.
 
 * Fork the repository on GitHub.
 * Fix the issue ensuring that your code follows the
-  [style guide](https://github.com/hapijs/hapi/blob/master/docs/Style.md).
+  [style guide](https://github.com/hapijs/contrib/blob/master/Style.md).
 * Add tests for your new code ensuring that you have 100% code coverage
   (we can help you reach 100% but will not merge without it).
 * Run `npm test` to generate a report of test coverage
