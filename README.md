@@ -25,7 +25,7 @@ var Hapi = require('hapi');
 var server = new Hapi.Server(8000);
 
 // Register bell with the server
-server.pack.register(require('bell'), function (err) {
+server.register(require('bell'), function (err) {
 
     // Declare an authentication strategy using the bell scheme
     // with the name of the provider, cookie encryption password,
@@ -139,7 +139,7 @@ var Hapi = require('hapi');
 var server = new Hapi.Server(8000);
 
 // Register bell with the server
-server.pack.register(require('bell'), function (err) {
+server.register(require('bell'), function (err) {
 
     server.auth.strategy('twitter', 'bell', {
         provider: 'twitter',
