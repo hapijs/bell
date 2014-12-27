@@ -1194,7 +1194,7 @@ describe('Bell', function () {
             });
         });
     });
-    
+
     describe('#vk', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
@@ -1210,7 +1210,7 @@ describe('Bell', function () {
 
                     var custom = Bell.providers.vk();
                     Hoek.merge(custom, provider);
-                    
+
                     var data = {
                         response: [{
                             uid: '1234567890',
@@ -1271,7 +1271,7 @@ describe('Bell', function () {
             });
         });
     });
-    
+
     describe('#bitbucket', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
@@ -1424,7 +1424,96 @@ describe('Bell', function () {
                                         }
                                     }
                                 });
-                                
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('#twitch', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    var custom = Bell.providers.twitch();
+                    Hoek.merge(custom, provider);
+
+                    var profile = {
+                        display_name: 'displayname',
+                        _id: 1337,
+                        name: 'username',
+                        type: 'user',
+                        bio: null,
+                        created_at: '2011-12-04T01:33:73Z',
+                        updated_at: '2014-12-25T06:02:17Z',
+                        logo: null,
+                        email: 'user@example.com',
+                        partnered: false,
+                        notifications: {}
+                    };
+
+                    Mock.override('https://api.twitch.tv/kraken/user', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'twitch',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        display_name: 'displayname',
+                                        _id: 1337,
+                                        name: 'username',
+                                        type: 'user',
+                                        bio: null,
+                                        created_at: '2011-12-04T01:33:73Z',
+                                        updated_at: '2014-12-25T06:02:17Z',
+                                        logo: null,
+                                        email: 'user@example.com',
+                                        partnered: false,
+                                        notifications: {}
+                                    }
+                                });
+
                                 Mock.clear();
                                 mock.stop(done);
                             });
