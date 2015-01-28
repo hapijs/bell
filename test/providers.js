@@ -1424,7 +1424,17 @@ describe('Bell', function () {
                                         }
                                     }
                                 });
-                                
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
     describe('#dropbox', function () {
         it('authenticates with mock', { parallel: false }, function (done) {
 
