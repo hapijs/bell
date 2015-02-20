@@ -66,7 +66,7 @@ server.register(require('bell'), function (err) {
 ### Options
 
 The `server.auth.strategy()` method requires the following strategy options:
-- `provider` - the name of the third-party provider (`'facebook'`, `'github'`, `'google'`, `'instagram'`, `'live'`, `'twitter'`, `'yahoo'`, `'foursquare'`, `'bitbucket'`, `'vk'`)
+- `provider` - the name of the third-party provider (`'bitbucket'`, `'dropbox'`, `'facebook'`, `'foursquare'`, `'github'`, `'google'`, `'instagram'`, `'live'`, `'twitter'`, `'vk'`, `'yahoo'`)
   or an object containing a custom provider with the following:
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
@@ -96,6 +96,7 @@ The `server.auth.strategy()` method requires the following strategy options:
   protocol steps.
 - `clientId` - the OAuth client identifier (consumer key).
 - `clientSecret` - the OAuth client secret (consumer secret).
+- `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to https. Useful if your hapi application runs as http, but is accessed through https.
 
 Each strategy accepts the following optional settings:
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to `'bell-provider'` where 'provider' is the provider name
@@ -170,5 +171,3 @@ server.register(require('bell'), function (err) {
     server.start();
 });
 ```
-
-
