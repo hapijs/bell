@@ -80,6 +80,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -161,6 +162,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -234,6 +236,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -312,6 +315,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -397,6 +401,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -478,6 +483,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -556,6 +562,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -635,6 +642,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -710,6 +718,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -775,6 +784,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -848,6 +858,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -938,6 +949,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1028,6 +1040,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1106,6 +1119,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -1171,6 +1185,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -1194,7 +1209,7 @@ describe('Bell', function () {
             });
         });
     });
-    
+
     describe('#vk', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
@@ -1210,7 +1225,7 @@ describe('Bell', function () {
 
                     var custom = Bell.providers.vk();
                     Hoek.merge(custom, provider);
-                    
+
                     var data = {
                         response: [{
                             uid: '1234567890',
@@ -1249,6 +1264,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
@@ -1271,7 +1287,7 @@ describe('Bell', function () {
             });
         });
     });
-    
+
     describe('#bitbucket', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
@@ -1327,6 +1343,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1408,6 +1425,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
+                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1491,6 +1509,7 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
+                                    expiresIn: 3600,
                                     refreshToken: undefined,
                                     query: {},
                                     profile: profile
