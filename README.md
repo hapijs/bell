@@ -135,6 +135,10 @@ Another way to handle authentication errors is within the route handler. By defa
 skipped. However, if the authentication mode is set to `'try'` instead of `'required'`, the handler will still be called. In this case,
 the `request.auth.isAuthenticated` must be checked to test if authentication failed. In that case, `request.auth.error` will contain the error.
 
+#### Token Refresh
+
+To keep track of the token expiry time, `request.auth.credentials.expiresIn` provides you the duration (in seconds) after which you could send a refresh token request using the `request.auth.credentials.refreshToken` to get a new token.
+
 ```javascript
 var Hapi = require('hapi');
 var server = new Hapi.Server(8000);
