@@ -509,7 +509,18 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-                        mock.stop(done);
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
                     });
                 });
             });
