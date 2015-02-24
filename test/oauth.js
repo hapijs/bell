@@ -512,11 +512,12 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
                         mock.server.inject(res.headers.location, function (res) {
+
                             expect(res.headers.location).to.contain('https://localhost:80/login?code=1&state=');
 
-                            server.inject({url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-                                expect(res.statusCode).to.equal(200);
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
+                                expect(res.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
