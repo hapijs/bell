@@ -128,7 +128,7 @@ By default, **bell** will reply back with an internal error (500) on most authen
 There is little that can be done to recover from errors as almost all of them are caused by implementation or deployment issues.
 
 If you would like to display a useful error page instead of the default JSON response, use the **hapi**
-[`onPreResponse`](https://github.com/hapijs/hapi/blob/master/docs/Reference.md#error-transformation) extension point to transform the
+[`onPreResponse`](http://hapijs.com/api#error-transformation) extension point to transform the
 error into a useful page or to redirect the user to another destination.
 
 Another way to handle authentication errors is within the route handler. By default, an authentication error will cause the handler to be
