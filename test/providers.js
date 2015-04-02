@@ -1543,11 +1543,12 @@ describe('Bell', function () {
 
                     var profile = {
                         orgId: 'acme',
-                        username: 'steve',
-                        name: 'steve',
-                        fullName: 'steve',
+                        username: 'disco_steve',
+                        fullName: 'steve smith',
+                        firstName: 'steve',
                         lastName: 'smith',
-                        email: 'steve@example.com'
+                        email: 'steve@example.com',
+                        role: 'terminator'
                     };
 
                     Mock.override('https://www.arcgis.com/sharing/rest/community/self', profile);
@@ -1586,15 +1587,16 @@ describe('Bell', function () {
                                     refreshToken: undefined,
                                     query: {},
                                     profile: {
+                                        provider: 'arcgisonline',
                                         orgId: 'acme',
-                                        username: 'steve',
-                                        displayName: 'steve',
+                                        username: 'disco_steve',
+                                        displayName: 'steve smith',
                                         name: {
                                             first: 'steve',
                                             last: 'smith'
                                         },
                                         email: 'steve@example.com',
-                                        role: 'user',
+                                        role: 'terminator',
                                         raw: profile
                                     }
                                 });
