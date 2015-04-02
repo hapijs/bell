@@ -189,7 +189,7 @@ exports.V2 = internals.V2 = function () {
                             profile_picture: 'http://distillery.s3.amazonaws.com/profiles/profile_1574083_75sq_1295469061.jpg'
                         };
                     }
-                    
+
                     if (code.client_id === 'vk') {
                         payload.user_id = '1234567890';
                         payload.email = 'steve@example.com';
@@ -253,13 +253,13 @@ exports.override = function (uri, payload) {
                 return Hoek.nextTick(callback)(null, { statusCode: 200 }, typeof payload === 'string' ? payload : JSON.stringify(payload));
             }
 
-            return internals.nipple[method].apply(null, arguments);
+            return internals.wreck[method].apply(null, arguments);
         }
     };
 
-    internals.nipple = {
-        get: Wreck.get,
-        post: Wreck.post
+    internals.wreck = {
+        get: Wreck.get.bind(Wreck),
+        post: Wreck.post.bind(Wreck)
     };
 
     Wreck.get = override('get');
@@ -269,6 +269,6 @@ exports.override = function (uri, payload) {
 
 exports.clear = function (uri) {
 
-    Wreck.get = internals.nipple.get;
-    Wreck.post = internals.nipple.post;
+    Wreck.get = internals.wreck.get;
+    Wreck.post = internals.wreck.post;
 };
