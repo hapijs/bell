@@ -1524,4 +1524,88 @@ describe('Bell', function () {
             });
         });
     });
+
+    describe('#arcgisonline', function () {
+
+        it('authenticates with mock', { parallel: false }, function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    var custom = Bell.providers.arcgisonline();
+                    Hoek.merge(custom, provider);
+
+                    var profile = {
+                        orgId: 'acme',
+                        username: 'steve',
+                        name: 'steve',
+                        fullName: 'steve',
+                        lastName: 'smith',
+                        email: 'steve@example.com'
+                    };
+
+                    Mock.override('https://www.arcgis.com/sharing/rest/community/self', profile);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'arcgisonline',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    expiresIn: 3600,
+                                    refreshToken: undefined,
+                                    query: {},
+                                    profile: {
+                                        orgId: 'acme',
+                                        username: 'steve',
+                                        displayName: 'steve',
+                                        name: {
+                                            first: 'steve',
+                                            last: 'smith'
+                                        },
+                                        email: 'steve@example.com',
+                                        role: 'user',
+                                        raw: profile
+                                    }
+                                });
+
+                                Mock.clear();
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
