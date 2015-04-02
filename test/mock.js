@@ -234,7 +234,6 @@ exports.override = function (uri, payload) {
 
         return function (dest) {
 
-            var options = arguments.length === 3 ? arguments[1] : {};
             var callback = arguments.length === 3 ? arguments[2] : arguments[1];
 
             if (dest.indexOf(uri) === 0) {
