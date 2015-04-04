@@ -30,7 +30,7 @@
     "boom": "2.x.x",
     "cryptiles": "2.x.x",
     "hoek": "2.11.0",
-    "joi": "5.x.x",
+    "joi": "6.x.x",
     "wreck": "5.x.x"
   },
   "peerDependencies": {
