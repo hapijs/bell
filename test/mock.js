@@ -130,7 +130,7 @@ internals.V1.prototype.start = function (callback) {
             auth: self.server.info.uri + '/auth',
             token: self.server.info.uri + '/token'
         });
-    })
+    });
 };
 
 
@@ -218,7 +218,7 @@ internals.V2.prototype.start = function (callback) {
             auth: self.server.info.uri + '/auth',
             token: self.server.info.uri + '/token'
         });
-    })
+    });
 };
 
 
@@ -253,7 +253,7 @@ exports.override = function (uri, payload) {
             }
 
             return internals.wreck[method].apply(null, arguments);
-        }
+        };
     };
 
     internals.wreck = {

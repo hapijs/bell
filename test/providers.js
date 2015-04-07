@@ -980,17 +980,17 @@ describe('#linkedin', function () {
                     var data = {
                         response: {
                             user: {
-                                id: "1234",
-                                firstName: "Steve",
-                                lastName: "Smith",
-                                gender: "male",
-                                relationship: "self",
+                                id: '1234',
+                                firstName: 'Steve',
+                                lastName: 'Smith',
+                                gender: 'male',
+                                relationship: 'self',
                                 photo: {
-                                    prefix: "https://irs0.4sqi.net/img/user/",
-                                    suffix: "/1234-K0KG0PLWAG1WTOXM.jpg"
+                                    prefix: 'https://irs0.4sqi.net/img/user/',
+                                    suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
                                 },
                                 contact: {
-                                    email: "stevesmith@test.com"
+                                    email: 'stevesmith@test.com'
                                 }
                             }
                         }
@@ -1070,17 +1070,17 @@ describe('#linkedin', function () {
                     var data = {
                         response: {
                             user: {
-                                id: "1234",
-                                firstName: "Steve",
-                                lastName: "Smith",
-                                gender: "male",
-                                relationship: "self",
+                                id: '1234',
+                                firstName: 'Steve',
+                                lastName: 'Smith',
+                                gender: 'male',
+                                relationship: 'self',
                                 photo: {
-                                    prefix: "https://irs0.4sqi.net/img/user/",
-                                    suffix: "/1234-K0KG0PLWAG1WTOXM.jpg"
+                                    prefix: 'https://irs0.4sqi.net/img/user/',
+                                    suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
                                 },
                                 contact: {
-                                    facebook: "http://facebook.com/stevesmith.test"
+                                    facebook: 'http://facebook.com/stevesmith.test'
                                 }
                             }
                         }
@@ -1163,7 +1163,7 @@ describe('#linkedin', function () {
 
                     var profile = {
                         meta: { code: 200 },
-                        data: { property: "something" }
+                        data: { property: 'something' }
                     };
 
                     Mock.override('https://api.instagram.com/v1/users/self', profile);
@@ -1311,7 +1311,7 @@ describe('#linkedin', function () {
                             first_name: 'steve',
                             last_name: 'smith'
                         }]
-                    }
+                    };
 
                     Mock.override('https://api.vk.com/method/users.get', data);
 
