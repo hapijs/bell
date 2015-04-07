@@ -183,7 +183,7 @@ describe('Bell', function () {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), { name: "custom_1" }),
+                    provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_1' }),
                     cookie: 'ring_1'
                 });
 
@@ -192,7 +192,7 @@ describe('Bell', function () {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), { name: "custom_2" }),
+                    provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_2' }),
                     cookie: 'ring_2'
                 });
 
