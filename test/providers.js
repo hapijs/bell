@@ -1703,9 +1703,7 @@ describe('#linkedin', function () {
 
                     expect(err).to.not.exist();
 
-                    expect( function() {
-                        Bell.providers.phabricator();
-                    }).to.throw(Error);
+                    expect(Bell.providers.phabricator).to.throw(Error);
 
                     Mock.clear();
                     mock.stop(done);
