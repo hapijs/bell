@@ -121,6 +121,10 @@ Each strategy accepts the following optional settings:
 
 ### Advanced Usage
 
+#### Configuration via Environment Variables
+The `server.auth.strategy()` method supports string representations of its boolean and number typed options. 
+For example, `forceHttps` can be set to 'true', 'false', 'yes', or 'no'. In effect, this allows you to configure any strategy option using environment variables.
+
 #### Handling Errors
 
 By default, **bell** will reply back with an internal error (500) on most authentication errors due to the nature of the OAuth protocol.
