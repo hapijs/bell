@@ -61,7 +61,7 @@ describe('Bell', function () {
 
                 spy.restore();
 
-                done();
+                mock.stop(done);
             });
         });
     });
