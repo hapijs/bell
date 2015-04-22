@@ -6,7 +6,8 @@ var Hapi = require('hapi');
 var Hoek = require('hoek');
 var Lab = require('lab');
 var Mock = require('./mock');
-
+var Sinon = require('sinon');
+var OAuth = require('../lib/oauth');
 
 // Declare internals
 
@@ -22,6 +23,48 @@ var expect = Code.expect;
 
 
 describe('Bell', function () {
+
+    it('supports string representations of boolean and number strategy options', function(done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, function (err) {
+
+                expect(err).to.not.exist();
+
+                var spy = Sinon.spy(OAuth, 'v1');
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: 'false',
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    ttl: '1234567890',
+                    forceHttps: 'true',
+                    provider: provider,
+                    config: {
+                        testNoBoolean: 'false',
+                        testNoNumber: '0987654321'
+                    }
+                });
+
+                expect( spy.calledOnce ).to.be.true();
+                expect( spy.getCall(0).args[0] ).to.be.an.object();
+                expect( spy.getCall(0).args[0].isSecure ).to.be.false();
+                expect( spy.getCall(0).args[0].ttl ).to.be.equal(1234567890);
+                expect( spy.getCall(0).args[0].forceHttps ).to.be.true();
+                expect( spy.getCall(0).args[0].config.testNoBoolean ).to.be.equal('false');
+                expect( spy.getCall(0).args[0].config.testNoNumber ).to.be.equal('0987654321');
+
+                spy.restore();
+
+                done();
+            });
+        });
+    });
 
     it('authenticates an endpoint via oauth', function (done) {
 
