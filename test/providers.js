@@ -48,7 +48,7 @@ describe('Bell', function () {
                         email: 'steve@example.com'
                     };
 
-                    Mock.override('https://graph.facebook.com/me', profile);
+                    Mock.override('https://graph.facebook.com/v2.3/me', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
