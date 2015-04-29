@@ -418,6 +418,35 @@ describe('#linkedin', function () {
                 });
             });
         });
+
+        it('adds profile fields', { parallel: false }, function (done) {
+
+            var custom = Bell.providers.linkedin();
+
+            var strategyOptions = {
+                clientSecret: 'secret',
+                providerParams: {
+                    fields: '(id,firstName)'
+                }
+            };
+            Hoek.merge(custom, strategyOptions);
+
+            var profile = {
+                id: '1234567890',
+                firstName: 'steve',
+                lastName: 'smith',
+                headline: 'Master of the universe'
+            };
+
+            custom.profile({ token: '456' }, null, function (url, query, callback) {
+
+                expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
+                callback(profile);
+            }, function () {
+
+                done();
+            });
+        });
     });
 
     describe('#live', function () {
