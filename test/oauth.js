@@ -275,12 +275,14 @@ describe('Bell', function () {
                 var server = new Hapi.Server();
                 server.connection({ host: 'localhost', port: 80 });
                 server.register(Bell, function (err) {
+
                     expect(err).to.not.exist();
 
                     var custom = Bell.providers.twitter();
                     Hoek.merge(custom, provider);
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', function (uri) {
+
                         expect(uri).to.equal('https://api.twitter.com/1.1/users/show.json?user_id=1234567890&fields=id%2Cemail');
                         Mock.clear();
                         mock.stop(done);
@@ -1099,12 +1101,14 @@ describe('Bell', function () {
                 var server = new Hapi.Server();
                 server.connection({ host: 'localhost', port: 80 });
                 server.register(Bell, function (err) {
+
                     expect(err).to.not.exist();
 
                     var custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
                     Mock.override('https://graph.facebook.com/v2.3/me', function (uri) {
+
                         expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         Mock.clear();
                         mock.stop(done);
