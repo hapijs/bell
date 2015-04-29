@@ -28,6 +28,7 @@ server.register(Bell, function (err) {
         config: {
             auth: 'linkedin',
             handler: function (request, reply) {
+
                 reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
             }
         }

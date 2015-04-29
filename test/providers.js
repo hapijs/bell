@@ -341,7 +341,7 @@ describe('Bell', function () {
         });
     });
 
-describe('#linkedin', function () {
+    describe('#linkedin', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
 
@@ -1329,6 +1329,7 @@ describe('#linkedin', function () {
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
+
                                 reply(request.auth.credentials);
                             }
                         }
@@ -1338,6 +1339,7 @@ describe('#linkedin', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, function (res) {
+
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.result).to.deep.equal({
@@ -1533,6 +1535,7 @@ describe('#linkedin', function () {
     });
 
     describe('#dropbox', function () {
+
         it('authenticates with mock', { parallel: false }, function (done) {
 
             var mock = new Mock.V2();
