@@ -72,6 +72,7 @@ describe('Bell', function () {
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
+
                                 reply(request.auth.credentials);
                             }
                         }
@@ -83,6 +84,7 @@ describe('Bell', function () {
                         mock.server.inject(res.headers.location, function (res) {
 
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
