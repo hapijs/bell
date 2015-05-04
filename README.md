@@ -1,7 +1,7 @@
 ### **bell**
 
 **bell** is a third-party login plugin for [hapi](https://github.com/hapijs/hapi). **bell** ships with built-in support for Facebook, GitHub,
-Google, Instagram, LinkedIn, Twitter, Yahoo, Foursquare, VK, ArcGIS Online, Windows Live, and Phabricator. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple configuration object.
+Google, Instagram, LinkedIn, Twitter, Yahoo, Foursquare, VK, ArcGIS Online, Windows Live, Nest, and Phabricator. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple configuration object.
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 
@@ -65,7 +65,7 @@ server.register(require('bell'), function (err) {
 ### Options
 
 The `server.auth.strategy()` method requires the following strategy options:
-- `provider` - the name of the third-party provider (`'bitbucket'`, `'dropbox'`, `'facebook'`, `'foursquare'`, `'github'`, `'google'`, `'instagram'`, `'linkedin'`, `'live'`, `'twitter'`, `'vk'`, `'arcgisonline'`, `'yahoo'`, `'phabricator'`)
+- `provider` - the name of the third-party provider (`'bitbucket'`, `'dropbox'`, `'facebook'`, `'foursquare'`, `'github'`, `'google'`, `'instagram'`, `'linkedin'`, `'live'`, `'twitter'`, `'vk'`, `'arcgisonline'`, `'yahoo'`, `'nest'`, `'phabricator'`)
   or an object containing a custom provider with the following:
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
@@ -122,7 +122,7 @@ Each strategy accepts the following optional settings:
 ### Advanced Usage
 
 #### Configuration via Environment Variables
-The `server.auth.strategy()` method supports string representations of its boolean and number typed options. 
+The `server.auth.strategy()` method supports string representations of its boolean and number typed options.
 For example, `forceHttps` can be set to 'true', 'false', 'yes', or 'no'. In effect, this allows you to configure any strategy option using environment variables.
 
 #### Handling Errors
