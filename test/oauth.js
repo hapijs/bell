@@ -528,6 +528,59 @@ describe('Bell', function () {
             });
         });
 
+        it('uses location setting in redirect_uri when set in options', function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true },
+                        location: 'https://differenthost:8888'
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
         it('authenticates an endpoint with custom scope', function (done) {
 
             var mock = new Mock.V2();

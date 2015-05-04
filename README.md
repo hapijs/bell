@@ -96,6 +96,7 @@ The `server.auth.strategy()` method requires the following strategy options:
 - `clientId` - the OAuth client identifier (consumer key).
 - `clientSecret` - the OAuth client secret (consumer secret).
 - `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to https. Useful if your hapi application runs as http, but is accessed through https.
+- `location` - Set the base redirect_uri manually if it cannot be inferred properly from server settings. Useful to override port, protocol, and host if proxied or forwarded.
 
 Each strategy accepts the following optional settings:
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to `'bell-provider'` where 'provider' is the provider name
