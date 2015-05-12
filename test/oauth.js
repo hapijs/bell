@@ -430,6 +430,104 @@ describe('Bell', function () {
                 });
             });
         });
+        it('forces https in callback_url when set in options', function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        forceHttps: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+        it('uses location setting in callback_url when set in options', function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        location: 'https://differenthost:8888'
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
     });
 
     describe('#v2', function () {
