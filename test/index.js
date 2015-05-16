@@ -275,4 +275,21 @@ describe('Bell', function () {
             });
         });
     });
+
+    it('exposes OAuth implementation', function (done) {
+
+        expect(Bell.oauth.Client).to.be.function();
+        done();
+    });
+
+    it('exposes OAuth via plugin', function (done) {
+
+        var server = new Hapi.Server();
+        server.connection({ host: 'localhost', port: 80 });
+        server.register(Bell, function (err) {
+
+            expect(server.plugins.bell.oauth.Client).to.be.function();
+            done();
+        });
+    });
 });
