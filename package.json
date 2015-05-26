@@ -3,7 +3,7 @@
   "description": "Third-party login plugin for hapi",
   "version": "2.8.0",
   "repository": "git://github.com/hapijs/bell",
-  "main": "index",
+  "main": "lib/index.js",
   "keywords": [
     "hapi",
     "login",
@@ -45,12 +45,8 @@
     "sinon": "1.x.x"
   },
   "scripts": {
-    "test": "make test-cov"
+    "test": "node node_modules/lab/bin/lab -a code -t 100 -L",
+    "test-cov-html": "node node_modules/lab/bin/lab -a code -r html -o coverage.html",
   },
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "http://github.com/hapijs/bell/raw/master/LICENSE"
-    }
-  ]
+  "license": "BSD-3-Clause"
 }
