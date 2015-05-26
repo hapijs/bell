@@ -430,6 +430,7 @@ describe('Bell', function () {
                 });
             });
         });
+
         it('forces https in callback_url when set in options', function (done) {
 
             var mock = new Mock.V1();
@@ -479,6 +480,7 @@ describe('Bell', function () {
                 });
             });
         });
+
         it('uses location setting in callback_url when set in options', function (done) {
 
             var mock = new Mock.V1();
@@ -521,6 +523,69 @@ describe('Bell', function () {
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
 
                                 expect(res.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('returns resource response stream', { parallel: false }, function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                var client = new Bell.oauth.Client({
+                                    name: 'twitter',
+                                    provider: provider,
+                                    clientId: 'test',
+                                    clientSecret: 'secret'
+                                });
+
+                                var credentials = request.auth.credentials;
+                                client.resource('GET', mock.uri + '/resource', null, { token: credentials.token, secret: credentials.secret, stream: true }, function (err, res) {
+
+                                    expect(err).to.not.exist();
+                                    return reply(res);
+                                });
+                            }
+                        }
+                    });
+
+                    server.inject('/login?next=%2Fhome', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.equal('some text reply');
                                 mock.stop(done);
                             });
                         });

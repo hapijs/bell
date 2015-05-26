@@ -57,7 +57,7 @@ exports.V1 = internals.V1 = function (fail) {
                         oauth_callback_confirmed: true
                     };
 
-                    reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
             }
         },
@@ -75,7 +75,7 @@ exports.V1 = internals.V1 = function (fail) {
                     token.verifier = '123';
 
                     var extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
-                    reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
+                    return reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
                 }
             }
         },
@@ -106,7 +106,21 @@ exports.V1 = internals.V1 = function (fail) {
                         payload.screen_name = 'Steve Stevens';
                     }
 
-                    reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                }
+            }
+        },
+        {
+            method: '*',
+            path: '/resource',
+            config: {
+                bind: this,
+                handler: function (request, reply) {
+
+                    var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
+                    expect(header.oauth_token).to.equal('final');
+
+                    return reply('some text reply');
                 }
             }
         }
