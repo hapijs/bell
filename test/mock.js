@@ -120,7 +120,7 @@ exports.V1 = internals.V1 = function (fail) {
                     var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_token).to.equal('final');
 
-                    return reply('some text reply');
+                    return reply(request.payload ? request.payload : 'some text reply');
                 }
             }
         }
