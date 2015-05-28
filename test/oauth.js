@@ -593,6 +593,69 @@ describe('Bell', function () {
                 });
             });
         });
+
+        it('returns resource POST response', { parallel: false }, function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                var client = new Bell.oauth.Client({
+                                    name: 'twitter',
+                                    provider: provider,
+                                    clientId: 'test',
+                                    clientSecret: 'secret'
+                                });
+
+                                var credentials = request.auth.credentials;
+                                client.resource('POST', mock.uri + '/resource', { a: 5 }, { token: credentials.token, secret: credentials.secret, stream: true }, function (err, res) {
+
+                                    expect(err).to.not.exist();
+                                    return reply(res);
+                                });
+                            }
+                        }
+                    });
+
+                    server.inject('/login?next=%2Fhome', function (res) {
+
+                        var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                        mock.server.inject(res.headers.location, function (res) {
+
+                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+
+                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
+                                expect(res.result).to.equal('{"a":"5"}');
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
     });
 
     describe('#v2', function () {
@@ -1376,14 +1439,14 @@ describe('Bell', function () {
             done();
         });
 
-        describe('#request', function () {
+        describe('_request()', function () {
 
             it('errors on failed request', function (done) {
 
                 Mock.override('http://example.com/', null);
 
                 var client = new OAuth.Client({ provider: Bell.providers.twitter() });
-                client.request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, 'secret', 'type', function (err, payload) {
+                client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, function (err, payload) {
 
                     expect(err.message).to.equal('unknown');
                     Mock.clear();
@@ -1396,16 +1459,29 @@ describe('Bell', function () {
                 Mock.override('http://example.com/', '{x');
 
                 var client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
-                client.request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, 'secret', 'type', function (err, payload) {
+                client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, function (err, payload) {
 
                     expect(err.message).to.equal('Received invalid payload from prov type endpoint: Unexpected token x');
                     Mock.clear();
                     done();
                 });
             });
+
+            it('errors on invalid response (no desc)', function (done) {
+
+                Mock.override('http://example.com/', '{x');
+
+                var client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
+                client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' }, function (err, payload) {
+
+                    expect(err.message).to.equal('Received invalid payload from prov resource endpoint: Unexpected token x');
+                    Mock.clear();
+                    done();
+                });
+            });
         });
 
-        describe('#baseUri', function () {
+        describe('baseUri()', function () {
 
             it('removes default port', function (done) {
 
@@ -1422,7 +1498,7 @@ describe('Bell', function () {
             });
         });
 
-        describe('#signature', function () {
+        describe('signature()', function () {
 
             it('generates RFC 5849 example', function (done) {
 
@@ -1499,6 +1575,22 @@ describe('Bell', function () {
 
                 var signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
                 expect(signature).to.equal('dub5m7j8nN7KtHBochesFDQHea4=');
+                done();
+            });
+        });
+
+        describe('queryString()', function () {
+
+            it('handles params with non-string values', function (done) {
+
+                var params = {
+                    a: [1, 2],
+                    b: null,
+                    c: [true, false],
+                    d: Infinity
+                };
+
+                expect(OAuth.Client.queryString(params)).to.equal('a=1&a=2&b=&c=true&c=false&d=');
                 done();
             });
         });
