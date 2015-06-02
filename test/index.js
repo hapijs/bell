@@ -292,4 +292,42 @@ describe('Bell', function () {
             done();
         });
     });
+
+    it('allows null for cookie domain value', function (done) {
+
+        var mock = new Mock.V1();
+        mock.start(function (provider) {
+
+            var server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, function (err) {
+
+                expect(err).to.not.exist();
+
+                var spy = Sinon.spy(OAuth, 'v1');
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'password',
+                    isSecure: 'false',
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    ttl: '1234567890',
+                    forceHttps: 'true',
+                    provider: provider,
+                    domain: null
+                });
+
+                expect(spy.calledOnce).to.be.true();
+                expect(spy.getCall(0).args[0]).to.be.an.object();
+                expect(spy.getCall(0).args[0].isSecure).to.be.false();
+                expect(spy.getCall(0).args[0].ttl).to.be.equal(1234567890);
+                expect(spy.getCall(0).args[0].forceHttps).to.be.true();
+                expect(spy.getCall(0).args[0].domain).to.be.null();
+
+                spy.restore();
+
+                mock.stop(done);
+            });
+        });
+    });
 });
