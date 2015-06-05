@@ -154,9 +154,10 @@ internals.V1.prototype.stop = function (callback) {
 };
 
 
-exports.V2 = internals.V2 = function () {
+exports.V2 = internals.V2 = function (authMethod) {
 
     this.codes = {};
+    this.authMethod = authMethod ? authMethod : 'param';
 
     this.server = new Hapi.Server();
     this.server.connection({ host: 'localhost' });
@@ -188,7 +189,13 @@ exports.V2 = internals.V2 = function () {
                     var code = this.codes[request.payload.code];
                     expect(code).to.exist();
                     expect(code.redirect_uri).to.equal(request.payload.redirect_uri);
-                    expect(code.client_id).to.equal(request.payload.client_id);
+                    if (authMethod === 'param') {
+                        expect(code.client_id).to.equal(request.payload.client_id);
+                    }
+                    else if (authMethod === 'basic') {
+                        var basic = new Buffer(request.headers.authorization.slice(6), 'base64').toString();
+                        expect(basic).to.startWith(code.client_id);
+                    }
 
                     var payload = {
                         access_token: '456',
@@ -229,6 +236,7 @@ internals.V2.prototype.start = function (callback) {
 
         return callback({
             protocol: 'oauth2',
+            authMethod: self.authMethod,
             auth: self.server.info.uri + '/auth',
             token: self.server.info.uri + '/token'
         });
