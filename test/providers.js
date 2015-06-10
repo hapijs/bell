@@ -1075,7 +1075,7 @@ describe('Bell', function () {
 
         it('authenticates with mock', { parallel: false }, function (done) {
 
-            var mock = new Mock.V1();
+            var mock = new Mock.V2();
             mock.start(function (provider) {
 
                 var server = new Hapi.Server();
@@ -1137,7 +1137,7 @@ describe('Bell', function () {
 
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
-                                    token: 'final',
+                                    token: '456',
                                     expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
@@ -1165,7 +1165,7 @@ describe('Bell', function () {
 
         it('authenticates with mock when user has no email set', { parallel: false }, function (done) {
 
-            var mock = new Mock.V1();
+            var mock = new Mock.V2();
             mock.start(function (provider) {
 
                 var server = new Hapi.Server();
@@ -1228,7 +1228,7 @@ describe('Bell', function () {
 
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
-                                    token: 'final',
+                                    token: '456',
                                     expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
