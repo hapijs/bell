@@ -171,7 +171,7 @@ describe('Bell', function () {
 
     it('authenticates an endpoint via oauth2 and basic authentication', function (done) {
 
-        var mock = new Mock.V2('basic');
+        var mock = new Mock.V2(false);
         mock.start(function (provider) {
 
             var server = new Hapi.Server();
