@@ -71,7 +71,7 @@ The `server.auth.strategy()` method requires the following strategy options:
         - `'oauth'` - OAuth 1.0a
         - `'oauth2'` - OAuth 2.0
     - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only).
-    - `useParamsAuth` - boolean that determines if OAuth client id and client secret will be sent as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to false.
+    - `useParamsAuth` - boolean that determines if OAuth client id and client secret will be sent as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to `false`.
     - `auth` - the authorization endpoint URI.
     - `token` - the access token endpoint URI.
     - `version` - the OAuth version.
