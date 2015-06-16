@@ -357,7 +357,6 @@ describe('Bell', function () {
 
                     var profile = {
                         id: '1234567890',
-                        username: 'steve',
                         name: 'steve',
                         given_name: 'steve',
                         family_name: 'smith',
@@ -401,7 +400,6 @@ describe('Bell', function () {
                                     query: {},
                                     profile: {
                                         id: '1234567890',
-                                        username: 'steve',
                                         displayName: 'steve',
                                         name: {
                                             first: 'steve',
