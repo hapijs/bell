@@ -1090,6 +1090,7 @@ describe('Bell', function () {
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
+
                                 reply(request.auth.credentials);
                             }
                         }
@@ -1099,7 +1100,9 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
                         mock.server.inject(res.headers.location, function (res) {
+
                             server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+
                                 expect(res.statusCode).to.equal(500);
                                 Mock.clear();
                                 mock.stop(done);
@@ -1135,6 +1138,7 @@ describe('Bell', function () {
                         config: {
                             auth: 'custom',
                             handler: function (request, reply) {
+
                                 reply(request.auth.credentials);
                             }
                         }
