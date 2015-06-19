@@ -364,8 +364,8 @@ describe('Bell', function () {
                         },
                         emails: [
                             {
-                              "type": "account",
-                              "value": "steve@example.com"
+                              'type': 'account',
+                              'value': 'steve@example.com'
                             }
                         ],
                         raw: profile
@@ -415,8 +415,8 @@ describe('Bell', function () {
                                         },
                                         emails: [
                                             {
-                                              "type": "account",
-                                              "value": "steve@example.com"
+                                              'type': 'account',
+                                              'value': 'steve@example.com'
                                             }
                                         ],
                                         raw: profile
