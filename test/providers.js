@@ -357,14 +357,21 @@ describe('Bell', function () {
 
                     var profile = {
                         id: '1234567890',
-                        username: 'steve',
-                        name: 'steve',
-                        given_name: 'steve',
-                        family_name: 'smith',
-                        email: 'steve@example.com'
+                        displayName: 'steve smith',
+                        name: {
+                            givenName: 'steve',
+                            familyName: 'smith'
+                        },
+                        emails: [
+                            {
+                              "type": "account",
+                              "value": "steve@example.com"
+                            }
+                        ],
+                        raw: profile
                     };
 
-                    Mock.override('https://www.googleapis.com/oauth2/v1/userinfo', profile);
+                    Mock.override('https://www.googleapis.com/plus/v1/people/me', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
@@ -401,13 +408,17 @@ describe('Bell', function () {
                                     query: {},
                                     profile: {
                                         id: '1234567890',
-                                        username: 'steve',
-                                        displayName: 'steve',
+                                        displayName: 'steve smith',
                                         name: {
-                                            first: 'steve',
-                                            last: 'smith'
+                                            givenName: 'steve',
+                                            familyName: 'smith'
                                         },
-                                        email: 'steve@example.com',
+                                        emails: [
+                                            {
+                                              "type": "account",
+                                              "value": "steve@example.com"
+                                            }
+                                        ],
                                         raw: profile
                                     }
                                 });
