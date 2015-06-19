@@ -1097,6 +1097,7 @@ describe('Bell', function () {
                     });
 
                     server.inject('/login', function (res) {
+
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
                         mock.server.inject(res.headers.location, function (res) {
