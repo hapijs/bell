@@ -363,7 +363,7 @@ describe('Bell', function () {
                         email: 'steve@example.com'
                     };
 
-                    Mock.override('https://www.googleapis.com/oauth2/v1/userinfo', profile);
+                    Mock.override('https://www.googleapis.com/oauth2/v3/userinfo', profile);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
