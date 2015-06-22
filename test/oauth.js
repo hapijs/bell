@@ -1128,8 +1128,8 @@ describe('Bell', function () {
                     server.auth.strategy('custom', 'bell', {
                         password: 'password',
                         isSecure: false,
-                        clientId: Mock.SECRET_TESTER,
-                        clientSecret: Mock.SECRET_TESTER,
+                        clientId: Mock.CLIENT_ID_TESTER,
+                        clientSecret: Mock.CLIENT_SECRET_TESTER,
                         provider: provider
                     });
 

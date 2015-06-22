@@ -20,7 +20,8 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var expect = Code.expect;
 
-exports.SECRET_TESTER = internals.SECRET_TESTER = 'secretTester';
+exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
+exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
 
 exports.V1 = internals.V1 = function (fail) {
 
@@ -223,8 +224,8 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                         payload.email = 'steve@example.com';
                     }
 
-                    if (code.client_id === internals.SECRET_TESTER) {
-                        expect(internals.SECRET_TESTER).to.equal(request.payload.client_secret);
+                    if (code.client_id === internals.CLIENT_ID_TESTER) {
+                        expect(internals.CLIENT_SECRET_TESTER).to.equal(request.payload.client_secret);
                     }
 
                     reply(payload);
