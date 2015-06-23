@@ -5,7 +5,7 @@ var Bell = require('../');
 
 
 var server = new Hapi.Server();
-server.connection({ port: 8000 });
+server.connection({ host: 'localhost', port: 4567});
 
 server.register(Bell, function (err) {
 
@@ -30,9 +30,14 @@ server.register(Bell, function (err) {
         method: '*',
         path: '/bell/door',
         config: {
-            auth: 'google',
+            auth: {
+                strategy: 'google',
+                mode: 'try'
+            },
             handler: function (request, reply) {
-
+                if (!request.auth.isAuthenticated) {
+                    return reply('Authentication failed due to: ' + request.auth.error.message);
+                }
                 reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
             }
         }
