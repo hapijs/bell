@@ -35,6 +35,7 @@ server.register(Bell, function (err) {
                 mode: 'try'
             },
             handler: function (request, reply) {
+
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);
                 }
