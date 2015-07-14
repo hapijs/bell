@@ -18,12 +18,10 @@ server.register(Bell, function (err) {
         // Next, go to "APIs & auth >> Credentials and Create new Client ID
         // Select "web application" and set "AUTHORIZED JAVASCRIPT ORIGINS" and "AUTHORIZED REDIRECT URIS"
         // This will net you the clientId and the clientSecret needed.
-        // Also be sure to pass the redirect_uri as well. It must be in the list of "AUTHORIZED REDIRECT URIS"
+        // Also be sure to pass the location as well. It must be in the list of "AUTHORIZED REDIRECT URIS"
         clientId: '',
         clientSecret: '',
-        providerParams: {
-            redirect_uri: server.info.uri + '/bell/door'
-        }
+        location: server.info.uri
     });
 
     server.route({
