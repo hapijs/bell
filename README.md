@@ -5,7 +5,7 @@ Google, Instagram, LinkedIn, Twitter, Yahoo, Foursquare, VK, ArcGIS Online, Wind
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 
-Lead Maintainer: [Wyatt Preul](https://github.com/wpreul)
+Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 
 ### Usage
 
