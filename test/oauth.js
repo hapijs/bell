@@ -1382,7 +1382,7 @@ describe('Bell', function () {
 
                     Mock.override('https://graph.facebook.com/v2.3/me', function (uri) {
 
-                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102');
+                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id,name,email,first_name,last_name,middle_name');
                         Mock.clear();
                         mock.stop(done);
                     });
