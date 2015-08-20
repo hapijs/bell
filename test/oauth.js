@@ -1,3 +1,4 @@
+/*eslint "hapi/no-shadow-relaxed": [1, { "ignore": ["err", "done", "res"] }]*/
 // Load modules
 
 var Bell = require('../');
