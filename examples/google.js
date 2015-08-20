@@ -5,7 +5,7 @@ var Bell = require('../');
 
 
 var server = new Hapi.Server();
-server.connection({ host: 'localhost', port: 4567});
+server.connection({ host: 'localhost', port: 4567 });
 
 server.register(Bell, function (err) {
 

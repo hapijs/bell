@@ -1,3 +1,4 @@
+/*eslint "hapi/no-shadow-relaxed": [1, { "ignore": ["err", "done", "res"] }]*/
 // Load modules
 
 var Bell = require('../');
@@ -364,8 +365,8 @@ describe('Bell', function () {
                         },
                         emails: [
                             {
-                              'type': 'account',
-                              'value': 'steve@example.com'
+                                'type': 'account',
+                                'value': 'steve@example.com'
                             }
                         ]
                     };
@@ -414,8 +415,8 @@ describe('Bell', function () {
                                         },
                                         emails: [
                                             {
-                                              'type': 'account',
-                                              'value': 'steve@example.com'
+                                                'type': 'account',
+                                                'value': 'steve@example.com'
                                             }
                                         ],
                                         raw: profile
