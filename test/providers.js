@@ -367,8 +367,7 @@ describe('Bell', function () {
                               'type': 'account',
                               'value': 'steve@example.com'
                             }
-                        ],
-                        raw: profile
+                        ]
                     };
 
                     Mock.override('https://www.googleapis.com/plus/v1/people/me', profile);
@@ -453,6 +452,7 @@ describe('Bell', function () {
                         id: '1234567890',
                         firstName: 'steve',
                         lastName: 'smith',
+                        email: 'steve.smith@domain.com',
                         headline: 'Master of the universe'
                     };
 
@@ -497,6 +497,7 @@ describe('Bell', function () {
                                             first: 'steve',
                                             last: 'smith'
                                         },
+                                        email: 'steve.smith@domain.com',
                                         headline: 'Master of the universe',
                                         raw: profile
                                     }
@@ -918,7 +919,6 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
-                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -984,7 +984,6 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
-                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1058,7 +1057,6 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
-                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1545,7 +1543,6 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
-                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
@@ -1627,7 +1624,6 @@ describe('Bell', function () {
                                 expect(res.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
-                                    expiresIn: 3600,
                                     secret: 'secret',
                                     query: {},
                                     profile: {
