@@ -7,6 +7,7 @@ var Code = require('code');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
 var Lab = require('lab');
+var Joi = require('joi');
 var Mock = require('./mock');
 var OAuth = require('../lib/oauth');
 
@@ -218,6 +219,89 @@ describe('Bell', function () {
                                 mock.stop(done);
                             });
                         });
+                    });
+                });
+            });
+        });
+
+        it('does not pass on runtime query params by default', function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?runtime=true', function (res) {
+
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
+        it('passes on runtime query params with allowRuntimeProviderParams', function (done) {
+
+            var mock = new Mock.V1();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        allowRuntimeProviderParams: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?runtime=true', function (res) {
+
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1&runtime=true');
+
+                        mock.stop(done);
                     });
                 });
             });
@@ -848,6 +932,89 @@ describe('Bell', function () {
                 });
             });
         });
+
+        it('authenticates an endpoint with runtime query parameters', function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true },
+                        allowRuntimeProviderParams: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?runtime=5', function (res) {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
+        it('does not include runtime query parameters by default', function (done) {
+
+            var mock = new Mock.V2();
+            mock.start(function (provider) {
+
+                var server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, function (err) {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true }
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?notallowed=b', function (res) {
+
+                        expect(res.headers.location).to.not.contain('notallowed');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
     });
 
     describe('#v2', function () {
@@ -1361,7 +1528,6 @@ describe('Bell', function () {
 
                         expect(res.statusCode).to.equal(500);
                         done();
-
                     });
                 });
             });
