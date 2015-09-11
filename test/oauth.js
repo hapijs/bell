@@ -741,7 +741,7 @@ describe('Bell', function () {
         });
     });
 
-    describe('#v2', function () {
+    describe('v2()', function () {
 
         it('authenticates an endpoint with provider parameters', function (done) {
 
@@ -1013,9 +1013,6 @@ describe('Bell', function () {
                 });
             });
         });
-    });
-
-    describe('v2()', function () {
 
         it('errors on missing cookie in token step', function (done) {
 
