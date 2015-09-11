@@ -2,7 +2,7 @@ If you want to write your own provider please see the section at the bottom of t
 
 ## Existing Providers
 
-Each provider may specify configuration options that are unique. Any of these unique options are documented here and must be provided during strategy creation. See the [API Documentation](https://github.com/hapijs/bell/API.md) for all other options.
+Each provider may specify configuration options that are unique. Any of these unique options are documented here and must be provided during strategy creation. See the [API Documentation](API.md) for all other options.
 
 ### ArcGIS Online
 

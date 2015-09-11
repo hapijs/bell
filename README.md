@@ -4,9 +4,9 @@
 
 **bell** ships with built-in support for `Facebook`, `GitHub`, `Google`, `Instagram`, `LinkedIn`, `Twitter`, `Yahoo`, `Foursquare`, `VK`, `ArcGIS Online`, `Windows Live`, `Nest`, `Phabricator`, `BitBucket`, `Dropbox`, and `Reddit`. It also supports any compliant OAuth 1.0a and 2.0 based login services with a simple configuration object.
 
-[**API Documentation**](https://github.com/hapijs/bell/API.md)
+[**API Documentation**](API.md)
 
-[**Providers Documentation**](https://github.com/hapijs/bell/Providers.md)
+[**Providers Documentation**](Providers.md)
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 

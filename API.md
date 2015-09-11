@@ -117,7 +117,7 @@ Each strategy accepts the following optional settings:
 - `config` - a configuration object used to customize the provider settings. The built-in `'twitter'` provider accepts the `extendedProfile`
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
   The built-in `'github'` and `'phabricator'` providers accept the `uri` option which allows pointing to a private enterprise installation
-  (e.g. `'https://vpn.example.com'`). See [Providers documentation](https://github.com/hapijs/bell/Providers.md) for more information.
+  (e.g. `'https://vpn.example.com'`). See [Providers documentation](Providers.md) for more information.
 - `profileParams` - an object of key-value pairs that specify additional URL query parameters to send with the profile request to the provider.
    The built-in `facebook` provider, for example, could have `fields` specified to determine the fields returned from the user's graph, which would
    then be available to you in the `auth.credentials.profile.raw` object.
