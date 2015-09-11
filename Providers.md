@@ -10,6 +10,8 @@ Each provider may specify configuration options that are unique. Any of these un
 
 - `scope`: No default scope
 - `config`: not applicable
+- `auth`: https://www.arcgis.com/sharing/rest/oauth2/authorize
+- `token`: https://www.arcgis.com/sharing/rest/oauth2/token
 
 The default profile response will look like this:
 
@@ -35,6 +37,9 @@ credentials.profile = {
 
 - `scope`: not applicable
 - `config`: not applicable
+- `temporary`: https://bitbucket.org/api/1.0/oauth/request_token
+- `auth`: https://bitbucket.org/api/1.0/oauth/authenticate
+- `token`: https://bitbucket.org/api/1.0/oauth/access_token
 
 The default profile response will look like this:
 
@@ -52,6 +57,8 @@ credentials.profile.raw = profile;
 
 - `scope`: No default scope
 - `config`: not applicable
+- `auth`: https://www.dropbox.com/1/oauth2/authorize
+- `token`: https://api.dropbox.com/1/oauth2/token
 
 The default profile response will look like this:
 
@@ -65,6 +72,8 @@ The default profile response will look like this:
 
 - `scope`: Defaults to `['email']`
 - `config`: not applicable
+- `auth`: https://www.facebook.com/v2.3/dialog/oauth
+- `token`: https://graph.facebook.com/v2.3/oauth/access_token
 
 The default profile response will look like this:
 
@@ -89,6 +98,8 @@ credentials.profile = {
 
 - `scope`: No default scope
 - `config`: not applicable
+- `auth`: https://foursquare.com/oauth2/authenticate
+- `token`: https://foursquare.com/oauth2/access_token
 
 The default profile response will look like this:
 
@@ -112,6 +123,8 @@ credentials.profile = {
 - `scope`: Defaults to `['user:email']`
 - `config`:
   - `uri`: Point to your github enterprise uri. Defaults to `https://github.com`.
+- `auth`: /login/oauth/authorize
+- `token`: /login/oauth/access_token
 
 The default profile response will look like this:
 
@@ -131,6 +144,8 @@ credentials.profile = {
 
 - `scope`: Defaults to `['profile', 'email']`
 - `config`: not applicable
+- `auth`: https://accounts.google.com/o/oauth2/v2/auth
+- `token`: https://www.googleapis.com/oauth2/v4/token
 
 The default profile response will look like this:
 
@@ -151,6 +166,8 @@ credentials.profile = {
 - `scope`: Defaults to `['basic']`
 - `config`:
   - `extendedProfile`: Boolean that determines if extended profile information will be fetched
+- `auth`: https://api.instagram.com/oauth/authorize
+- `token`: https://api.instagram.com/oauth/access_token
 
 The default profile response will look like this:
 
@@ -171,6 +188,8 @@ credentials.profile = {
 
 - `scope`: Defaults to `['r_basicprofile', 'r_emailaddress']`
 - `config`: not applicable
+- `auth`: https://www.linkedin.com/uas/oauth2/authorization
+- `token`: https://www.linkedin.com/uas/oauth2/accessToken
 
 The default profile response will look like this:
 
@@ -193,6 +212,8 @@ credentials.profile = {
 
 - `scope`: Defaults to `['wl.basic', 'wl.emails']`
 - `config`: not applicable
+- `auth`: https://login.live.com/oauth20_authorize.srf
+- `token`: https://login.live.com/oauth20_token.srf
 
 The default profile response will look like this:
 
@@ -216,6 +237,8 @@ credentials.profile = {
 
 - `scope`: No default scope
 - `config`: not applicable
+- `auth`: https://home.nest.com/login/oauth2
+- `token`: https://api.home.nest.com/oauth2/access_token
 
 The default profile response will look like this:
 
@@ -231,6 +254,8 @@ The default profile response will look like this:
 - `scope`: Defaults to `['whoami']`
 - `config`:
   - `uri`: URI of phabricator instance
+- `auth`: /oauthserver/auth/
+- `token`: /oauthserver/token/
 
 The default profile response will look like this:
 
@@ -250,6 +275,8 @@ credentials.profile = {
 
 - `scope`: Defaults to `['identity']`
 - `config`: not applicable
+- `auth`: https://www.reddit.com/api/v1/authorize
+- `token`: https://www.reddit.com/api/v1/access_token
 
 The default profile response will look like this:
 
@@ -264,6 +291,9 @@ The default profile response will look like this:
 - `scope`: not applicable
 - `config`:
   - `extendedProfile`: Request for more profile information
+- `temporary`: 'https://api.twitter.com/oauth/request_token'
+- `auth`: https://api.twitter.com/oauth/authenticate
+- `token`: https://api.twitter.com/oauth/access_token
 
 The default profile response will look like this:
 
@@ -282,6 +312,8 @@ credentials.profile = {
 
 - `scope`: No default scope
 - `config`: not applicable
+- `auth`: https://oauth.vk.com/authorize
+- `token`: https://oauth.vk.com/access_token
 
 The default profile response will look like this:
 
@@ -303,6 +335,9 @@ credentials.profile = {
 
 - `scope`: not applicable
 - `config`: not applicable
+- `temporary`: https://api.login.yahoo.com/oauth/v2/get_request_token
+- `auth`: https://api.login.yahoo.com/oauth/v2/request_auth
+- `token`: https://api.login.yahoo.com/oauth/v2/get_token
 
 The default profile response will look like this:
 
