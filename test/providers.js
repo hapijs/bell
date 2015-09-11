@@ -1,4 +1,3 @@
-/*eslint "hapi/no-shadow-relaxed": [1, { "ignore": ["err", "done", "res"] }]*/
 // Load modules
 
 var Bell = require('../');
@@ -82,11 +81,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -95,7 +95,6 @@ describe('Bell', function () {
                                     profile: profile
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -155,11 +154,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -179,7 +179,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -237,11 +236,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -255,8 +255,6 @@ describe('Bell', function () {
                                         raw: profile
                                     }
                                 });
-
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -311,11 +309,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -330,7 +329,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -396,11 +394,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -423,7 +422,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -482,11 +480,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -504,7 +503,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -596,11 +594,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -619,7 +618,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -678,11 +676,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -701,7 +700,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -757,11 +755,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -780,7 +779,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -837,11 +835,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -860,7 +859,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -913,11 +911,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
@@ -932,7 +931,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -978,11 +976,11 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
@@ -1051,11 +1049,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
@@ -1071,7 +1070,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1141,11 +1139,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1164,7 +1163,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1232,11 +1230,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1255,7 +1254,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1311,11 +1309,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1331,7 +1330,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1377,11 +1375,11 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1458,11 +1456,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1479,7 +1478,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1537,11 +1535,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
@@ -1561,7 +1560,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1618,11 +1616,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: 'final',
                                     secret: 'secret',
@@ -1642,7 +1641,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1702,11 +1700,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1715,7 +1714,6 @@ describe('Bell', function () {
                                     profile: profile
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1776,11 +1774,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1801,7 +1800,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1826,7 +1824,6 @@ describe('Bell', function () {
 
                     expect(Bell.providers.phabricator).to.throw(Error);
 
-                    Mock.clear();
                     mock.stop(done);
                 });
             });
@@ -1880,11 +1877,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                Mock.clear();
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1899,7 +1897,6 @@ describe('Bell', function () {
                                     }
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
@@ -1949,11 +1946,11 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.deep.equal({
+                                expect(response.result).to.deep.equal({
                                     provider: 'custom',
                                     token: '456',
                                     expiresIn: 3600,
@@ -1961,7 +1958,6 @@ describe('Bell', function () {
                                     query: {}
                                 });
 
-                                Mock.clear();
                                 mock.stop(done);
                             });
                         });
