@@ -1,4 +1,3 @@
-/*eslint "hapi/no-shadow-relaxed": [1, { "ignore": ["err", "done", "res"] }]*/
 // Load modules
 
 var Bell = require('../');
@@ -27,7 +26,7 @@ var expect = Code.expect;
 
 describe('Bell', function () {
 
-    describe('#v1', function () {
+    describe('v1()', function () {
 
         it('errors on missing oauth_verifier', function (done) {
 
@@ -211,11 +210,11 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -342,9 +341,9 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         expect(res.headers.location).to.equal(mock.uri + '/auth?special=true&oauth_token=1');
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (response) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
+                            expect(response.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
                             mock.stop(done);
                         });
                     });
@@ -368,8 +367,8 @@ describe('Bell', function () {
 
                     Mock.override('https://api.twitter.com/1.1/users/show.json', function (uri) {
 
-                        expect(uri).to.equal('https://api.twitter.com/1.1/users/show.json?user_id=1234567890&fields=id%2Cemail');
                         Mock.clear();
+                        expect(uri).to.equal('https://api.twitter.com/1.1/users/show.json?user_id=1234567890&fields=id%2Cemail');
                         mock.stop(done);
                     });
 
@@ -400,9 +399,9 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) { });
                         });
                     });
                 });
@@ -450,15 +449,14 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+                            expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
-
-                                expect(res.statusCode).to.equal(500);
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -503,11 +501,11 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function () {
 
-                            server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -551,13 +549,13 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
+                            expect(mockRes.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(200);
+                                expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
@@ -601,13 +599,13 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
+                            expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(200);
+                                expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
@@ -664,13 +662,13 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+                            expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.equal('some text reply');
+                                expect(response.result).to.equal('some text reply');
                                 mock.stop(done);
                             });
                         });
@@ -727,13 +725,13 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+                            expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.result).to.equal('{"a":"5"}');
+                                expect(response.result).to.equal('{"a":"5"}');
                                 mock.stop(done);
                             });
                         });
@@ -743,7 +741,7 @@ describe('Bell', function () {
         });
     });
 
-    describe('#v2', function () {
+    describe('v2()', function () {
 
         it('authenticates an endpoint with provider parameters', function (done) {
 
@@ -824,13 +822,13 @@ describe('Bell', function () {
                         expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+                            expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(200);
+                                expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
@@ -877,13 +875,13 @@ describe('Bell', function () {
                         expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
+                            expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(200);
+                                expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
@@ -1015,9 +1013,6 @@ describe('Bell', function () {
                 });
             });
         });
-    });
-
-    describe('#v2', function () {
 
         it('errors on missing cookie in token step', function (done) {
 
@@ -1055,13 +1050,13 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+                            expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            server.inject(res.headers.location, function (res) {
+                            server.inject(mockRes.headers.location, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1106,13 +1101,13 @@ describe('Bell', function () {
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+                            expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: res.headers.location + 'xx', headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location + 'xx', headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1160,12 +1155,12 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1214,12 +1209,12 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1268,12 +1263,12 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1317,11 +1312,11 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(200);
+                                expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
                             });
                         });
@@ -1370,12 +1365,12 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1424,12 +1419,12 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1478,12 +1473,12 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                                expect(res.statusCode).to.equal(500);
                                 Mock.clear();
+                                expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
                             });
                         });
@@ -1549,8 +1544,8 @@ describe('Bell', function () {
 
                     Mock.override('https://graph.facebook.com/v2.3/me', function (uri) {
 
-                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         Mock.clear();
+                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         mock.stop(done);
                     });
 
@@ -1581,9 +1576,9 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) { });
                         });
                     });
                 });
@@ -1606,8 +1601,8 @@ describe('Bell', function () {
 
                     Mock.override('https://graph.facebook.com/v2.3/me', function (uri) {
 
-                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         Mock.clear();
+                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         mock.stop(done);
                     });
 
@@ -1638,9 +1633,9 @@ describe('Bell', function () {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-                        mock.server.inject(res.headers.location, function (res) {
+                        mock.server.inject(res.headers.location, function (mockRes) {
 
-                            server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) { });
                         });
                     });
                 });
@@ -1666,8 +1661,8 @@ describe('Bell', function () {
                 var client = new OAuth.Client({ provider: Bell.providers.twitter() });
                 client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, function (err, payload) {
 
-                    expect(err.message).to.equal('unknown');
                     Mock.clear();
+                    expect(err.message).to.equal('unknown');
                     done();
                 });
             });
@@ -1679,8 +1674,8 @@ describe('Bell', function () {
                 var client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
                 client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, function (err, payload) {
 
-                    expect(err.message).to.equal('Received invalid payload from prov type endpoint: Unexpected token x');
                     Mock.clear();
+                    expect(err.message).to.equal('Received invalid payload from prov type endpoint: Unexpected token x');
                     done();
                 });
             });
@@ -1692,8 +1687,8 @@ describe('Bell', function () {
                 var client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
                 client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' }, function (err, payload) {
 
-                    expect(err.message).to.equal('Received invalid payload from prov resource endpoint: Unexpected token x');
                     Mock.clear();
+                    expect(err.message).to.equal('Received invalid payload from prov resource endpoint: Unexpected token x');
                     done();
                 });
             });

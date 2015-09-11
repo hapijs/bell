@@ -1,4 +1,3 @@
-/*eslint "hapi/no-shadow-relaxed": [1, { "ignore": ["err", "done", "res"] }]*/
 // Load modules
 
 var Bell = require('../');
@@ -103,14 +102,14 @@ describe('Bell', function () {
                     var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                    mock.server.inject(res.headers.location, function (res) {
+                    mock.server.inject(res.headers.location, function (mockRes) {
 
-                        expect(res.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+                        expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                            expect(res.result.provider).to.equal('custom');
-                            expect(res.result.query.next).to.equal('/home');
+                            expect(response.result.provider).to.equal('custom');
+                            expect(response.result.query.next).to.equal('/home');
                             mock.stop(done);
                         });
                     });
@@ -155,13 +154,13 @@ describe('Bell', function () {
                     var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                    mock.server.inject(res.headers.location, function (res) {
+                    mock.server.inject(res.headers.location, function (mockRes) {
 
-                        expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                            expect(res.result.provider).to.equal('custom');
+                            expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
                         });
                     });
@@ -206,13 +205,13 @@ describe('Bell', function () {
                     var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                    mock.server.inject(res.headers.location, function (res) {
+                    mock.server.inject(res.headers.location, function (mockRes) {
 
-                        expect(res.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: res.headers.location, headers: { cookie: cookie } }, function (res) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
 
-                            expect(res.result.provider).to.equal('custom');
+                            expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
                         });
                     });
@@ -318,9 +317,9 @@ describe('Bell', function () {
                 server.inject('/login_1', function (res) {
 
                     expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
-                    server.inject('/login_2', function (res) {
+                    server.inject('/login_2', function (response) {
 
-                        expect(res.headers['set-cookie'][0]).to.contain('ring_2=');
+                        expect(response.headers['set-cookie'][0]).to.contain('ring_2=');
                         mock.stop(done);
                     });
                 });
