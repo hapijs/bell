@@ -26,7 +26,7 @@ var expect = Code.expect;
 
 describe('Bell', function () {
 
-    describe('#v1', function () {
+    describe('v1()', function () {
 
         it('errors on missing oauth_verifier', function (done) {
 
@@ -1015,7 +1015,7 @@ describe('Bell', function () {
         });
     });
 
-    describe('#v2', function () {
+    describe('v2()', function () {
 
         it('errors on missing cookie in token step', function (done) {
 
