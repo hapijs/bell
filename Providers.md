@@ -142,6 +142,8 @@ credentials.profile = {
 
 [Provider Documentation](https://developers.google.com/identity/protocols/OpenIDConnect)
 
+You must also enable the Google+ API in your profile. Go to APIs & Auth, then APIs and under Social APIs click Google+ API and enable it.
+
 - `scope`: Defaults to `['profile', 'email']`
 - `config`: not applicable
 - `auth`: https://accounts.google.com/o/oauth2/v2/auth
