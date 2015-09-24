@@ -208,6 +208,21 @@ credentials.profile = {
 };
 ```
 
+### Meetup
+
+[Provider Documentation](http://www.meetup.com/meetup_api/auth)
+
+ - `scope`: Defaults to `['basic']`
+ - `config`: not applicable
+ - `auth`: https://secure.meetup.com/oauth2/authorize
+ - `token`: https://secure.meetup.com/oauth2/access
+
+The default profile response will look like this:
+
+```javascript
+// Defaults to meetup response (http://www.meetup.com/meetup_api/docs/2/member/#get)
+```
+
 ### Microsoft Live
 
 [Provider Documentation](https://msdn.microsoft.com/en-us/library/hh243647.aspx)
