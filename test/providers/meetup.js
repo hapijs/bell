@@ -87,6 +87,7 @@ describe('meetup', function () {
                                     country: 'us'
                                 }
                             });
+
                             mock.stop(done);
                         });
                     });
