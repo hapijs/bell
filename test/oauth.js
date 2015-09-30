@@ -6,7 +6,6 @@ var Code = require('code');
 var Hapi = require('hapi');
 var Hoek = require('hoek');
 var Lab = require('lab');
-var Joi = require('joi');
 var Mock = require('./mock');
 var OAuth = require('../lib/oauth');
 
@@ -1048,6 +1047,7 @@ describe('Bell', function () {
                     server.inject('/login', function (res) {
 
                         var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(cookie).to.exist();
                         expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
                         mock.server.inject(res.headers.location, function (mockRes) {
