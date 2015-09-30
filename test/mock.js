@@ -6,7 +6,6 @@ var Code = require('code');
 var Hapi = require('hapi');
 var Hawk = require('hawk');
 var Hoek = require('hoek');
-var Lab = require('lab');
 var Wreck = require('wreck');
 
 
@@ -17,7 +16,6 @@ var internals = {};
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
 var expect = Code.expect;
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
