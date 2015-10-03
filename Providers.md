@@ -208,6 +208,16 @@ credentials.profile = {
 };
 ```
 
+You can request additional profile fields by setting the `fields` option of `providerParams`. All possible fields are described in the [Basic Profile Fields documentation](https://developer.linkedin.com/docs/fields/basic-profile) (see an example on [this page](https://developer.linkedin.com/docs/signin-with-linkedin) under _Requesting additional profile fields_).
+
+Here is an example of a custom strategy configuration:
+
+```javascript
+providerParams: {
+    fields: ':(id,first-name,last-name,positions,picture-url,picture-urls::(original),email-address)'
+}
+```
+
 ### Meetup
 
 [Provider Documentation](http://www.meetup.com/meetup_api/auth)
