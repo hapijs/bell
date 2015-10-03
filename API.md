@@ -111,6 +111,7 @@ Each strategy accepts the following optional settings:
     - Facebook supports `display` ('page', 'popup', or 'touch'), `auth_type`, `auth_nonce`.
     - Google supports `access_type`, `approval_prompt`, `prompt`, `login_hint`, `user_id`, `hd`.
     - Twitter supports `force_login`, `screen_name`.
+    - Linkedin supports `fields`.
 - `allowRuntimeProviderParams` - allows passing query parameters from a **bell** protected endpoint to the auth request. It will merge the query params you pass along with the providerParams and any other predefined ones. Be aware that this will override predefined query parameters! Default to `false`.
 - `scope` - Each built-in vendor comes with the required scope for basic profile information. Use `scope` to specify a different scope
   as required by your application. Consult the provider for their specific supported scopes.
