@@ -22,7 +22,8 @@
     "foursquare",
     "vk",
     "arcgisonline",
-    "reddit"
+    "reddit",
+    "tumblr"
   ],
   "engines": {
     "node": ">=0.10.33"
