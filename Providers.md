@@ -380,6 +380,25 @@ credentials.profile = {
 };
 ```
 
+### Tumblr
+
+[Provider Documentation](https://www.tumblr.com/docs/en/api/v2#auth)
+
+- `scope`: not applicable
+- `temporary`: https://www.tumblr.com/oauth/request_token
+- `auth`: https://www.tumblr.com/oauth/authorize
+- `token`: https://www.tumblr.com/oauth/access_token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    username: profile.response.user.name,
+    raw: profile.response.user
+};
+
+```
+
 ## Writing a new provider
 
 When writing a new provider see existing implementations (in `lib/providers`) for reference as well as any documentation provided by your provider. You may want to support `uri` or `extendedProfile` options depending on your needs.
