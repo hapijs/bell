@@ -397,7 +397,6 @@ credentials.profile = {
     raw: profile.response.user
 };
 
-// credentials.profile.raw will contain extendedProfile if enabled
 ```
 
 ## Writing a new provider
