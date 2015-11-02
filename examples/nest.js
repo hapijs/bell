@@ -1,12 +1,15 @@
+'use strict';
+
 // Load modules
 
-var Hapi = require('hapi');
-var Bell = require('../');
-var server = new Hapi.Server();
+const Hapi = require('hapi');
+const Bell = require('../');
 
+
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-server.register(Bell, function (err) {
+server.register(Bell, (err) => {
 
     server.auth.strategy('nest', 'bell', {
         provider: 'nest',
@@ -29,7 +32,7 @@ server.register(Bell, function (err) {
         }
     });
 
-    server.start(function (err) {
+    server.start((err) => {
 
         console.log('Server started at:', server.info.uri);
     });

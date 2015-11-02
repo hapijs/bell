@@ -1,22 +1,24 @@
+'use strict';
+
 // Load modules
 
-var Querystring = require('querystring');
-var Boom = require('boom');
-var Code = require('code');
-var Hapi = require('hapi');
-var Hawk = require('hawk');
-var Hoek = require('hoek');
-var Wreck = require('wreck');
+const Querystring = require('querystring');
+const Boom = require('boom');
+const Code = require('code');
+const Hapi = require('hapi');
+const Hawk = require('hawk');
+const Hoek = require('hoek');
+const Wreck = require('wreck');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var expect = Code.expect;
+const expect = Code.expect;
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
@@ -41,17 +43,17 @@ exports.V1 = internals.V1 = function (fail) {
                         return reply(Boom.badRequest());
                     }
 
-                    var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
+                    const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_callback).to.exist();
 
-                    var token = String(Object.keys(this.tokens).length + 1);
+                    const token = String(Object.keys(this.tokens).length + 1);
                     this.tokens[token] = {
                         authorized: false,
                         secret: 'secret',
                         callback: header.oauth_callback
                     };
 
-                    var payload = {
+                    const payload = {
                         oauth_token: token,
                         oauth_token_secret: 'secret',
                         oauth_callback_confirmed: true
@@ -68,13 +70,13 @@ exports.V1 = internals.V1 = function (fail) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    var token = this.tokens[request.query.oauth_token];
+                    const token = this.tokens[request.query.oauth_token];
                     expect(token).to.exist();
 
                     token.authorized = true;
                     token.verifier = '123';
 
-                    var extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
+                    const extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
                     return reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
                 }
             }
@@ -90,13 +92,13 @@ exports.V1 = internals.V1 = function (fail) {
                         return reply(Boom.badRequest());
                     }
 
-                    var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
-                    var token = this.tokens[header.oauth_token];
+                    const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
+                    const token = this.tokens[header.oauth_token];
                     expect(token).to.exist();
                     expect(token.verifier).to.equal(header.oauth_verifier);
                     expect(token.authorized).to.equal(true);
 
-                    var payload = {
+                    const payload = {
                         oauth_token: 'final',
                         oauth_token_secret: 'secret'
                     };
@@ -117,7 +119,7 @@ exports.V1 = internals.V1 = function (fail) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    var header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
+                    const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_token).to.equal('final');
 
                     return reply(request.payload ? request.payload : 'some text reply');
@@ -130,19 +132,17 @@ exports.V1 = internals.V1 = function (fail) {
 
 internals.V1.prototype.start = function (callback) {
 
-    var self = this;
-
-    this.server.start(function (err) {
+    this.server.start((err) => {
 
         expect(err).to.not.exist();
 
-        self.uri = self.server.info.uri;
+        this.uri = this.server.info.uri;
 
         return callback({
             protocol: 'oauth',
-            temporary: self.server.info.uri + '/temporary',
-            auth: self.server.info.uri + '/auth',
-            token: self.server.info.uri + '/token'
+            temporary: this.server.info.uri + '/temporary',
+            auth: this.server.info.uri + '/auth',
+            token: this.server.info.uri + '/token'
         });
     });
 };
@@ -173,7 +173,7 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    var code = String(Object.keys(this.codes).length + 1);
+                    const code = String(Object.keys(this.codes).length + 1);
                     this.codes[code] = {
                         redirect_uri: request.query.redirect_uri,
                         client_id: request.query.client_id
@@ -190,7 +190,7 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    var code = this.codes[request.payload.code];
+                    const code = this.codes[request.payload.code];
                     expect(code).to.exist();
                     expect(code.redirect_uri).to.equal(request.payload.redirect_uri);
                     if (useParamsAuth) {
@@ -198,12 +198,12 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                         expect(request.headers.authorization).to.be.undefined();
                     }
                     else {
-                        var basic = new Buffer(request.headers.authorization.slice(6), 'base64').toString();
+                        const basic = new Buffer(request.headers.authorization.slice(6), 'base64').toString();
                         expect(basic).to.startWith(code.client_id);
                         expect(request.payload.client_id).to.be.undefined();
                     }
 
-                    var payload = {
+                    const payload = {
                         access_token: '456',
                         expires_in: 3600
                     };
@@ -236,19 +236,17 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
 
 internals.V2.prototype.start = function (callback) {
 
-    var self = this;
-
-    this.server.start(function (err) {
+    this.server.start((err) => {
 
         expect(err).to.not.exist();
 
-        self.uri = self.server.info.uri;
+        this.uri = this.server.info.uri;
 
         return callback({
             protocol: 'oauth2',
-            useParamsAuth: self.useParamsAuth,
-            auth: self.server.info.uri + '/auth',
-            token: self.server.info.uri + '/token'
+            useParamsAuth: this.useParamsAuth,
+            auth: this.server.info.uri + '/auth',
+            token: this.server.info.uri + '/token'
         });
     });
 };
@@ -262,11 +260,11 @@ internals.V2.prototype.stop = function (callback) {
 
 exports.override = function (uri, payload) {
 
-    var override = function (method) {
+    const override = function (method) {
 
         return function (dest) {
 
-            var callback = arguments.length === 3 ? arguments[2] : arguments[1];
+            const callback = arguments.length === 3 ? arguments[2] : arguments[1];
 
             if (dest.indexOf(uri) === 0) {
                 if (typeof payload === 'function') {
@@ -298,7 +296,7 @@ exports.override = function (uri, payload) {
 };
 
 
-exports.clear = function (uri) {
+exports.clear = (uri) => {
 
     Wreck.get = internals.wreck.get;
     Wreck.post = internals.wreck.post;
