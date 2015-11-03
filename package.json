@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "boom": "3.x.x",
-    "cryptiles": "2.x.x",
+    "cryptiles": "3.x.x",
     "hoek": "3.x.x",
     "joi": "7.x.x",
     "wreck": "7.x.x"
