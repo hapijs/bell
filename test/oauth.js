@@ -510,6 +510,148 @@ describe('Bell', () => {
             });
         });
 
+        it('errors if isSecure is true when protocol is not https', (done) => {
+
+            const mock = new Mock.V1();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: true,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.statusCode).to.equal(500);
+                        done();
+                    });
+                });
+            });
+        });
+
+
+        it('passes if isSecure is true when protocol is https (forced)', (done) => {
+
+            const mock = new Mock.V1();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        isSecure: true,
+                        password: 'password',
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        forceHttps: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('passes if isSecure is true when protocol is https (location)', (done) => {
+
+            const mock = new Mock.V1();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: true,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        location: 'https://differenthost:8888'
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
         it('forces https in callback_url when set in options', (done) => {
 
             const mock = new Mock.V1();
@@ -1520,6 +1662,153 @@ describe('Bell', () => {
 
                         expect(res.statusCode).to.equal(500);
                         done();
+                    });
+                });
+            });
+        });
+
+        it('errors if isSecure is true when protocol is not https', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: true,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true }
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.statusCode).to.equal(500);
+                        done();
+                    });
+                });
+            });
+        });
+
+        it('passes if isSecure is true when protocol is https (location)', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: true,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true },
+                        location: 'https://differenthost:8888'
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('passes if isSecure is true when protocol is https (forced)', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: true,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true },
+                        forceHttps: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: (request, reply) => {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
                     });
                 });
             });
