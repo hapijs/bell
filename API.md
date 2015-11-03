@@ -29,7 +29,7 @@ server.register(require('bell'), function (err) {
         password: 'cookie_encryption_password',
         clientId: 'my_twitter_client_id',
         clientSecret: 'my_twitter_client_secret',
-        isSecure: false     // Terrible idea but required if not using HTTPS
+        isSecure: false     // Terrible idea but required if not using HTTPS especially if developing locally
     });
 
     // Use the 'twitter' authentication strategy to protect the
