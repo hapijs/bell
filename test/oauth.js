@@ -511,6 +511,7 @@ describe('Bell', () => {
         });
 
         it('errors if isSecure is true when protocol is not https', (done) => {
+
             const mock = new Mock.V1();
             mock.start((provider) => {
 
@@ -651,7 +652,7 @@ describe('Bell', () => {
             });
         });
 
-        it('forces https in callback_url when set in options', function (done) {
+        it('forces https in callback_url when set in options', (done) => {
 
             const mock = new Mock.V1();
             mock.start((provider) => {
@@ -1699,6 +1700,7 @@ describe('Bell', () => {
                     });
 
                     server.inject('/login', (res) => {
+
                         expect(res.statusCode).to.equal(500);
                         done();
                     });
@@ -1812,7 +1814,7 @@ describe('Bell', () => {
             });
         });
 
-        it('passes profile get params', { parallel: false }, function (done) {
+        it('passes profile get params', { parallel: false }, (done) => {
 
             const mock = new Mock.V2();
             mock.start((provider) => {
