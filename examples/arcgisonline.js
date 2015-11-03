@@ -1,13 +1,15 @@
+'use strict';
+
 // Load modules
 
-var Hapi = require('hapi');
-var Bell = require('../');
+const Hapi = require('hapi');
+const Bell = require('../');
 
 
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({ port: 8000 });
 
-server.register(Bell, function (err) {
+server.register(Bell, (err) => {
 
     server.auth.strategy('arcgisonline', 'bell', {
         provider: 'arcgisonline',
@@ -35,7 +37,7 @@ server.register(Bell, function (err) {
         }
     });
 
-    server.start(function (err) {
+    server.start((err) => {
 
         console.log('Server started at:', server.info.uri);
     });

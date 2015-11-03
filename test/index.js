@@ -1,41 +1,39 @@
+'use strict';
+
 // Load modules
 
-var Bell = require('../');
-var Code = require('code');
-var Hapi = require('hapi');
-var Hoek = require('hoek');
-var Lab = require('lab');
-var Sinon = require('sinon');
-var Mock = require('./mock');
-var OAuth = require('../lib/oauth');
-
-// Declare internals
-
-var internals = {};
+const Bell = require('../');
+const Code = require('code');
+const Hapi = require('hapi');
+const Hoek = require('hoek');
+const Lab = require('lab');
+const Sinon = require('sinon');
+const Mock = require('./mock');
+const OAuth = require('../lib/oauth');
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.describe;
-var it = lab.it;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.describe;
+const it = lab.it;
+const expect = Code.expect;
 
 
-describe('Bell', function () {
+describe('Bell', () => {
 
-    it('supports string representations of boolean and number strategy options', function (done) {
+    it('supports string representations of boolean and number strategy options', (done) => {
 
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
+        const mock = new Mock.V1();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
-                var spy = Sinon.spy(OAuth, 'v1');
+                const spy = Sinon.spy(OAuth, 'v1');
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
@@ -66,14 +64,14 @@ describe('Bell', function () {
         });
     });
 
-    it('authenticates an endpoint via oauth', function (done) {
+    it('authenticates an endpoint via oauth', (done) => {
 
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
+        const mock = new Mock.V1();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
@@ -97,16 +95,16 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login?next=%2Fhome', function (res) {
+                server.inject('/login?next=%2Fhome', (res) => {
 
-                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                    mock.server.inject(res.headers.location, function (mockRes) {
+                    mock.server.inject(res.headers.location, (mockRes) => {
 
                         expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             expect(response.result.query.next).to.equal('/home');
@@ -118,14 +116,14 @@ describe('Bell', function () {
         });
     });
 
-    it('authenticates an endpoint via oauth2', function (done) {
+    it('authenticates an endpoint via oauth2', (done) => {
 
-        var mock = new Mock.V2();
-        mock.start(function (provider) {
+        const mock = new Mock.V2();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
@@ -149,16 +147,16 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login', function (res) {
+                server.inject('/login', (res) => {
 
-                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                    mock.server.inject(res.headers.location, function (mockRes) {
+                    mock.server.inject(res.headers.location, (mockRes) => {
 
                         expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
@@ -169,14 +167,14 @@ describe('Bell', function () {
         });
     });
 
-    it('authenticates an endpoint via oauth2 and basic authentication', function (done) {
+    it('authenticates an endpoint via oauth2 and basic authentication', (done) => {
 
-        var mock = new Mock.V2(false);
-        mock.start(function (provider) {
+        const mock = new Mock.V2(false);
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
@@ -200,16 +198,16 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login', function (res) {
+                server.inject('/login', (res) => {
 
-                    var cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-                    mock.server.inject(res.headers.location, function (mockRes) {
+                    mock.server.inject(res.headers.location, (mockRes) => {
 
                         expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, function (response) {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
@@ -220,14 +218,14 @@ describe('Bell', function () {
         });
     });
 
-    it('overrides cookie name', function (done) {
+    it('overrides cookie name', (done) => {
 
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
+        const mock = new Mock.V1();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
@@ -252,7 +250,7 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login', function (res) {
+                server.inject('/login', (res) => {
 
                     expect(res.headers['set-cookie'][0]).to.contain('ring=');
                     mock.stop(done);
@@ -261,14 +259,14 @@ describe('Bell', function () {
         });
     });
 
-    it('allows multiple custom provider names', function (done) {
+    it('allows multiple custom provider names', (done) => {
 
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
+        const mock = new Mock.V1();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
@@ -314,10 +312,10 @@ describe('Bell', function () {
                     }
                 });
 
-                server.inject('/login_1', function (res) {
+                server.inject('/login_1', (res) => {
 
                     expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
-                    server.inject('/login_2', function (response) {
+                    server.inject('/login_2', (response) => {
 
                         expect(response.headers['set-cookie'][0]).to.contain('ring_2=');
                         mock.stop(done);
@@ -327,35 +325,35 @@ describe('Bell', function () {
         });
     });
 
-    it('exposes OAuth implementation', function (done) {
+    it('exposes OAuth implementation', (done) => {
 
         expect(Bell.oauth.Client).to.be.function();
         done();
     });
 
-    it('exposes OAuth via plugin', function (done) {
+    it('exposes OAuth via plugin', (done) => {
 
-        var server = new Hapi.Server();
+        const server = new Hapi.Server();
         server.connection({ host: 'localhost', port: 80 });
-        server.register(Bell, function (err) {
+        server.register(Bell, (err) => {
 
             expect(server.plugins.bell.oauth.Client).to.be.function();
             done();
         });
     });
 
-    it('allows null for cookie domain value', function (done) {
+    it('allows null for cookie domain value', (done) => {
 
-        var mock = new Mock.V1();
-        mock.start(function (provider) {
+        const mock = new Mock.V1();
+        mock.start((provider) => {
 
-            var server = new Hapi.Server();
+            const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, function (err) {
+            server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
-                var spy = Sinon.spy(OAuth, 'v1');
+                const spy = Sinon.spy(OAuth, 'v1');
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'password',
