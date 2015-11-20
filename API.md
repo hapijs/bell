@@ -154,8 +154,8 @@ flow as well as the multiple steps required. To assist in testing such applicati
 code, **Bell** provides an override method `Bell.simulate()` which puts the module into simulation mode and any strategies created while
 it is in this mode will return the simulated credentials.
 
-The `Bell.simulate(credetialsFunc)` takes a single argument:
-- `credetialsFunc` - a function called for each incoming request to the protected resource with the signature `function(request, next)` where:
+The `Bell.simulate(credentialsFunc)` takes a single argument:
+- `credentialsFunc` - a function called for each incoming request to the protected resource with the signature `function(request, next)` where:
     - `request` - the **hapi** request object.
     - `next` - the callback method using the signature `function(err, credentials)` where:
         - `err` - the error object to return an error response.
