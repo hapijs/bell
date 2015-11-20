@@ -147,6 +147,24 @@ the `request.auth.isAuthenticated` must be checked to test if authentication fai
 
 To keep track of the token expiry time, `request.auth.credentials.expiresIn` provides you the duration (in seconds) after which you could send a refresh token request using the `request.auth.credentials.refreshToken` to get a new token.
 
+#### Simulated authentication
+
+Testing applications using third-party login can be challenging given the lack of user interaction to perform the third-party login
+flow as well as the multiple steps required. To assist in testing such application without having to modify the application with custom
+code, **Bell** provides an override method `Bell.simulate()` which puts the module into simulation mode and any strategies created while
+it is in this mode will return the simulated credentials.
+
+The `Bell.simulate(credentialsFunc)` takes a single argument:
+- `credentialsFunc` - a function called for each incoming request to the protected resource with the signature `function(request, next)` where:
+    - `request` - the **hapi** request object.
+    - `next` - the callback method using the signature `function(err, credentials)` where:
+        - `err` - the error object to return an error response.
+        - `credentials` - the credentials object set in `request.auth.credentials`. Note that **bell** will set the default keys
+          automatically if not present except for the provider-specific values.
+
+Note that you must call `Bell.simulate()` before the module is registered by your application and need to call `Bell.simulate(false)`
+to stop it from simulating authentication.
+
 ### Usage without a strategy
 
 Sometimes, you want to use bell without using specifying a Hapi strategy. This can be the case when combining the auth logic together with another module.

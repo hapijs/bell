@@ -3,6 +3,7 @@
 // Load modules
 
 const Bell = require('../');
+const Boom = require('boom');
 const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
@@ -376,6 +377,155 @@ describe('Bell', () => {
                 spy.restore();
 
                 mock.stop(done);
+            });
+        });
+    });
+
+    describe('simulate()', () => {
+
+        it('authenticates an endpoint via oauth', { parallel: false }, (done) => {
+
+            Bell.simulate((request, next) => {
+
+                return next(null, { some: 'value' });
+            });
+
+            const server = new Hapi.Server();
+            server.connection();
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('twitter', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'twitter'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'twitter',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?next=%2Fhome', (res) => {
+
+                    expect(res.result).to.deep.equal({
+                        provider: 'twitter',
+                        token: 'oauth_token',
+                        query: {
+                            next: '/home'
+                        },
+                        secret: 'token_secret',
+                        some: 'value'
+                    });
+
+                    Bell.simulate(false);
+                    done();
+                });
+            });
+        });
+
+        it('authenticates an endpoint via oauth2', { parallel: false }, (done) => {
+
+            Bell.simulate((request, next) => {
+
+                return next(null, { some: 'value' });
+            });
+
+            const server = new Hapi.Server();
+            server.connection();
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('github', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'github'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'github',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?next=%2Fhome', (res) => {
+
+                    expect(res.result).to.deep.equal({
+                        provider: 'github',
+                        token: 'oauth_token',
+                        query: {
+                            next: '/home'
+                        },
+                        refreshToken: 'refresh_token',
+                        expiresIn: 3600,
+                        some: 'value'
+                    });
+
+                    Bell.simulate(false);
+                    done();
+                });
+            });
+        });
+
+        it('simulates error', { parallel: false }, (done) => {
+
+            Bell.simulate((request, next) => {
+
+                return next(Boom.badRequest());
+            });
+
+            const server = new Hapi.Server();
+            server.connection();
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('twitter', 'bell', {
+                    password: 'password',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'twitter'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'twitter',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?next=%2Fhome', (res) => {
+
+                    expect(res.statusCode).to.equal(400);
+
+                    Bell.simulate(false);
+                    done();
+                });
             });
         });
     });
