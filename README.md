@@ -14,6 +14,10 @@ Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 
 [**Providers Documentation**](Providers.md)
 
+## Tutorials
+
+[**Social Login with Twitter using hapi.js**](http://mph-web.de/social-signup-with-twitter-using-hapi-js/)
+
 ## Example
 
 ```javascript
