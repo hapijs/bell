@@ -37,17 +37,16 @@ credentials.profile = {
 
 - `scope`: not applicable
 - `config`: not applicable
-- `temporary`: https://bitbucket.org/api/1.0/oauth/request_token
-- `auth`: https://bitbucket.org/api/1.0/oauth/authenticate
-- `token`: https://bitbucket.org/api/1.0/oauth/access_token
+- `auth`: https://bitbucket.org/site/oauth2/authorize
+- `token`: https://bitbucket.org/site/oauth2/access_token
 
 The default profile response will look like this:
 
 ```javascript
 credentials.profile = {};
-credentials.profile.id = profile.user.username;
-credentials.profile.username = profile.user.username;
-credentials.profile.displayName = profile.user.first_name + (profile.user.last_name ? ' ' + profile.user.last_name : '');
+credentials.profile.id = profile.username;
+credentials.profile.username = profile.username;
+credentials.profile.displayName = profile.display_name;
 credentials.profile.raw = profile;
 ```
 
