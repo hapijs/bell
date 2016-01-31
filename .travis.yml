@@ -8,6 +8,7 @@ node_js:
 env:
     - HAPI_VERSION="10"
     - HAPI_VERSION="11"
+    - HAPI_VERSION="12"
 
 install:
     - npm install
