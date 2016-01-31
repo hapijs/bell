@@ -3,6 +3,7 @@
 // Load modules
 
 const Hapi = require('hapi');
+const Hoek = require('hoek');
 const Bell = require('../');
 
 
@@ -11,6 +12,7 @@ server.connection({ host: 'localhost', port: 4567 });
 
 server.register(Bell, (err) => {
 
+    Hoek.assert(!err, err);
     server.auth.strategy('google', 'bell', {
         provider: 'google',
         password: 'password',
@@ -48,6 +50,7 @@ server.register(Bell, (err) => {
 
     server.start((err) => {
 
+        Hoek.assert(!err, err);
         console.log('Server started at:', server.info.uri);
     });
 });

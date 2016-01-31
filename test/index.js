@@ -338,6 +338,7 @@ describe('Bell', () => {
         server.connection({ host: 'localhost', port: 80 });
         server.register(Bell, (err) => {
 
+            expect(err).to.not.exist();
             expect(server.plugins.bell.oauth.Client).to.be.function();
             done();
         });
