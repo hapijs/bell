@@ -398,6 +398,20 @@ credentials.profile = {
 
 ```
 
+### Twitch
+
+[Provider Documentation](https://github.com/justintv/Twitch-API/blob/master/authentication.md)
+
+- `scope`: Defaults to `'user_read'`
+- `auth`: https://api.twitch.tv/kraken/oauth2/authorize
+- `token`: https://api.twitch.tv/kraken/oauth2/token
+
+The default profile response will look like this:
+
+```javascript
+// default profile response from Twitch
+```
+
 ## Writing a new provider
 
 When writing a new provider see existing implementations (in `lib/providers`) for reference as well as any documentation provided by your provider. You may want to support `uri` or `extendedProfile` options depending on your needs.
