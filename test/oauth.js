@@ -1111,6 +1111,48 @@ describe('Bell', () => {
             });
         });
 
+        it('allows runtime state', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: { special: true },
+                        allowRuntimeState: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?state=something', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
         it('does not include runtime query parameters by default', (done) => {
 
             const mock = new Mock.V2();
@@ -1205,6 +1247,57 @@ describe('Bell', () => {
         });
 
         it('errors on mismatching state', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                            server.inject({ url: 'http://localhost:80/login?code=1&state=W10', headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(500);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('errors on invalid state', (done) => {
 
             const mock = new Mock.V2();
             mock.start((provider) => {

@@ -122,6 +122,7 @@ Each strategy accepts the following optional settings:
 - `profileParams` - an object of key-value pairs that specify additional URL query parameters to send with the profile request to the provider.
    The built-in `facebook` provider, for example, could have `fields` specified to determine the fields returned from the user's graph, which would
    then be available to you in the `auth.credentials.profile.raw` object.
+- `allowRuntimeState` - allows passing additional state by query parameter which will be encoded into the **bell** state.
 
 ### Advanced Usage
 
