@@ -461,6 +461,63 @@ describe('Bell', () => {
             });
         });
 
+        it('authenticates with mock Twitter with skip profile', { parallel: false }, (done) => {
+
+            const mock = new Mock.V1();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    const custom = Bell.providers.twitter();
+                    Hoek.merge(custom, provider);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'twitter',
+                        clientSecret: 'secret',
+                        provider: custom,
+                        skipProfile: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: 'final',
+                                    secret: 'secret',
+                                    query: {}
+                                });
+
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
         it('errors on mismatching token', (done) => {
 
             const mock = new Mock.V1();
@@ -1064,6 +1121,64 @@ describe('Bell', () => {
 
                         expect(res.headers.location).to.contain('scope=a');
                         mock.stop(done);
+                    });
+                });
+            });
+        });
+
+        it('authenticates with mock Instagram with skip profile', { parallel: false }, (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    const custom = Bell.providers.instagram();
+                    Hoek.merge(custom, provider);
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'password',
+                        isSecure: false,
+                        clientId: 'instagram',
+                        clientSecret: 'secret',
+                        provider: custom,
+                        skipProfile: true
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                                expect(response.result).to.deep.equal({
+                                    provider: 'custom',
+                                    token: '456',
+                                    refreshToken: undefined,
+                                    expiresIn: 3600,
+                                    query: {}
+                                });
+
+                                mock.stop(done);
+                            });
+                        });
                     });
                 });
             });
