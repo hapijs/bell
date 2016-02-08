@@ -115,6 +115,7 @@ Each strategy accepts the following optional settings:
 - `allowRuntimeProviderParams` - allows passing query parameters from a **bell** protected endpoint to the auth request. It will merge the query params you pass along with the providerParams and any other predefined ones. Be aware that this will override predefined query parameters! Default to `false`.
 - `scope` - Each built-in vendor comes with the required scope for basic profile information. Use `scope` to specify a different scope
   as required by your application. Consult the provider for their specific supported scopes.
+- `skipProfile` - skips obtaining a user profile from the provider. Useful if you need specific `scope`s, but not the user profile. Defaults to `false`.
 - `config` - a configuration object used to customize the provider settings. The built-in `'twitter'` provider accepts the `extendedProfile`
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
   The built-in `'github'` and `'phabricator'` providers accept the `uri` option which allows pointing to a private enterprise installation
