@@ -37,7 +37,7 @@ describe('Bell', () => {
                 const spy = Sinon.spy(OAuth, 'v1');
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: 'false',
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -77,7 +77,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -129,7 +129,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -180,7 +180,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -231,7 +231,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -272,7 +272,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom_1', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -281,7 +281,7 @@ describe('Bell', () => {
                 });
 
                 server.auth.strategy('custom_2', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -358,7 +358,7 @@ describe('Bell', () => {
                 const spy = Sinon.spy(OAuth, 'v1');
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: 'false',
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -398,7 +398,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('twitter', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -449,7 +449,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('github', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -501,7 +501,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('twitter', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',

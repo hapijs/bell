@@ -46,7 +46,7 @@ describe('dropbox', () => {
                 Mock.override('https://api.dropbox.com/1/account/info', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'dropbox',
                     clientSecret: 'secret',

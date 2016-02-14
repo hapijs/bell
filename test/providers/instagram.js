@@ -42,7 +42,7 @@ describe('instagram', () => {
                 Mock.override('https://api.instagram.com/v1/users/self', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'instagram',
                     clientSecret: 'secret',
@@ -108,7 +108,7 @@ describe('instagram', () => {
                 Hoek.merge(custom, provider);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'instagram',
                     clientSecret: 'secret',

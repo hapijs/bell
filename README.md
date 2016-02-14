@@ -34,7 +34,7 @@ server.register(require('bell'), function (err) {
     // and the OAuth client credentials.
     server.auth.strategy('twitter', 'bell', {
         provider: 'twitter',
-        password: 'cookie_encryption_password',
+        password: 'cookie_encryption_password_secure',
         clientId: 'my_twitter_client_id',
         clientSecret: 'my_twitter_client_secret',
         isSecure: false     // Terrible idea but required if not using HTTPS especially if developing locally

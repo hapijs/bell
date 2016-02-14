@@ -54,7 +54,7 @@ describe('reddit', () => {
                 Mock.override('https://oauth.reddit.com/api/v1/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'reddit',
                     clientSecret: 'secret',

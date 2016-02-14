@@ -45,7 +45,7 @@ describe('facebook', () => {
                 Mock.override('https://graph.facebook.com/v2.3/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'facebook',
                     clientSecret: 'secret',

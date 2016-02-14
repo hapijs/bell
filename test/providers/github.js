@@ -44,7 +44,7 @@ describe('github', () => {
                 Mock.override('https://api.github.com/user', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'github',
                     clientSecret: 'secret',
@@ -117,7 +117,7 @@ describe('github', () => {
                 Mock.override('http://example.com/api/v3/user', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'github',
                     clientSecret: 'secret',

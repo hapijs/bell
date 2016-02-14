@@ -49,7 +49,7 @@ describe('live', () => {
                 Mock.override('https://apis.live.net/v5.0/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'live',
                     clientSecret: 'secret',
@@ -131,7 +131,7 @@ describe('live', () => {
                 Mock.override('https://apis.live.net/v5.0/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'live',
                     clientSecret: 'secret',
@@ -210,7 +210,7 @@ describe('live', () => {
                 Mock.override('https://apis.live.net/v5.0/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'live',
                     clientSecret: 'secret',
@@ -290,7 +290,7 @@ describe('live', () => {
                 Mock.override('https://apis.live.net/v5.0/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'live',
                     clientSecret: 'secret',

@@ -33,7 +33,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -69,7 +69,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -105,7 +105,7 @@ describe('Bell', () => {
                 expect(err).to.not.exist();
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
@@ -144,7 +144,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -184,7 +184,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -231,7 +231,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -272,7 +272,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -314,7 +314,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -369,7 +369,7 @@ describe('Bell', () => {
                     });
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'twitter',
                         clientSecret: 'secret',
@@ -421,7 +421,7 @@ describe('Bell', () => {
                     Mock.override('https://api.twitter.com/1.1/users/show.json', Boom.badRequest());
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'twitter',
                         clientSecret: 'secret',
@@ -476,7 +476,7 @@ describe('Bell', () => {
                     Hoek.merge(custom, provider);
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'twitter',
                         clientSecret: 'secret',
@@ -530,7 +530,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -579,7 +579,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -621,7 +621,7 @@ describe('Bell', () => {
 
                     server.auth.strategy('custom', 'bell', {
                         isSecure: true,
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         clientId: 'test',
                         clientSecret: 'secret',
                         provider: provider,
@@ -671,7 +671,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -721,7 +721,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         clientId: 'test',
                         clientSecret: 'secret',
                         provider: provider,
@@ -771,7 +771,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -821,7 +821,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -884,7 +884,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -950,7 +950,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -991,7 +991,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1044,7 +1044,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1097,7 +1097,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1141,7 +1141,7 @@ describe('Bell', () => {
                     Hoek.merge(custom, provider);
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'instagram',
                         clientSecret: 'secret',
@@ -1196,7 +1196,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1238,7 +1238,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1279,7 +1279,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1331,7 +1331,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1387,7 +1387,7 @@ describe('Bell', () => {
                     Mock.override(provider.token, null);
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1440,7 +1440,7 @@ describe('Bell', () => {
                     Mock.override(provider.token, Boom.badRequest());
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1494,7 +1494,7 @@ describe('Bell', () => {
                     Mock.override(provider.token, '{x');
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1543,7 +1543,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: Mock.CLIENT_ID_TESTER,
                         clientSecret: Mock.CLIENT_SECRET_TESTER,
@@ -1596,7 +1596,7 @@ describe('Bell', () => {
                     Mock.override('https://graph.facebook.com/v2.3/me', null);
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1650,7 +1650,7 @@ describe('Bell', () => {
                     Mock.override('https://graph.facebook.com/v2.3/me', Boom.badRequest());
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1704,7 +1704,7 @@ describe('Bell', () => {
                     Mock.override('https://graph.facebook.com/v2.3/me', '{c');
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -1753,7 +1753,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1802,7 +1802,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1843,7 +1843,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1896,7 +1896,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1959,7 +1959,7 @@ describe('Bell', () => {
                     });
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',
@@ -2016,7 +2016,7 @@ describe('Bell', () => {
                     });
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'facebook',
                         clientSecret: 'secret',

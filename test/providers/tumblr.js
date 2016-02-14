@@ -43,7 +43,7 @@ describe('tumblr', () => {
                 Mock.override('https://api.tumblr.com/v2/user/info', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'tumblr',
                     clientSecret: 'secret',

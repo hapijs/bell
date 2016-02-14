@@ -64,7 +64,7 @@ describe('phabricator', () => {
                 Mock.override('http://example.com/api/user.whoami', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'phabricator',
                     clientSecret: 'secret',

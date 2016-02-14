@@ -15,7 +15,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('arcgisonline', 'bell', {
         provider: 'arcgisonline',
-        password: 'password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // You'll need to go to https://developers.arcgis.com/en/applications and set up an application to get started
         // Once you create your app you will get your ClientID and Client Secret.

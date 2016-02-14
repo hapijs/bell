@@ -39,7 +39,7 @@ describe('twitter', () => {
                 });
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'twitter',
                     clientSecret: 'secret',
@@ -104,7 +104,7 @@ describe('twitter', () => {
                 Hoek.merge(custom, provider);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'twitter',
                     clientSecret: 'secret',

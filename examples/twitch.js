@@ -17,7 +17,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('twitch', 'bell', {
         provider: 'twitch',
-        password: 'cookie_encryption_password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // You need to register developer application with a Twitch account to obtain your clientId, clientSecret, and asign redirect URI
         clientId: '', // Set client id

@@ -45,7 +45,7 @@ describe('yahoo', () => {
                 Mock.override('https://social.yahooapis.com/v1/user/', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'yahoo',
                     clientSecret: 'secret',

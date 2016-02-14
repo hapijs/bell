@@ -15,7 +15,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('twitter', 'bell', {
         provider: 'twitter',
-        password: 'password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // Make sure to set a "Callback URL" and
         // check the "Allow this application to be used to Sign in with Twitter"

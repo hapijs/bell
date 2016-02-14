@@ -15,7 +15,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('facebook', 'bell', {
         provider: 'facebook',
-        password: 'password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // You'll need to go to https://developers.facebook.com/ and set up a
         // Website application to get started

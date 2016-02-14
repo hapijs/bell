@@ -49,7 +49,7 @@ describe('twitch', () => {
                 Mock.override('https://api.twitch.tv/kraken/user', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'twitch',
                     clientSecret: 'secret',

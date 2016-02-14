@@ -45,7 +45,7 @@ describe('vk', () => {
                 Mock.override('https://api.vk.com/method/users.get', data);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'vk',
                     clientSecret: 'secret',

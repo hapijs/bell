@@ -45,7 +45,7 @@ describe('linkedin', () => {
                 Mock.override('https://api.linkedin.com/v1/people/~', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'linkedin',
                     clientSecret: 'secret',

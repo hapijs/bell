@@ -44,7 +44,7 @@ describe('meetup', () => {
                 Mock.override('https://api.meetup.com/2/member/self', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'meetup',
                     clientSecret: 'secret',

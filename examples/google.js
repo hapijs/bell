@@ -15,7 +15,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('google', 'bell', {
         provider: 'google',
-        password: 'password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // You'll need to go to https://console.developers.google.com and set up an application to get started
         // Once you create your app, fill out "APIs & auth >> Consent screen" and make sure to set the email field

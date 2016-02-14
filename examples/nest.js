@@ -15,7 +15,7 @@ server.register(Bell, (err) => {
     Hoek.assert(!err, err);
     server.auth.strategy('nest', 'bell', {
         provider: 'nest',
-        password: 'password',
+        password: 'cookie_encryption_password_secure',
         isSecure: false,
         // Fill in your clientId and clientSecret
         clientId: '',

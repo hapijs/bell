@@ -52,7 +52,7 @@ describe('google', () => {
                 Mock.override('https://www.googleapis.com/plus/v1/people/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'google',
                     clientSecret: 'secret',

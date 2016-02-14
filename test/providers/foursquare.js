@@ -56,7 +56,7 @@ describe('foursquare', () => {
                 Mock.override('https://api.foursquare.com/v2/users/self', data);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'foursquare',
                     clientSecret: 'secret',
@@ -146,7 +146,7 @@ describe('foursquare', () => {
                 Mock.override('https://api.foursquare.com/v2/users/self', data);
 
                 server.auth.strategy('custom', 'bell', {
-                    password: 'password',
+                    password: 'cookie_encryption_password_secure',
                     isSecure: false,
                     clientId: 'foursquare',
                     clientSecret: 'secret',
