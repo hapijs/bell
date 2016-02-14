@@ -1776,7 +1776,15 @@ describe('Bell', () => {
                     server.inject('/login?error=access_denied', (res) => {
 
                         expect(res.statusCode).to.equal(500);
-                        done();
+                        server.inject('/login?error=access_denied&error_description="rejection"', (res2) => {
+
+                            expect(res2.statusCode).to.equal(500);
+                            server.inject('/login?denied="definitely"', (res3) => {
+
+                                expect(res3.statusCode).to.equal(500);
+                                done();
+                            });
+                        });
                     });
                 });
             });
