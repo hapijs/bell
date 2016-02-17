@@ -1123,7 +1123,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1169,7 +1169,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
@@ -1214,7 +1214,7 @@ describe('Bell', () => {
                     expect(err).to.not.exist();
 
                     server.auth.strategy('custom', 'bell', {
-                        password: 'password',
+                        password: 'cookie_encryption_password_secure',
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
