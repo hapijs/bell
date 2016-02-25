@@ -31,6 +31,41 @@ credentials.profile = {
 };
 ```
 
+### Auth0
+
+[Provider Documentation](https://auth0.com/docs/protocols#oauth-server-side)
+
+- `scope`: not applicable
+- `config`:
+  - `domain`: Your Auth0 domain name, such as `example.auth0.com` or `example.eu.auth0.com`
+- `auth`: [/authorize](https://auth0.com/docs/auth-api#!#get--authorize_social)
+- `token`: [/oauth/token](https://auth0.com/docs/protocols#3-getting-the-access-token)
+
+To authenticate a user with a specific identity provider directly, use `providerParams`. For example:
+
+```javascript
+providerParams: {
+    connection: 'Username-Password-Authentication'
+}
+```
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.user_id,
+    email: profile.email,
+    displayName: profile.name,
+    name: {
+        first: profile.given_name,
+        last: profile.family_name
+    },
+    raw: profile
+};
+```
+
+Specific fields may vary depending on the identity provider used. For more information, [refer to the documentation on user profiles](https://auth0.com/docs/user-profile/normalized).
+
 ### Bitbucket
 
 [Provider Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-238027431.html)
