@@ -78,11 +78,12 @@ Specific fields may vary depending on the identity provider used. For more infor
 The default profile response will look like this:
 
 ```javascript
-credentials.profile = {};
-credentials.profile.id = profile.username;
-credentials.profile.username = profile.username;
-credentials.profile.displayName = profile.display_name;
-credentials.profile.raw = profile;
+credentials.profile = {
+    id: profile.uuid,
+    username: profile.username,
+    displayName: profile.display_name,
+    raw: profile
+};
 ```
 
 ### Dropbox
