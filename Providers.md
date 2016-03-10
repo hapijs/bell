@@ -346,6 +346,29 @@ The default profile response will look like this:
 // Defaults to reddit response
 ```
 
+### Slack
+
+[Provider Documentation](https://api.slack.com/docs/oauth)
+
+- `scope`: Defaults to `['identify']`
+- `config`:
+  - `extendedProfile`: Set to `false` if all you want is the `access_token`, without `user_id`, `user`, `raw`, etc...
+- `auth`: https://slack.com/oauth/authorize
+- `token`: https://slack.com/api/oauth.access
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+  scope: params.scope,
+  access_token: params.access_token,
+  user: params.user,
+  user_id: params.user_id
+}
+
+// credentials.profile.raw will contain all of the keys sent by Slack for the `auth.test` method
+```
+
 ### Twitter
 
 [Provider Documentation](https://dev.twitter.com/oauth)
