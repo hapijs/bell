@@ -226,6 +226,10 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                         expect(internals.CLIENT_SECRET_TESTER).to.equal(request.payload.client_secret);
                     }
 
+                    if (code.client_id === 'salesforce') {
+                        payload.id = 'https://login.salesforce.com/id/foo/bar';
+                    }
+
                     reply(payload);
                 }
             }
