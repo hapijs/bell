@@ -471,6 +471,30 @@ The default profile response will look like this:
 // default profile response from Twitch
 ```
 
+### Salesforce
+
+[Provider Documentation](https://developer.salesforce.com/page/Digging_Deeper_into_OAuth_2.0_on_Force.com)
+
+- `scope`: not applicable
+- `config`:
+  - `uri`: Point to your Salesforce org. Defaults to `https://login.salesforce.com`.
+- `auth`: /services/oauth2/authorize
+- `token`: /services/oauth2/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.user_id,
+    username: profile.username,
+    displayName: profile.display_name,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    email: profile.email,
+    raw: profile
+};
+```
+
 ## Writing a new provider
 
 When writing a new provider see existing implementations (in `lib/providers`) for reference as well as any documentation provided by your provider. You may want to support `uri` or `extendedProfile` options depending on your needs.
