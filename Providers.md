@@ -356,6 +356,13 @@ The default profile response will look like this:
 - `auth`: https://slack.com/oauth/authorize
 - `token`: https://slack.com/api/oauth.access
 
+To authenticate user in a specific team, use `providerParams`. For example:
+```javascript
+providerParams: {
+    team: 'T0XXXXXX'
+}
+```
+
 The default profile response will look like this:
 
 ```javascript
