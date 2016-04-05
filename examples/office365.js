@@ -13,13 +13,13 @@ server.connection({ host: 'localhost', port: 4567 });
 server.register(Bell, (err) => {
 
     Hoek.assert(!err, err);
-    
+
     server.auth.strategy('office', 'bell', {
         provider: 'office365',
         clientId: '',
         clientSecret: '',
         providerParams: {
-            response_type: 'code',
+            response_type: 'code'
         },
         scope: ['openid','offline_access', 'profile']
         /**
