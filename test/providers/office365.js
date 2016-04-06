@@ -31,22 +31,13 @@ describe('office365', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.google();
+                const custom = Bell.providers.office365();
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    id: '1234567890',
-                    displayName: 'steve smith',
-                    name: {
-                        givenName: 'steve',
-                        familyName: 'smith'
-                    },
-                    emails: [
-                        {
-                            'type': 'account',
-                            'value': 'steve@example.com'
-                        }
-                    ]
+                    Id: '1234567890',
+                    DisplayName: 'steve smith',
+                    EmailAddress: 'steve_smith@domain.onmicrosoft.com'
                 };
 
                 Mock.override('https://outlook.office.com/api/v2.0/me', profile);
@@ -63,9 +54,13 @@ describe('office365', () => {
                     method: '*',
                     path: '/login',
                     config: {
-                        auth: 'custom',
+                        auth: {
+                            strategy: 'custom'
+                        },
                         handler: function (request, reply) {
-
+                            /*if (!request.auth.isAuthenticated) {
+                                return reply('Authentication failed due to: '+request.auth.error.message);
+                            }*/
                             reply(request.auth.credentials);
                         }
                     }
@@ -82,22 +77,13 @@ describe('office365', () => {
                             expect(response.result).to.deep.equal({
                                 provider: 'custom',
                                 token: '456',
-                                expiresIn: 3600,
                                 refreshToken: undefined,
+                                expiresIn: 3600,
                                 query: {},
                                 profile: {
                                     id: '1234567890',
                                     displayName: 'steve smith',
-                                    name: {
-                                        givenName: 'steve',
-                                        familyName: 'smith'
-                                    },
-                                    emails: [
-                                        {
-                                            'type': 'account',
-                                            'value': 'steve@example.com'
-                                        }
-                                    ],
+                                    email: 'steve_smith@domain.onmicrosoft.com',
                                     raw: profile
                                 }
                             });
