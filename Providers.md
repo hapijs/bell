@@ -502,6 +502,25 @@ credentials.profile = {
 };
 ```
 
+### WordPress
+
+[Provider Documentation](https://developer.wordpress.com/docs/api/)
+
+- `scope`: Defaults to `'global'`
+- `auth`: /oauth2/authorize
+- `token`: /oauth2/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.ID,
+    username: profile.username,
+    displayName: profile.display_name,
+    raw: profile
+};
+```
+
 ## Writing a new provider
 
 When writing a new provider see existing implementations (in `lib/providers`) for reference as well as any documentation provided by your provider. You may want to support `uri` or `extendedProfile` options depending on your needs.
