@@ -501,6 +501,27 @@ credentials.profile = {
     raw: profile
 };
 ```
+### Office 365
+
+[Provider Documentation](https://msdn.microsoft.com/en-us/library/azure/dn645545.aspx)
+
+
+- `scope`: Defaults to `['openid','offline_access', 'profile']`
+- `config`: not applicable
+- `auth`: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+- `token`: https://login.microsoftonline.com/common/oauth2/v2.0/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.Id,
+    displayName: profile.DisplayName,
+    email: profile.EmailAddress,
+    raw: profile
+};
+```
+
 
 ### WordPress
 
