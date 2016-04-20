@@ -173,6 +173,22 @@ credentials.profile = {
 };
 ```
 
+### GitLab
+
+[Provider Documentation](https://gitlab.com/help/api/oauth2.md)
+
+- `scope`: No default scope.
+- `config`:
+  - `uri`: Point to your gitlab uri. Defaults to `https://gitlab.com`.
+- `auth`: /oauth/authorize
+- `token`: /oauth/token
+
+The default profile response will look like this:
+
+```javascript
+// Defaults to gitlab response (https://gitlab.com/help/api/users.md#current-user)
+```
+
 ### Google
 
 [Provider Documentation](https://developers.google.com/identity/protocols/OpenIDConnect)
