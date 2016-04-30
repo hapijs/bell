@@ -1471,7 +1471,7 @@ describe('Bell', () => {
             });
         });
 
-        it('errors on missing cookie in token step', (done) => {
+        it('refreshes & errors on missing cookie in token step', (done) => {
 
             const mock = new Mock.V2();
             mock.start((provider) => {
@@ -1511,11 +1511,17 @@ describe('Bell', () => {
                         mock.server.inject(res.headers.location, (mockRes) => {
 
                             expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
                             server.inject(mockRes.headers.location, (response) => {
 
-                                expect(response.statusCode).to.equal(500);
-                                mock.stop(done);
+                                expect(response.statusCode).to.equal(200);
+                                const newLocation = mockRes.headers.location + '&refresh=1';
+                                expect(response.payload).to.contain(newLocation);
+
+                                server.inject(newLocation, (errorResponse) => {
+
+                                    expect(errorResponse.statusCode).to.equal(500);
+                                    mock.stop(done);
+                                });
                             });
                         });
                     });
