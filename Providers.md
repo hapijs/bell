@@ -347,6 +347,29 @@ credentials.profile = {
 };
 ```
 
+### Pinterest
+
+[Provider Documentation](https://developers.pinterest.com/docs/api/overview/)
+
+- `scope`: Defaults to `['read_public', 'write_public', 'read_relationships', 'write_relationships']`
+- `config`: not applicable
+- `auth`: https://api.pinterest.com/oauth/
+- `token`: https://api.pinterest.com/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.data.id,
+    username: profile.data.username,
+    name: {
+        first: profile.data.first_name,
+        last: profile.data.last_name
+    },
+    raw: profile
+};
+```
+
 ### Reddit
 
 [Provider Documentation](https://github.com/reddit/reddit/wiki/OAuth2)
