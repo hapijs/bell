@@ -2294,7 +2294,7 @@ describe('Bell', () => {
                 client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, (err, payload) => {
 
                     Mock.clear();
-                    expect(err.message).to.equal('Received invalid payload from prov type endpoint: Unexpected token x');
+                    expect(err.message).to.startWith('Received invalid payload from prov type endpoint: Unexpected token x');
                     done();
                 });
             });
@@ -2307,7 +2307,7 @@ describe('Bell', () => {
                 client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' }, (err, payload) => {
 
                     Mock.clear();
-                    expect(err.message).to.equal('Received invalid payload from prov resource endpoint: Unexpected token x');
+                    expect(err.message).to.startWith('Received invalid payload from prov resource endpoint: Unexpected token x');
                     done();
                 });
             });
