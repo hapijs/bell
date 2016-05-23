@@ -419,7 +419,7 @@ describe('Bell', () => {
 
                 server.inject('/login?next=%2Fhome', (res) => {
 
-                    expect(JSON.stringify(res.result)).to.equal(JSON.stringify({
+                    expect(res.result).to.equal({
                         provider: 'twitter',
                         token: 'oauth_token',
                         query: {
@@ -427,7 +427,7 @@ describe('Bell', () => {
                         },
                         secret: 'token_secret',
                         some: 'value'
-                    }));
+                    });
 
                     Bell.simulate(false);
                     done();
@@ -470,7 +470,7 @@ describe('Bell', () => {
 
                 server.inject('/login?next=%2Fhome', (res) => {
 
-                    expect(JSON.stringify(res.result)).to.equal(JSON.stringify({
+                    expect(res.result).to.equal({
                         provider: 'github',
                         token: 'oauth_token',
                         query: {
@@ -479,7 +479,7 @@ describe('Bell', () => {
                         refreshToken: 'refresh_token',
                         expiresIn: 3600,
                         some: 'value'
-                    }));
+                    });
 
                     Bell.simulate(false);
                     done();

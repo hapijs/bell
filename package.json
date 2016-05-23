@@ -50,7 +50,7 @@
     "hapi": "13.x.x",
     "hawk": "4.x.x",
     "lab": "10.x.x",
-    "code": "2.x.x",
+    "code": "3.x.x",
     "sinon": "1.x.x"
   },
   "scripts": {

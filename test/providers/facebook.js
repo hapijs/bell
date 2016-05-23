@@ -72,7 +72,7 @@ describe('facebook', () => {
                         server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
                             Mock.clear();
-                            expect(response.result).to.deep.equal({
+                            expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
