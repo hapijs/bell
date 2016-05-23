@@ -66,7 +66,7 @@ describe('twitter', () => {
                         server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
                             Mock.clear();
-                            expect(response.result).to.deep.equal({
+                            expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: 'final',
                                 secret: 'secret',
@@ -130,7 +130,7 @@ describe('twitter', () => {
 
                         server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
 
-                            expect(response.result).to.deep.equal({
+                            expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: 'final',
                                 secret: 'secret',
