@@ -60,7 +60,7 @@ describe('Bell', () => {
             });
         });
 
-        it('errors on missing cookie on token step', (done) => {
+        it('attempts to perform html redirection on missing cookie on token step', (done) => {
 
             const server = new Hapi.Server();
             server.connection({ host: 'localhost', port: 80 });
@@ -89,6 +89,43 @@ describe('Bell', () => {
                 });
 
                 server.inject('/login?oauth_token=123&oauth_verifier=123', (res) => {
+
+                    expect(res.statusCode).to.equal(200);
+                    expect(res.result).to.equal('<html><head><meta http-equiv=\"refresh\" content=\"0;URL=\"http://localhost:80/login?oauth_token=123&oauth_verifier=123&refresh=1\"></head><body></body></html>');
+                    done();
+                });
+            });
+        });
+
+        it('errors on missing cookie on token step (with refresh)', (done) => {
+
+            const server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'cookie_encryption_password_secure',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: 'secret',
+                    provider: 'twitter'
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?oauth_token=123&oauth_verifier=123&refresh=1', (res) => {
 
                     expect(res.statusCode).to.equal(500);
                     done();
