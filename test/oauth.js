@@ -91,7 +91,7 @@ describe('Bell', () => {
                 server.inject('/login?oauth_token=123&oauth_verifier=123', (res) => {
 
                     expect(res.statusCode).to.equal(200);
-                    expect(res.result).to.equal('<html><head><meta http-equiv=\"refresh\" content=\"0;URL=\"http://localhost:80/login?oauth_token=123&oauth_verifier=123&refresh=1\"></head><body></body></html>');
+                    expect(res.result).to.equal('<html><head><meta http-equiv=\"refresh\" content=\"0;URL=\'http://localhost:80/login?oauth_token=123&oauth_verifier=123&refresh=1\'\"></head><body></body></html>');
                     done();
                 });
             });
