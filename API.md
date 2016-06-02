@@ -116,7 +116,7 @@ Each strategy accepts the following optional settings:
 - `scope` - Each built-in vendor comes with the required scope for basic profile information. Use `scope` to specify a different scope
   as required by your application. Consult the provider for their specific supported scopes.
 - `skipProfile` - skips obtaining a user profile from the provider. Useful if you need specific `scope`s, but not the user profile. Defaults to `false`.
-- `config` - a configuration object used to customize the provider settings. The built-in `'twitter'` provider accepts the `extendedProfile`
+- `config` - a configuration object used to customize the provider settings. The built-in `'twitter'` provider accepts the `extendedProfile` & `getMethod` options.
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
   The built-in `'github'` and `'phabricator'` providers accept the `uri` option which allows pointing to a private enterprise installation
   (e.g. `'https://vpn.example.com'`). See [Providers documentation](Providers.md) for more information.

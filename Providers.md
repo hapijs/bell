@@ -422,6 +422,7 @@ credentials.profile = {
 - `scope`: not applicable
 - `config`:
   - `extendedProfile`: Request for more profile information
+  - `getMethod`: [Twitter API](https://dev.twitter.com/rest/public) GET method to call when `extendedProfile` is enabled. Defaults to `'users/show'`
 - `temporary`: 'https://api.twitter.com/oauth/request_token'
 - `auth`: https://api.twitter.com/oauth/authenticate
 - `token`: https://api.twitter.com/oauth/access_token
