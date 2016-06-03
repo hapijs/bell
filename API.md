@@ -96,6 +96,9 @@ The `server.auth.strategy()` method requires the following strategy options:
   protocol steps.
 - `clientId` - the OAuth client identifier (consumer key).
 - `clientSecret` - the OAuth client secret (consumer secret).
+- `signatureMethod` - the OAuth signature method (OAuth 1.0a only). Must be one of:
+    - `'HMAC-SHA1'` - default
+    - `'RSA-SHA1'` - in that case, the `clientSecret` is your RSA private key
 - `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to https. Useful if your hapi application runs as http, but is accessed through https.
 - `location` - Set the base redirect_uri manually if it cannot be inferred properly from server settings. Useful to override port, protocol, and host if proxied or forwarded.
 

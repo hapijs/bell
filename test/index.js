@@ -21,6 +21,8 @@ const it = lab.it;
 const expect = Code.expect;
 
 
+const privateKey = require('./constants.json').privateKey;
+
 describe('Bell', () => {
 
     it('supports string representations of boolean and number strategy options', (done) => {
@@ -82,6 +84,59 @@ describe('Bell', () => {
                     clientId: 'test',
                     clientSecret: 'secret',
                     provider: provider
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login?next=%2Fhome', (res) => {
+
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+                    mock.server.inject(res.headers.location, (mockRes) => {
+
+                        expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+
+                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+
+                            expect(response.result.provider).to.equal('custom');
+                            expect(response.result.query.next).to.equal('/home');
+                            mock.stop(done);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it('authenticates an endpoint via oauth using RSA-SHA1 signing', (done) => {
+
+        const mock = new Mock.V1();
+        mock.start((provider) => {
+
+            const server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'cookie_encryption_password_secure',
+                    isSecure: false,
+                    clientId: 'test',
+                    clientSecret: privateKey,
+                    provider: provider,
+                    signatureMethod: 'RSA-SHA1'
                 });
 
                 server.route({
