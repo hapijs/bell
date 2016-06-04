@@ -23,9 +23,10 @@ const expect = Code.expect;
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
 
-exports.V1 = internals.V1 = function (fail) {
+exports.V1 = internals.V1 = function (options) {
 
-    fail = fail || {};
+    this.options = options || {};
+    this.options.signatureMethod = this.options.signatureMethod || 'HMAC-SHA1';
 
     this.tokens = {};
 
@@ -39,7 +40,7 @@ exports.V1 = internals.V1 = function (fail) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    if (fail.temporary) {
+                    if (this.options.failTemporary) {
                         return reply(Boom.badRequest());
                     }
 
@@ -88,7 +89,7 @@ exports.V1 = internals.V1 = function (fail) {
                 bind: this,
                 handler: function (request, reply) {
 
-                    if (fail.token) {
+                    if (this.options.failToken) {
                         return reply(Boom.badRequest());
                     }
 
@@ -142,7 +143,8 @@ internals.V1.prototype.start = function (callback) {
             protocol: 'oauth',
             temporary: this.server.info.uri + '/temporary',
             auth: this.server.info.uri + '/auth',
-            token: this.server.info.uri + '/token'
+            token: this.server.info.uri + '/token',
+            signatureMethod: this.options.signatureMethod
         });
     });
 };

@@ -70,6 +70,9 @@ The `server.auth.strategy()` method requires the following strategy options:
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
         - `'oauth2'` - OAuth 2.0
+    - `signatureMethod` - the OAuth signature method (OAuth 1.0a only). Must be one of:
+        - `'HMAC-SHA1'` - default
+        - `'RSA-SHA1'` - in that case, the `clientSecret` is your RSA private key
     - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only).
     - `useParamsAuth` - boolean that determines if OAuth client id and client secret will be sent as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to `false`.
     - `auth` - the authorization endpoint URI.
@@ -96,9 +99,6 @@ The `server.auth.strategy()` method requires the following strategy options:
   protocol steps.
 - `clientId` - the OAuth client identifier (consumer key).
 - `clientSecret` - the OAuth client secret (consumer secret).
-- `signatureMethod` - the OAuth signature method (OAuth 1.0a only). Must be one of:
-    - `'HMAC-SHA1'` - default
-    - `'RSA-SHA1'` - in that case, the `clientSecret` is your RSA private key
 - `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to https. Useful if your hapi application runs as http, but is accessed through https.
 - `location` - Set the base redirect_uri manually if it cannot be inferred properly from server settings. Useful to override port, protocol, and host if proxied or forwarded.
 

@@ -121,7 +121,7 @@ describe('Bell', () => {
 
     it('authenticates an endpoint via oauth using RSA-SHA1 signing', (done) => {
 
-        const mock = new Mock.V1();
+        const mock = new Mock.V1({ signatureMethod: 'RSA-SHA1' });
         mock.start((provider) => {
 
             const server = new Hapi.Server();
@@ -135,8 +135,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: privateKey,
-                    provider: provider,
-                    signatureMethod: 'RSA-SHA1'
+                    provider: provider
                 });
 
                 server.route({

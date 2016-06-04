@@ -172,7 +172,7 @@ describe('Bell', () => {
 
         it('fails getting temporary credentials', (done) => {
 
-            const mock = new Mock.V1({ temporary: true });
+            const mock = new Mock.V1({ failTemporary: true });
             mock.start((provider) => {
 
                 const server = new Hapi.Server();
@@ -212,7 +212,7 @@ describe('Bell', () => {
 
         it('fails getting token credentials', (done) => {
 
-            const mock = new Mock.V1({ token: true });
+            const mock = new Mock.V1({ failToken: true });
             mock.start((provider) => {
 
                 const server = new Hapi.Server();
@@ -2398,7 +2398,17 @@ describe('Bell', () => {
 
             it('computes RSA-SHA1 signature', (done) => {
 
-                const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: privateKey, signatureMethod: 'RSA-SHA1', provider: Bell.providers.twitter() });
+                const client = new OAuth.Client({
+                    clientId: '9djdj82h48djs9d2',
+                    clientSecret: privateKey,
+                    provider: {
+                        protocol: 'oauth',
+                        auth: 'https://example.com/oauth/authorize',
+                        token: 'https://example.com/oauth/access-token',
+                        temporary: 'https://example.com/oauth/request-token',
+                        signatureMethod: 'RSA-SHA1'
+                    }
+                });
 
                 const params = {
                     b5: '=%3D',
