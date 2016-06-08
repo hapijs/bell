@@ -193,10 +193,13 @@ The default profile response will look like this:
 
 [Provider Documentation](https://developers.google.com/identity/protocols/OpenIDConnect)
 
-You must also enable the Google+ API in your profile. Go to APIs & Auth, then APIs and under Social APIs click Google+ API and enable it.
+By default the Google provider uses a Google+ API to access a users profile. Using Google+ APIs requires developers to enable the Google+ API in the Google Developer Console. Go to APIs & Auth, then APIs and under Social APIs click Google+ API and enable it.
+
+Alternatively you may use the `profileUrl` config to fetch a users standard Google Account details. At the time of writing, [https://www.googleapis.com/oauth2/v3/userinfo](https://www.googleapis.com/oauth2/v3/userinfo) is the latest version of the alternative user profile endpoint.
 
 - `scope`: Defaults to `['profile', 'email']`
-- `config`: not applicable
+- `config`:
+  - `profileUrl`: String *optional* alternative to the default Google+ API profile URL. (use this if you wish to fetch non-Google+ profile data.)
 - `auth`: https://accounts.google.com/o/oauth2/v2/auth
 - `token`: https://www.googleapis.com/oauth2/v4/token
 
@@ -208,6 +211,20 @@ credentials.profile = {
     displayName: profile.displayName,
     name: profile.name,
     emails: profile.emails,
+    raw: profile
+};
+```
+
+Non-Google+ profile response will look like this:
+```javascript
+credentials.profile = {
+    id: profile.id,
+    displayName: profile.name,
+    name: {
+        given_name: profile.given_name,
+        family_name: profile.family_name
+    },
+    email: profile.email,
     raw: profile
 };
 ```
