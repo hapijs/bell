@@ -19,6 +19,7 @@ const describe = lab.describe;
 const it = lab.it;
 const expect = Code.expect;
 
+const privateKey = require('./constants.json').privateKey;
 
 describe('Bell', () => {
 
@@ -171,7 +172,7 @@ describe('Bell', () => {
 
         it('fails getting temporary credentials', (done) => {
 
-            const mock = new Mock.V1({ temporary: true });
+            const mock = new Mock.V1({ failTemporary: true });
             mock.start((provider) => {
 
                 const server = new Hapi.Server();
@@ -211,7 +212,7 @@ describe('Bell', () => {
 
         it('fails getting token credentials', (done) => {
 
-            const mock = new Mock.V1({ token: true });
+            const mock = new Mock.V1({ failToken: true });
             mock.start((provider) => {
 
                 const server = new Hapi.Server();
@@ -2392,6 +2393,41 @@ describe('Bell', () => {
 
                 const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
                 expect(signature).to.equal('r6/TJjbCOr97/+UU0NsvSne7s5g=');
+                done();
+            });
+
+            it('computes RSA-SHA1 signature', (done) => {
+
+                const client = new OAuth.Client({
+                    clientId: '9djdj82h48djs9d2',
+                    clientSecret: privateKey,
+                    provider: {
+                        protocol: 'oauth',
+                        auth: 'https://example.com/oauth/authorize',
+                        token: 'https://example.com/oauth/access-token',
+                        temporary: 'https://example.com/oauth/request-token',
+                        signatureMethod: 'RSA-SHA1'
+                    }
+                });
+
+                const params = {
+                    b5: '=%3D',
+                    a3: ['a', '2 q'],
+                    'c@': '',
+                    a2: 'r b',
+                    c2: ''
+                };
+
+                const oauth = {
+                    oauth_consumer_key: '9djdj82h48djs9d2',
+                    oauth_token: 'kkk9d7dh3k39sjv7',
+                    oauth_signature_method: 'RSA-SHA1',
+                    oauth_timestamp: '137131201',
+                    oauth_nonce: '7d8f3e4a'
+                };
+
+                const signature = client.signature('get', 'http://example.com/request', params, oauth, privateKey);
+                expect(signature).to.equal('mUUxSJS/cfLML3eZMlLK7eYxN36hWeBf4gGkAQbEc0bjz2GTH7YVaW2bQ+wwkHuWwxOTSLD70FJxVV4fmGIyw+/l7kt1FaJepL3Uc7IcARhUzsdT9HXRcHFjRkyDvBSssZA6LksQjGyblpYv5LXtUtVTm+IFR19ZwovFjIvNBxM=');
                 done();
             });
 
