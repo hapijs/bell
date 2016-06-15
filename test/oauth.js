@@ -1271,6 +1271,47 @@ describe('Bell', () => {
             });
         });
 
+        it('authenticates an endpoint with custom function scope', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        scope: (request) => [request.query.scope]
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?scope=foo', (res) => {
+
+                        expect(res.headers.location).to.contain('scope=foo');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
         it('authenticates with mock Instagram with skip profile', { parallel: false }, (done) => {
 
             const mock = new Mock.V2();
