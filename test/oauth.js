@@ -385,6 +385,51 @@ describe('Bell', () => {
             });
         });
 
+        it('authenticates an endpoint via oauth with a function as provider parameters', (done) => {
+
+            const mock = new Mock.V1();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider: provider,
+                        providerParams: (request) => ({ value: request.query.foo })
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login?foo=bar', (res) => {
+
+                        expect(res.headers.location).to.equal(mock.uri + '/auth?value=bar&oauth_token=1');
+                        mock.server.inject(res.headers.location, (response) => {
+
+                            expect(response.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
+                            mock.stop(done);
+                        });
+                    });
+                });
+            });
+        });
+
         it('passes profileParams', { parallel: false }, (done) => {
 
             const mock = new Mock.V1();
