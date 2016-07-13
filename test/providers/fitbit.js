@@ -79,7 +79,7 @@ describe('fitbit', () => {
                                 expiresIn: 3600,
                                 refreshToken: undefined,
                                 query: {},
-                                profile: {id: '1234', displayName: 'Steve', name: 'Steve Smith'}
+                                profile: { id: '1234', displayName: 'Steve', name: 'Steve Smith' }
                             });
 
                             mock.stop(done);
