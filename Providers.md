@@ -131,7 +131,7 @@ credentials.profile = {
 
 [Provider Documentation](https://dev.fitbit.com/docs/oauth2/)
 
-- `scope`: Defaults to `['activity','nutrition','profile','settings','sleep','weight']` 
+- `scope`: Defaults to `['activity', 'profile']` 
 - `config`: not applicable
 - `auth`: https://www.fitbit.com/oauth2/authorize
 - `token`: https://api.fitbit.com/oauth2/token
