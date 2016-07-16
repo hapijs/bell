@@ -41,7 +41,7 @@
     "boom": "3.x.x",
     "cryptiles": "3.x.x",
     "hoek": "4.x.x",
-    "joi": "8.x.x",
+    "joi": "9.x.x",
     "wreck": "8.x.x"
   },
   "peerDependencies": {
