@@ -38,7 +38,7 @@ describe('linkedin', () => {
                     id: '1234567890',
                     firstName: 'steve',
                     lastName: 'smith',
-                    email: 'steve.smith@domain.com',
+                    emailAddress: 'steve.smith@domain.com',
                     headline: 'Master of the universe'
                 };
 
