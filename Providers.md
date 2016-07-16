@@ -127,25 +127,6 @@ credentials.profile = {
 };
 ```
 
-### Fitbit
-
-[Provider Documentation](https://dev.fitbit.com/docs/oauth2/)
-
-- `scope`: Defaults to `['activity', 'profile']` 
-- `config`: not applicable
-- `auth`: https://www.fitbit.com/oauth2/authorize
-- `token`: https://api.fitbit.com/oauth2/token
-
-The default profile response will look like this:
-
-```javascript
-credentials.profile = {
-    id: profile.user.encodedId,
-    displayName: profile.user.displayName,
-    name: profile.user.fullName
-};
-```
-
 ### Foursquare
 
 [Provider Documentation](https://developer.foursquare.com/overview/auth)
