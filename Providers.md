@@ -212,6 +212,30 @@ The default profile response will look like this:
 
 [Provider Documentation](https://developers.google.com/identity/protocols/OpenIDConnect)
 
+- `scope`: Defaults to `['profile', 'email']`
+- `config`: not applicable
+- `auth`: https://accounts.google.com/o/oauth2/v2/auth
+- `token`: https://www.googleapis.com/oauth2/v4/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.id,
+    displayName: profile.name
+    name: {
+        given_name: profile.given_name,
+        family_name: profile.family_name
+    },
+    email: profile.email,
+    raw: profile
+};
+```
+
+### Google Plus
+
+[Provider Documentation](https://developers.google.com/identity/protocols/OpenIDConnect)
+
 You must also enable the Google+ API in your profile. Go to APIs & Auth, then APIs and under Social APIs click Google+ API and enable it.
 
 - `scope`: Defaults to `['profile', 'email']`

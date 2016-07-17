@@ -18,7 +18,7 @@ const it = lab.it;
 const expect = Code.expect;
 
 
-describe('google', () => {
+describe('googleplus', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
@@ -31,18 +31,25 @@ describe('google', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.google();
+                const custom = Bell.providers.googleplus();
                 Hoek.merge(custom, provider);
 
                 const profile = {
                     id: '1234567890',
-                    name: 'steve smith',
-                    given_name: 'steve',
-                    family_name: 'smith',
-                    email: 'steve@example.com'
+                    displayName: 'steve smith',
+                    name: {
+                        givenName: 'steve',
+                        familyName: 'smith'
+                    },
+                    emails: [
+                        {
+                            'type': 'account',
+                            'value': 'steve@example.com'
+                        }
+                    ]
                 };
 
-                Mock.override('https://www.googleapis.com/oauth2/v3/userinfo', profile);
+                Mock.override('https://www.googleapis.com/plus/v1/people/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
@@ -82,10 +89,15 @@ describe('google', () => {
                                     id: '1234567890',
                                     displayName: 'steve smith',
                                     name: {
-                                        given_name: 'steve',
-                                        family_name: 'smith'
+                                        givenName: 'steve',
+                                        familyName: 'smith'
                                     },
-                                    email: 'steve@example.com',
+                                    emails: [
+                                        {
+                                            'type': 'account',
+                                            'value': 'steve@example.com'
+                                        }
+                                    ],
                                     raw: profile
                                 }
                             });
@@ -97,5 +109,4 @@ describe('google', () => {
             });
         });
     });
-
 });
