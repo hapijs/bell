@@ -109,15 +109,13 @@ Each strategy accepts the following optional settings:
 - `isHttpOnly` - sets the cookie HTTP only flag. Defaults to `true`.
 - `ttl` - cookie time-to-live in milliseconds. Defaults to `null` (session time-life - cookies are deleted when the browser is closed).
 - `domain` - the domain scope. Defaults to `null` (no domain).
-- `providerParams` - provider-specific query parameters for the authentication endpoint. Each provider supports its own set of parameters
-  which customize the user's login experience. For example:
+- `providerParams` - provider-specific query parameters for the authentication endpoint. It may be passed either as an object to merge into the query string, or a function which takes the client's `request` and returns an object. Each provider supports its own set of parameters which customize the user's login experience. For example:
     - Facebook supports `display` ('page', 'popup', or 'touch'), `auth_type`, `auth_nonce`.
     - Google supports `access_type`, `approval_prompt`, `prompt`, `login_hint`, `user_id`, `hd`.
     - Twitter supports `force_login`, `screen_name`.
     - Linkedin supports `fields`.
 - `allowRuntimeProviderParams` - allows passing query parameters from a **bell** protected endpoint to the auth request. It will merge the query params you pass along with the providerParams and any other predefined ones. Be aware that this will override predefined query parameters! Default to `false`.
-- `scope` - Each built-in vendor comes with the required scope for basic profile information. Use `scope` to specify a different scope
-  as required by your application. Consult the provider for their specific supported scopes.
+- `scope` - Each built-in vendor comes with the required scope for basic profile information. Use `scope` to specify a different scope as required by your application. It may be passed either as an object to merge into the query string, or a function which takes the client's `request` and returns an object. Consult the provider for their specific supported scopes.
 - `skipProfile` - skips obtaining a user profile from the provider. Useful if you need specific `scope`s, but not the user profile. Defaults to `false`.
 - `config` - a configuration object used to customize the provider settings. The built-in `'twitter'` provider accepts the `extendedProfile` & `getMethod` options.
   option which allows disabling the extra profile request when the provider returns the user information in the callback (defaults to `true`).
@@ -175,3 +173,24 @@ to stop it from simulating authentication.
 Sometimes, you want to use bell without using specifying a Hapi strategy. This can be the case when combining the auth logic together with another module.
 
 **bell** exposes an oauth object in its plugin. Therefore, `server.plugins.bell.oauth` now has all that's needed. For example, calling the `v2` method with all the settings documented above, will handle the oauth2 flow.
+
+
+### Customized Scope and Params
+
+You can pass a function, rather than an object, into the `providerParams` and `scope` config options to allow you to customize the scope or parameters based on the user's request. For example, this may be used you want people to be able to log in with a provider (and only need some basic user information) but also want to let users authorize your application to post messages or status updates on their behalf.
+
+```js
+server.auth.strategy('twitter', 'bell', {
+    provider: 'twitter',
+    password: 'some cookie password',
+    location: 'http://example.com/oauth',
+    scope(request) {
+
+        const scopes = ['public_profile', 'email'];
+        if (request.query.wantsSharePermission) {
+          scopes.push('publish_actions');
+        }
+        return scopes;
+    }
+});
+```
