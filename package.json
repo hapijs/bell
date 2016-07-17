@@ -1,7 +1,7 @@
 {
   "name": "bell",
   "description": "Third-party login plugin for hapi",
-  "version": "7.9.3",
+  "version": "8.0.0",
   "repository": "git://github.com/hapijs/bell",
   "main": "lib/index.js",
   "keywords": [
