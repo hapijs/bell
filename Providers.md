@@ -86,6 +86,33 @@ credentials.profile = {
 };
 ```
 
+### Discord
+
+[Provider Documentation](https://discordapp.com/developers/docs/topics/oauth2)
+
+- `scope`: Defaults to `['email', 'identify']`
+- `config`: not applicable
+- `auth`: ttps://discordapp.com/api/oauth2/authorize
+- `token`: https://discordapp.com/api/oauth2/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: parseInt(profile.id),
+    discriminator: parseInt(profile.discriminator),
+    username: profile.username,
+    email: profile.email,
+    mfa_enabled: profile.mfa_enabled,
+    verified: profile.verified,
+    avatar: {
+        id: profile.avatar,
+        url: 'https://discordapp.com/api/users/' + profile.id + '/avatars/' + profile.avatar + '.jpg'
+    },
+    raw: profile
+};
+```
+
 ### Dropbox
 
 [Provider Documentation](https://www.dropbox.com/developers/core/docs)
