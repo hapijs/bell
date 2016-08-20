@@ -466,6 +466,7 @@ credentials.profile = {
 - `config`:
   - `extendedProfile`: Request for more profile information
   - `getMethod`: [Twitter API](https://dev.twitter.com/rest/public) GET method to call when `extendedProfile` is enabled. Defaults to `'users/show'`
+  - `getParams`: Additional parameters to pass to the GET method. For example, the `include_email` parameter for the [`account/verify` route](https://dev.twitter.com/rest/reference/get/account/verify_credentials)
 - `temporary`: 'https://api.twitter.com/oauth/request_token'
 - `auth`: https://api.twitter.com/oauth/authenticate
 - `token`: https://api.twitter.com/oauth/access_token
