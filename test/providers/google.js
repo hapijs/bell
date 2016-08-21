@@ -35,7 +35,7 @@ describe('google', () => {
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    id: '1234567890',
+                    sub: '1234567890',
                     name: 'steve smith',
                     given_name: 'steve',
                     family_name: 'smith',
