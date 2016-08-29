@@ -79,9 +79,9 @@ describe('discord', () => {
                                 expiresIn: 3600,
                                 query: {},
                                 profile: {
-                                    id: 80351110224678912,
+                                    id: '80351110224678912',
                                     username: 'Nelly',
-                                    discriminator: 1337,
+                                    discriminator: '1337',
                                     mfa_enabled: false,
                                     avatar: {
                                         id: '8342729096ea3675442027381ff50dfe',
