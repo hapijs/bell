@@ -45,7 +45,7 @@ describe('Bell', () => {
                     clientSecret: 'secret',
                     ttl: '1234567890',
                     forceHttps: 'true',
-                    provider: provider,
+                    provider,
                     config: {
                         testNoBoolean: 'false',
                         testNoNumber: '0987654321'
@@ -83,7 +83,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: provider
+                    provider
                 });
 
                 server.route({
@@ -107,7 +107,7 @@ describe('Bell', () => {
 
                         expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             expect(response.result.query.next).to.equal('/home');
@@ -135,7 +135,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: privateKey,
-                    provider: provider
+                    provider
                 });
 
                 server.route({
@@ -159,7 +159,7 @@ describe('Bell', () => {
 
                         expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             expect(response.result.query.next).to.equal('/home');
@@ -187,7 +187,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: provider
+                    provider
                 });
 
                 server.route({
@@ -211,7 +211,7 @@ describe('Bell', () => {
 
                         expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
@@ -238,7 +238,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: provider
+                    provider
                 });
 
                 server.route({
@@ -262,7 +262,7 @@ describe('Bell', () => {
 
                         expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result.provider).to.equal('custom');
                             mock.stop(done);
@@ -289,7 +289,7 @@ describe('Bell', () => {
                     isSecure: false,
                     clientId: 'test',
                     clientSecret: 'secret',
-                    provider: provider,
+                    provider,
                     cookie: 'ring'
                 });
 
@@ -418,7 +418,7 @@ describe('Bell', () => {
                     clientSecret: 'secret',
                     ttl: '1234567890',
                     forceHttps: 'true',
-                    provider: provider,
+                    provider,
                     domain: null
                 });
 

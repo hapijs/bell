@@ -186,7 +186,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -226,7 +226,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -246,7 +246,7 @@ describe('Bell', () => {
                         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
@@ -273,7 +273,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -314,7 +314,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         allowRuntimeProviderParams: true
                     });
 
@@ -356,7 +356,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true }
                     });
 
@@ -401,7 +401,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: (request) => ({ value: request.query.foo })
                     });
 
@@ -480,7 +480,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => { });
                         });
                     });
                 });
@@ -532,7 +532,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -584,7 +584,7 @@ describe('Bell', () => {
                         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.result).to.equal({
                                     provider: 'custom',
@@ -617,7 +617,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -639,7 +639,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, () => {
 
-                            server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
@@ -666,7 +666,7 @@ describe('Bell', () => {
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -706,7 +706,7 @@ describe('Bell', () => {
                         password: 'cookie_encryption_password_secure',
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         forceHttps: true
                     });
 
@@ -730,7 +730,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -757,7 +757,7 @@ describe('Bell', () => {
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         location: 'https://differenthost:8888'
                     });
 
@@ -780,7 +780,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -806,7 +806,7 @@ describe('Bell', () => {
                         password: 'cookie_encryption_password_secure',
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         forceHttps: true
                     });
 
@@ -830,7 +830,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -857,7 +857,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         location: 'https://differenthost:8888'
                     });
 
@@ -880,7 +880,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?oauth_token=1&oauth_verifier=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -907,7 +907,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -919,7 +919,7 @@ describe('Bell', () => {
 
                                 const client = new Bell.oauth.Client({
                                     name: 'twitter',
-                                    provider: provider,
+                                    provider,
                                     clientId: 'test',
                                     clientSecret: 'secret'
                                 });
@@ -943,7 +943,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.result).to.equal('some text reply');
                                 mock.stop(done);
@@ -970,7 +970,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -982,7 +982,7 @@ describe('Bell', () => {
 
                                 const client = new Bell.oauth.Client({
                                     name: 'twitter',
-                                    provider: provider,
+                                    provider,
                                     clientId: 'test',
                                     clientSecret: 'secret'
                                 });
@@ -1006,7 +1006,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.result).to.equal('{"a":"5"}');
                                 mock.stop(done);
@@ -1033,7 +1033,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -1045,7 +1045,7 @@ describe('Bell', () => {
 
                                 const client = new Bell.oauth.Client({
                                     name: 'twitter',
-                                    provider: provider,
+                                    provider,
                                     clientId: 'test',
                                     clientSecret: 'secret'
                                 });
@@ -1069,7 +1069,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.result).to.equal('{"a":"5"}');
                                 mock.stop(done);
@@ -1099,7 +1099,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true }
                     });
 
@@ -1140,7 +1140,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         forceHttps: true
                     });
@@ -1166,7 +1166,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -1193,7 +1193,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         location: 'https://differenthost:8888'
                     });
@@ -1219,7 +1219,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -1246,7 +1246,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         scope: ['a']
                     });
 
@@ -1287,7 +1287,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         scope: (request) => [request.query.scope]
                     });
 
@@ -1352,7 +1352,7 @@ describe('Bell', () => {
                         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.result).to.equal({
                                     provider: 'custom',
@@ -1386,7 +1386,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         allowRuntimeProviderParams: true
                     });
@@ -1428,7 +1428,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         runtimeStateCallback: function (request) {
 
@@ -1474,7 +1474,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         runtimeStateCallback: function (request) {
 
@@ -1519,7 +1519,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -1543,7 +1543,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: 'http://localhost:80/login?code=1', headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: 'http://localhost:80/login?code=1', headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
@@ -1570,7 +1570,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true }
                     });
 
@@ -1611,7 +1611,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -1669,7 +1669,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -1693,7 +1693,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: 'http://localhost:80/login?code=1&state=xx', headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: 'http://localhost:80/login?code=1&state=xx', headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(500);
                                 mock.stop(done);
@@ -1745,7 +1745,7 @@ describe('Bell', () => {
                         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -1799,7 +1799,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -1853,7 +1853,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -1881,7 +1881,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: Mock.CLIENT_ID_TESTER,
                         clientSecret: Mock.CLIENT_SECRET_TESTER,
-                        provider: provider
+                        provider
                     });
 
                     server.route({
@@ -1902,7 +1902,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -1955,7 +1955,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -2009,7 +2009,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -2063,7 +2063,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 Mock.clear();
                                 expect(response.statusCode).to.equal(500);
@@ -2091,7 +2091,7 @@ describe('Bell', () => {
                         isSecure: false,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true }
                     });
 
@@ -2140,7 +2140,7 @@ describe('Bell', () => {
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true }
                     });
 
@@ -2181,7 +2181,7 @@ describe('Bell', () => {
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         location: 'https://differenthost:8888'
                     });
@@ -2207,7 +2207,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -2234,7 +2234,7 @@ describe('Bell', () => {
                         isSecure: true,
                         clientId: 'test',
                         clientSecret: 'secret',
-                        provider: provider,
+                        provider,
                         providerParams: { special: true },
                         forceHttps: true
                     });
@@ -2260,7 +2260,7 @@ describe('Bell', () => {
 
                             expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                                 expect(response.statusCode).to.equal(200);
                                 mock.stop(done);
@@ -2321,7 +2321,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => { });
                         });
                     });
                 });
@@ -2378,7 +2378,7 @@ describe('Bell', () => {
 
                         mock.server.inject(res.headers.location, (mockRes) => {
 
-                            server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => { });
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => { });
                         });
                     });
                 });

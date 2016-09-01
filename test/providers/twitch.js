@@ -76,7 +76,7 @@ describe('twitch', () => {
                         server.inject({
                             url: mockRes.headers.location,
                             headers: {
-                                cookie: cookie
+                                cookie
                             }
                         }, (response) => {
 
@@ -87,7 +87,7 @@ describe('twitch', () => {
                                 expiresIn: 3600,
                                 refreshToken: undefined,
                                 query: {},
-                                profile: profile
+                                profile
                             });
 
                             mock.stop(done);

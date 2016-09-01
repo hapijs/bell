@@ -77,7 +77,7 @@ describe('pingfed', () => {
                         server.inject({
                             url: mockRes.headers.location,
                             headers: {
-                                cookie: cookie
+                                cookie
                             }
                         }, (response) => {
 
@@ -161,7 +161,7 @@ describe('pingfed', () => {
                         server.inject({
                             url: mockRes.headers.location,
                             headers: {
-                                cookie: cookie
+                                cookie
                             }
                         }, (response) => {
 
