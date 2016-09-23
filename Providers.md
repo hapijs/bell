@@ -66,6 +66,28 @@ credentials.profile = {
 
 Specific fields may vary depending on the identity provider used. For more information, [refer to the documentation on user profiles](https://auth0.com/docs/user-profile/normalized).
 
+### Azure Active Directory
+
+[Provider Documentation](https://azure.microsoft.com/en-in/documentation/articles/active-directory-whatis/)
+
+- `scope`: defaults to `['openid','offline_access', 'profile']`
+- `config`:
+  - `tenantId`: The tenant ID from the Azure AD application instance which is present in the authorization URL
+- `auth`: `'https://login.microsoftonline.com/'+ tenantId +'/oauth2/authorize'`
+- `token`: `'https://login.microsoftonline.com/'+ tenantId +'/oauth2/token'`
+
+The default response would look like this in the `profile` object obtained
+
+```javascript
+credentials.profile = {
+    id: profile.oid,
+    displayName: profile.name,
+    email: profile.upn,
+    raw: profile
+};
+```
+
+
 ### Bitbucket
 
 [Provider Documentation](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-238027431.html)
