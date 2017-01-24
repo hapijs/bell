@@ -1757,7 +1757,7 @@ describe('Bell', () => {
             });
         });
 
-        it('errors on errored token request', { parallel: false }, (done) => {
+        it('errors on errored token request (500)', { parallel: false }, (done) => {
 
             const mock = new Mock.V2();
             mock.start((provider) => {
@@ -1772,6 +1772,62 @@ describe('Bell', () => {
                     Hoek.merge(custom, provider);
 
                     Mock.override(provider.token, Boom.badRequest());
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'facebook',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                                Mock.clear();
+                                expect(response.statusCode).to.equal(500);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('errors on errored token request (<200)', { parallel: false }, (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    const custom = Bell.providers.facebook();
+                    Hoek.merge(custom, provider);
+
+                    const error = Boom.badRequest();
+                    error.output.statusCode = 199;
+                    Mock.override(provider.token, error);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
