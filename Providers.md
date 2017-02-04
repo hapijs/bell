@@ -361,6 +361,26 @@ providerParams: {
 }
 ```
 
+### Medium
+
+[Provider Documentation](https://github.com/Medium/medium-api-docs)
+
+ - `scope`: Defaults to `['basicProfile']`
+ - `config`: not applicable
+ - `auth`: https://medium.com/m/oauth/authorize
+ - `token`: https://medium.com/v1/tokens
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.data.id,
+    username: profile.data.username,
+    displayName: profile.data.name,
+    raw: profile.data
+};
+```
+
 ### Meetup
 
 [Provider Documentation](http://www.meetup.com/meetup_api/auth)
