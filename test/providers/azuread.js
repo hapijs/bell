@@ -17,42 +17,34 @@ const describe = lab.describe;
 const it = lab.it;
 const expect = Code.expect;
 
+describe('azuread', () => {
 
-describe('pingfed', () => {
-
-    it('authenticates with mock', {
-        parallel: false
-    }, (done) => {
+    it('authenticates with mock Azure AD', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
 
             const server = new Hapi.Server();
-            server.connection({
-                host: 'localhost',
-                port: 80
-            });
+            server.connection({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.pingfed();
+                const custom = Bell.providers.azuread();
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    id: 'steve.smith@example.com',
-                    displayName: 'steve.smith@example.com',
-                    username: 'steve.smith@example.com',
-                    email: 'steve.smith@example.com',
-                    sub: 'steve.smith@example.com'
+                    oid: '1234567890',
+                    name: 'Sample AD User',
+                    upn: 'sample@microsoft.com'
                 };
-                // need to fix this
-                Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
+
+                Mock.override('https://login.microsoftonline.com/common/openid/userinfo', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'pingfed',
+                    clientId: 'azuread',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -62,7 +54,7 @@ describe('pingfed', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply){
+                        handler: function (request, reply) {
 
                             reply(request.auth.credentials);
                         }
@@ -74,12 +66,7 @@ describe('pingfed', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({
-                            url: mockRes.headers.location,
-                            headers: {
-                                cookie
-                            }
-                        }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
                             expect(response.result).to.equal({
@@ -89,10 +76,9 @@ describe('pingfed', () => {
                                 refreshToken: undefined,
                                 query: {},
                                 profile: {
-                                    id: 'steve.smith@example.com',
-                                    displayName: 'steve.smith@example.com',
-                                    username: 'steve.smith@example.com',
-                                    email: 'steve.smith@example.com',
+                                    id: '1234567890',
+                                    displayName: 'Sample AD User',
+                                    email: 'sample@microsoft.com',
                                     raw: profile
                                 }
                             });
@@ -104,39 +90,33 @@ describe('pingfed', () => {
             });
         });
     });
-    it('authenticates with mock and custom uri ', {
-        parallel: false
-    }, (done) => {
+
+    it('authenticates with mock azure AD and custom tenant', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
 
             const server = new Hapi.Server();
-            server.connection({
-                host: 'localhost',
-                port: 80
-            });
+            server.connection({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.pingfed({ uri: 'https://login-dev.ext.hpe.com' });
+                const custom = Bell.providers.azuread({ tenant: 'abc-def-ghi' });
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    id: 'steve.smith@example.com',
-                    displayName: 'steve.smith@example.com',
-                    username: 'steve.smith@example.com',
-                    email: 'steve.smith@example.com',
-                    sub: 'steve.smith@example.com'
+                    oid: '1234567890',
+                    name: 'Sample AD User',
+                    upn: 'sample@microsoft.com'
                 };
-                // need to fix this
-                Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
+
+                Mock.override('https://login.microsoftonline.com/abc-def-ghi/openid/userinfo', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'pingfed',
+                    clientId: 'azuread',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -146,7 +126,7 @@ describe('pingfed', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply){
+                        handler: function (request, reply) {
 
                             reply(request.auth.credentials);
                         }
@@ -158,12 +138,7 @@ describe('pingfed', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({
-                            url: mockRes.headers.location,
-                            headers: {
-                                cookie
-                            }
-                        }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
                             expect(response.result).to.equal({
@@ -173,10 +148,9 @@ describe('pingfed', () => {
                                 refreshToken: undefined,
                                 query: {},
                                 profile: {
-                                    id: 'steve.smith@example.com',
-                                    displayName: 'steve.smith@example.com',
-                                    username: 'steve.smith@example.com',
-                                    email: 'steve.smith@example.com',
+                                    id: '1234567890',
+                                    displayName: 'Sample AD User',
+                                    email: 'sample@microsoft.com',
                                     raw: profile
                                 }
                             });
@@ -186,6 +160,7 @@ describe('pingfed', () => {
                     });
                 });
             });
+
         });
     });
 });

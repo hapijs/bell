@@ -60,7 +60,7 @@ describe('nest', () => {
 
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result).to.equal({
                                 provider: 'custom',

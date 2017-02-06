@@ -18,7 +18,7 @@ const it = lab.it;
 const expect = Code.expect;
 
 
-describe('google', () => {
+describe('discord', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
@@ -31,23 +31,23 @@ describe('google', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.google();
+                const custom = Bell.providers.discord();
                 Hoek.merge(custom, provider);
 
-                const profile = {
-                    sub: '1234567890',
-                    name: 'steve smith',
-                    given_name: 'steve',
-                    family_name: 'smith',
-                    email: 'steve@example.com'
-                };
-
-                Mock.override('https://www.googleapis.com/oauth2/v3/userinfo', profile);
+                Mock.override('https://discordapp.com/api/users/@me', {
+                    id: '80351110224678912',
+                    username: 'Nelly',
+                    discriminator: '1337',
+                    mfa_enabled: false,
+                    avatar: '8342729096ea3675442027381ff50dfe',
+                    verified: true,
+                    email: 'nelly@discordapp.com'
+                });
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'google',
+                    clientId: 'discord',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -75,18 +75,29 @@ describe('google', () => {
                             expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: '456',
-                                expiresIn: 3600,
                                 refreshToken: undefined,
+                                expiresIn: 3600,
                                 query: {},
                                 profile: {
-                                    id: '1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        given_name: 'steve',
-                                        family_name: 'smith'
+                                    id: '80351110224678912',
+                                    username: 'Nelly',
+                                    discriminator: '1337',
+                                    mfa_enabled: false,
+                                    avatar: {
+                                        id: '8342729096ea3675442027381ff50dfe',
+                                        url: 'https://discordapp.com/api/users/80351110224678912/avatars/8342729096ea3675442027381ff50dfe.jpg'
                                     },
-                                    email: 'steve@example.com',
-                                    raw: profile
+                                    verified: true,
+                                    email: 'nelly@discordapp.com',
+                                    raw: {
+                                        id: '80351110224678912',
+                                        username: 'Nelly',
+                                        discriminator: '1337',
+                                        mfa_enabled: false,
+                                        avatar: '8342729096ea3675442027381ff50dfe',
+                                        verified: true,
+                                        email: 'nelly@discordapp.com'
+                                    }
                                 }
                             });
 
@@ -97,5 +108,4 @@ describe('google', () => {
             });
         });
     });
-
 });

@@ -156,15 +156,13 @@ internals.V1.prototype.stop = function (callback) {
 };
 
 
-exports.V2 = internals.V2 = function (useParamsAuth) {
+exports.V2 = internals.V2 = function (options) {
+
+    options = options || {};
 
     this.codes = {};
 
-    if (typeof useParamsAuth === 'undefined') {
-        useParamsAuth = true;
-    }
-    this.useParamsAuth = useParamsAuth;
-
+    this.useParamsAuth = (options.useParamsAuth === false ? false : true);
     this.server = new Hapi.Server();
     this.server.connection({ host: 'localhost' });
     this.server.route([
@@ -181,7 +179,7 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                         client_id: request.query.client_id
                     };
 
-                    reply().redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
+                    return reply().redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
                 }
             }
         },
@@ -195,7 +193,7 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                     const code = this.codes[request.payload.code];
                     expect(code).to.exist();
                     expect(code.redirect_uri).to.equal(request.payload.redirect_uri);
-                    if (useParamsAuth) {
+                    if (this.useParamsAuth) {
                         expect(code.client_id).to.equal(request.payload.client_id);
                         expect(request.headers.authorization).to.be.undefined();
                     }
@@ -232,7 +230,7 @@ exports.V2 = internals.V2 = function (useParamsAuth) {
                         payload.id = 'https://login.salesforce.com/id/foo/bar';
                     }
 
-                    reply(payload);
+                    return reply(payload).code(options.code || 200);
                 }
             }
         }
@@ -278,7 +276,8 @@ exports.override = function (uri, payload) {
                 }
 
                 if (payload instanceof Error) {
-                    return Hoek.nextTick(callback)(null, { statusCode: 400 }, JSON.stringify({ message: payload.message }));
+                    const statusCode = (payload && payload.output ? payload.output.statusCode : 400);
+                    return Hoek.nextTick(callback)(null, { statusCode }, JSON.stringify({ message: payload.message }));
                 }
 
                 if (payload === null) {

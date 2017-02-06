@@ -18,11 +18,11 @@ const it = lab.it;
 const expect = Code.expect;
 
 
-describe('google', () => {
+describe('medium', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
-        const mock = new Mock.V2();
+        const mock = new Mock.V2({ code: 201 });
         mock.start((provider) => {
 
             const server = new Hapi.Server();
@@ -31,23 +31,25 @@ describe('google', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.google();
+                const custom = Bell.providers.medium();
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    sub: '1234567890',
-                    name: 'steve smith',
-                    given_name: 'steve',
-                    family_name: 'smith',
-                    email: 'steve@example.com'
+                    data: {
+                        id: '5303d74c64f66366f00cb9b2a94f3251bf5',
+                        username: 'majelbstoat',
+                        name: 'Jamie Talbot',
+                        url: 'https://medium.com/@majelbstoat',
+                        imageUrl: 'https://images.medium.com/0*fkfQiTzT7TlUGGyI.png'
+                    }
                 };
 
-                Mock.override('https://www.googleapis.com/oauth2/v3/userinfo', profile);
+                Mock.override('https://api.medium.com/v1/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'google',
+                    clientId: 'medium',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -79,14 +81,16 @@ describe('google', () => {
                                 refreshToken: undefined,
                                 query: {},
                                 profile: {
-                                    id: '1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        given_name: 'steve',
-                                        family_name: 'smith'
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
+                                    id: '5303d74c64f66366f00cb9b2a94f3251bf5',
+                                    username: 'majelbstoat',
+                                    displayName: 'Jamie Talbot',
+                                    raw: {
+                                        id: '5303d74c64f66366f00cb9b2a94f3251bf5',
+                                        username: 'majelbstoat',
+                                        name: 'Jamie Talbot',
+                                        url: 'https://medium.com/@majelbstoat',
+                                        imageUrl: 'https://images.medium.com/0*fkfQiTzT7TlUGGyI.png'
+                                    }
                                 }
                             });
 
@@ -97,5 +101,4 @@ describe('google', () => {
             });
         });
     });
-
 });

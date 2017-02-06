@@ -63,7 +63,7 @@ describe('twitter', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
                             expect(response.result).to.equal({
@@ -132,7 +132,7 @@ describe('twitter', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
                             expect(response.result).to.equal({
@@ -207,7 +207,7 @@ describe('twitter', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
                             expect(response.result).to.equal({
@@ -272,7 +272,7 @@ describe('twitter', () => {
                     const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
                     mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie: cookie } }, (response) => {
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             expect(response.result).to.equal({
                                 provider: 'custom',
