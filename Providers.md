@@ -180,7 +180,7 @@ credentials.profile = {
 
 [Provider Documentation](https://dev.fitbit.com/docs/oauth2/)
 
-- `scope`: Defaults to `['activity', 'profile']` 
+- `scope`: Defaults to `['activity', 'profile']`
 - `config`: not applicable
 - `auth`: https://www.fitbit.com/oauth2/authorize
 - `token`: https://api.fitbit.com/oauth2/token
@@ -654,6 +654,7 @@ credentials.profile = {
     raw: profile
 };
 ```
+
 ### Office 365
 
 [Provider Documentation](https://msdn.microsoft.com/en-us/library/azure/dn645545.aspx)
@@ -675,6 +676,29 @@ credentials.profile = {
 };
 ```
 
+### Okta
+
+[Provider Documentation](http://developer.okta.com/use_cases/authentication/)
+
+- `scope`: Defaults to `['openid', 'email', 'offline_access']`
+- `config`:
+  - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific..
+- `auth`: https://your-organization.okta.com/oauth2/v1/authorize
+- `token`: https://your-organization.okta.com/oauth2/v1/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.sub,
+    username: profile.email,
+    displayName: profile.nickname,
+    firstName: profile.given_name,
+    lastName: profile.family_name,
+    email: profile.email,
+    raw: profile
+};
+```
 
 ### WordPress
 
