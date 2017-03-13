@@ -82,7 +82,7 @@ The default response would look like this in the `profile` object obtained
 credentials.profile = {
     id: profile.oid,
     displayName: profile.name,
-    email: profile.upn,
+    email: profile.upn || profile.email,
     raw: profile
 };
 ```
