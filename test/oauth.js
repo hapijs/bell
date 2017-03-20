@@ -2637,7 +2637,17 @@ describe('Bell', () => {
                     d: Infinity
                 };
 
-                expect(OAuth.Client.queryString(params)).to.equal('a=1&a=2&b=&c=true&c=false&d=');
+                expect(OAuth.Client.queryString(params, true)).to.equal('a=1&a=2&b=&c=true&c=false&d=');
+                done();
+            });
+
+            it('allows for unescaped scope', (done) => {
+
+                const params = {
+                    scope: ['https://www.googleapis.com/auth/admin.directory.user.readonly']
+                };
+
+                expect(OAuth.Client.queryString(params, false)).to.equal('scope=https://www.googleapis.com/auth/admin.directory.user.readonly');
                 done();
             });
         });
