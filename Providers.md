@@ -82,7 +82,7 @@ The default response would look like this in the `profile` object obtained
 credentials.profile = {
     id: profile.oid,
     displayName: profile.name,
-    email: profile.upn,
+    email: profile.upn || profile.email,
     raw: profile
 };
 ```
@@ -359,6 +359,26 @@ Here is an example of a custom strategy configuration:
 providerParams: {
     fields: ':(id,first-name,last-name,positions,picture-url,picture-urls::(original),email-address)'
 }
+```
+
+### Medium
+
+[Provider Documentation](https://github.com/Medium/medium-api-docs)
+
+ - `scope`: Defaults to `['basicProfile']`
+ - `config`: not applicable
+ - `auth`: https://medium.com/m/oauth/authorize
+ - `token`: https://medium.com/v1/tokens
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.data.id,
+    username: profile.data.username,
+    displayName: profile.data.name,
+    raw: profile.data
+};
 ```
 
 ### Meetup
