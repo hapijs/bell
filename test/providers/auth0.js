@@ -80,7 +80,7 @@ describe('auth0', () => {
                         auth: 'custom',
                         handler: function (request, reply) {
 
-                            reply(request.auth.credentials);
+                            reply(request.auth);
                         }
                     }
                 });
@@ -93,7 +93,7 @@ describe('auth0', () => {
                         server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
-                            expect(response.result).to.equal({
+                            expect(response.result.credentials).to.equal({
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
@@ -110,7 +110,10 @@ describe('auth0', () => {
                                     raw: profile
                                 }
                             });
-
+                            expect(response.result.artifacts).to.equal({
+                                'access_token': '456',
+                                'expires_in': 3600
+                            });
                             mock.stop(done);
                         });
                     });
