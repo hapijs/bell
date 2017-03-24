@@ -527,6 +527,28 @@ credentials.profile = {
 // credentials.profile.raw will contain all of the keys sent by Slack for the `auth.test` method
 ```
 
+### Spotify
+
+[Provider Documentation](https://developer.spotify.com/web-api/)
+
+- `scope`: Defaults to `-` allowing to read the public information only. [Spotify Scopes](https://developer.spotify.com/web-api/using-scopes/)
+- `auth`: https://accounts.spotify.com/authorize
+- `token`: https://accounts.spotify.com/api/token
+
+Read more about the Spotify Web API's Authorization Flow here: [https://developer.spotify.com/web-api/authorization-guide/](https://developer.spotify.com/web-api/authorization-guide/)
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+  id: profile.id,
+  username: profile.id,
+  displayName: profile.display_name,
+  email: profile.email,
+  raw: profile
+}
+```
+
 ### Twitter
 
 [Provider Documentation](https://dev.twitter.com/oauth)
