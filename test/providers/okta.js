@@ -9,7 +9,6 @@ const Hoek = require('hoek');
 const Lab = require('lab');
 const Mock = require('../mock');
 
-
 // Test shortcuts
 
 const lab = exports.lab = Lab.script();
@@ -17,10 +16,9 @@ const describe = lab.describe;
 const it = lab.it;
 const expect = Code.expect;
 
+describe('Okta', () => {
 
-describe('auth0', () => {
-
-    it('fails with no domain', { parallel: false }, (done) => {
+    it('fails with no uri', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -31,14 +29,14 @@ describe('auth0', () => {
 
                 expect(err).to.not.exist();
 
-                expect(Bell.providers.auth0).to.throw(Error);
+                expect(Bell.providers.okta).to.throw(Error);
 
                 mock.stop(done);
             });
         });
     });
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock and custom uri', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -49,26 +47,28 @@ describe('auth0', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.auth0({ domain: 'example.auth0.com' });
+                const custom = Bell.providers.okta({ uri: 'http://example.com' });
+
+                expect(custom.auth).to.equal('http://example.com/oauth2/v1/authorize');
+                expect(custom.token).to.equal('http://example.com/oauth2/v1/token');
+
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    user_id: 'auth0|1234567890',
-                    name: 'steve smith',
+                    sub: '1234567890',
+                    nickname: 'steve_smith',
                     given_name: 'steve',
+                    middle_name: 'jared',
                     family_name: 'smith',
                     email: 'steve@example.com'
                 };
 
-                Mock.override('https://example.auth0.com/userinfo', profile);
+                Mock.override('http://example.com/oauth2/v1/userinfo', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    config: {
-                        domain: 'example.auth0.com'
-                    },
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: '123',
+                    clientId: 'okta',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -80,7 +80,7 @@ describe('auth0', () => {
                         auth: 'custom',
                         handler: function (request, reply) {
 
-                            reply(request.auth);
+                            reply(request.auth.credentials);
                         }
                     }
                 });
@@ -93,26 +93,21 @@ describe('auth0', () => {
                         server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
-                            expect(response.result.credentials).to.equal({
+                            expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
                                 refreshToken: undefined,
                                 query: {},
                                 profile: {
-                                    id: 'auth0|1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
+                                    id: '1234567890',
+                                    username: 'steve@example.com',
+                                    displayName: 'steve_smith',
+                                    firstName: 'steve',
+                                    lastName: 'smith',
                                     email: 'steve@example.com',
                                     raw: profile
                                 }
-                            });
-                            expect(response.result.artifacts).to.equal({
-                                'access_token': '456',
-                                'expires_in': 3600
                             });
                             mock.stop(done);
                         });

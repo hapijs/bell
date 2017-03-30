@@ -82,7 +82,7 @@ The default response would look like this in the `profile` object obtained
 credentials.profile = {
     id: profile.oid,
     displayName: profile.name,
-    email: profile.upn,
+    email: profile.upn || profile.email,
     raw: profile
 };
 ```
@@ -180,7 +180,7 @@ credentials.profile = {
 
 [Provider Documentation](https://dev.fitbit.com/docs/oauth2/)
 
-- `scope`: Defaults to `['activity', 'profile']` 
+- `scope`: Defaults to `['activity', 'profile']`
 - `config`: not applicable
 - `auth`: https://www.fitbit.com/oauth2/authorize
 - `token`: https://api.fitbit.com/oauth2/token
@@ -527,6 +527,28 @@ credentials.profile = {
 // credentials.profile.raw will contain all of the keys sent by Slack for the `auth.test` method
 ```
 
+### Spotify
+
+[Provider Documentation](https://developer.spotify.com/web-api/)
+
+- `scope`: Defaults to `-` allowing to read the public information only. [Spotify Scopes](https://developer.spotify.com/web-api/using-scopes/)
+- `auth`: https://accounts.spotify.com/authorize
+- `token`: https://accounts.spotify.com/api/token
+
+Read more about the Spotify Web API's Authorization Flow here: [https://developer.spotify.com/web-api/authorization-guide/](https://developer.spotify.com/web-api/authorization-guide/)
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+  id: profile.id,
+  username: profile.id,
+  displayName: profile.display_name,
+  email: profile.email,
+  raw: profile
+}
+```
+
 ### Twitter
 
 [Provider Documentation](https://dev.twitter.com/oauth)
@@ -654,6 +676,7 @@ credentials.profile = {
     raw: profile
 };
 ```
+
 ### Office 365
 
 [Provider Documentation](https://msdn.microsoft.com/en-us/library/azure/dn645545.aspx)
@@ -675,6 +698,29 @@ credentials.profile = {
 };
 ```
 
+### Okta
+
+[Provider Documentation](http://developer.okta.com/use_cases/authentication/)
+
+- `scope`: Defaults to `['openid', 'email', 'offline_access']`
+- `config`:
+  - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific..
+- `auth`: https://your-organization.okta.com/oauth2/v1/authorize
+- `token`: https://your-organization.okta.com/oauth2/v1/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.sub,
+    username: profile.email,
+    displayName: profile.nickname,
+    firstName: profile.given_name,
+    lastName: profile.family_name,
+    email: profile.email,
+    raw: profile
+};
+```
 
 ### WordPress
 
