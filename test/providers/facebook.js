@@ -87,6 +87,7 @@ describe('facebook', () => {
                                         last: 'smith',
                                         middle: undefined
                                     },
+                                    picture: undefined,
                                     email: 'steve@example.com',
                                     raw: profile
                                 }
