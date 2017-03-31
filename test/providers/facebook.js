@@ -42,7 +42,7 @@ describe('facebook', () => {
                     email: 'steve@example.com'
                 };
 
-                Mock.override('https://graph.facebook.com/v2.3/me', profile);
+                Mock.override('https://graph.facebook.com/v2.7/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
