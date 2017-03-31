@@ -20,6 +20,7 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
 
     server.auth.strategy('okta', 'bell', {
         provider: 'okta',
+        config: { uri: 'https://your-organization.okta.com' },
         password: 'cookie_encryption_password_secure',
         isSecure: false,
         location: 'http://127.0.0.1:8000',
