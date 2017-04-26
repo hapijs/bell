@@ -2037,7 +2037,7 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.8/me', Boom.badRequest());
+                    Mock.override('https://graph.facebook.com/v2.9/me', Boom.badRequest());
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
@@ -2398,10 +2398,10 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.8/me', (uri) => {
+                    Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
 
                         Mock.clear();
-                        expect(uri).to.equal('https://graph.facebook.com/v2.8/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+                        expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         mock.stop(done);
                     });
 
