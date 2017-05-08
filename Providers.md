@@ -108,6 +108,27 @@ credentials.profile = {
 };
 ```
 
+### DigitalOcean
+
+[Provider Documentation](https://developers.digitalocean.com/documentation/oauth)
+
+- `scope`: defaults to `read` scope
+- `config`: not applicable
+- `auth`: https://cloud.digitalocean.com/v1/oauth/authorize
+- `token`: https://cloud.digitalocean.com/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.account.uuid,
+    email: profile.account.email,
+    status: profile.account.status,
+    dropletLimit: profile.account.droplet_limit,
+    raw: profile.account
+};
+```
+
 ### Discord
 
 [Provider Documentation](https://discordapp.com/developers/docs/topics/oauth2)
