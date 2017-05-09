@@ -1,0 +1,18 @@
+dev:
+  build: .
+  dockerfile: Dockerfile
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/usr/src/app"
+  volumes_from:
+    - node-modules
+
+# Why am I using the same image for both `dev` and `node-modules`?
+# See here: http://container42.com/2014/11/18/data-only-container-madness/
+# TL;DR It sets file permissions correctly and saves a lot of space
+node-modules:
+  image: node:4.8.2
+  entrypoint: '/bin/echo node_modules data-only container for dev'
+  volumes:
+    - "/usr/src/app/node_modules"

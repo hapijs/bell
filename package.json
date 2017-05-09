@@ -59,6 +59,7 @@
   },
   "scripts": {
     "test": "node node_modules/lab/bin/lab -t 100 -L -v",
+    "test-docker": "docker-compose run dev npm install && docker-compose run dev node_modules/lab/bin/lab -t 100 -L -v",
     "test-cov-html": "node node_modules/lab/bin/lab -r html -o coverage.html -L"
   },
   "license": "BSD-3-Clause"
