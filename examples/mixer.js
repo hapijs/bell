@@ -25,7 +25,7 @@ server.register(Bell, (err) => {
          */
         clientId: '',
         clientSecret: ''
-        // Uncomment the below line for more scopes (check Twitch API documentation), "user:details:self" scope is set as default
+        // Uncomment the below line for more scopes (check Mixer API documentation), "user:details:self" scope is set as default
         // scope: ['user:details:self']
     });
 
