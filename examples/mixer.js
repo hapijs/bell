@@ -50,5 +50,5 @@ server.register(Bell, (err) => {
 
         Hoek.assert(!err, err);
         console.log('Server started at:', server.info.uri);
-    })
+    });
 });
