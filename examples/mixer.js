@@ -18,6 +18,10 @@ server.register(Bell, (err) => {
 		provider: 'mixer',
 		password: 'cookie_encryption_password_secure',
 		isSecure: false,
+		/**
+		 * you have to register your OAuth client here: https://mixer.com/lab/oauth
+		 * for all scopes see https://dev.mixer.com/reference/oauth/index.html#oauth_scopes
+		 */
 		clientId: '',
 		clientSecret: ''
 	});
