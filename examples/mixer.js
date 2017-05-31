@@ -8,41 +8,41 @@ const Bell = require('../');
 
 const server = new Hapi.Server();
 server.connection({
-	host: 'localhost',
-	port: 4567
+    host: 'localhost',
+    port: 4567
 });
 
 server.register(Bell, (err) => {
-	Hoek.assert(!err, err);
-	server.auth.strategy('mixer', 'bell', {
-		provider: 'mixer',
-		password: 'cookie_encryption_password_secure',
-		isSecure: false,
-		/**
-		 * you have to register your OAuth client here: https://mixer.com/lab/oauth
-		 * for all scopes see https://dev.mixer.com/reference/oauth/index.html#oauth_scopes
-		 */
-		clientId: '',
-		clientSecret: ''
-	});
+    Hoek.assert(!err, err);
+    server.auth.strategy('mixer', 'bell', {
+        provider: 'mixer',
+        password: 'cookie_encryption_password_secure',
+        isSecure: false,
+        /**
+         * you have to register your OAuth client here: https://mixer.com/lab/oauth
+         * for all scopes see https://dev.mixer.com/reference/oauth/index.html#oauth_scopes
+         */
+        clientId: '',
+        clientSecret: ''
+    });
 
-	server.route({
-		method: '*',
-		path: '/bell/door',
-		config: {
-			auth: 'mixer',
-			handler: function (request, reply) {
-				if (!request.auth.isAuthenticated) {
-					return reply('Authentication failed due to: ' + request.auth.error.message);
-				}
-				reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
-			}
-		}
-	});
+    server.route({
+        method: '*',
+        path: '/bell/door',
+        config: {
+            auth: 'mixer',
+            handler: function (request, reply) {
+                if (!request.auth.isAuthenticated) {
+                    return reply('Authentication failed due to: ' + request.auth.error.message);
+                }
+                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
+            }
+        }
+    });
 
-	server.start((err) => {
-		
-		Hoek.assert(!err, err);
-		console.log('Server started at:', server.info.uri);
-	})
+    server.start((err) => {
+        
+        Hoek.assert(!err, err);
+        console.log('Server started at:', server.info.uri);
+    })
 });
