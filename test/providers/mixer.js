@@ -107,7 +107,7 @@ describe('mixer', () => {
                 const profile = {
                     id: '1234567890',
                     username: 'jerome724',
-                    email: 'jerome724@example.com'                    
+                    email: 'jerome724@example.com'
                 };
 
                 Mock.override('http://example.com/api/v1/users/current', profile);
@@ -147,9 +147,9 @@ describe('mixer', () => {
                                 refreshToken: undefined,
                                 query: {},
                                 profile: {
-                                id: '1234567890',
-                                username: 'jerome724',
-                                email: 'jerome724@example.com',
+                                    id: '1234567890',
+                                    username: 'jerome724',
+                                    email: 'jerome724@example.com',
                                     raw: profile
                                 }
                             });
