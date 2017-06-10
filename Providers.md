@@ -176,7 +176,8 @@ The default profile response will look like this:
 [Provider Documentation](https://developers.facebook.com/docs/facebook-login/access-tokens)
 
 - `scope`: Defaults to `['email']`
-- `config`: not applicable
+- `config`:
+  - `fields`: List of profile fields to retrieve, as described in [Facebook's documentation](https://developers.facebook.com/docs/graph-api/reference/user). Defaults to `'id,name,email,first_name,last_name,middle_name,gender,link,locale,timezone,updated_time,verified'`.
 - `auth`: https://www.facebook.com/v2.3/dialog/oauth
 - `token`: https://graph.facebook.com/v2.3/oauth/access_token
 
