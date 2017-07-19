@@ -36,12 +36,12 @@ describe('mixer', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.twitch();
+                const custom = Bell.providers.mixer();
                 Hoek.merge(custom, provider);
 
                 const profile = {
                     id: 930,
-                    username: "Nick",
+                    username: "Mappa",
                     email: "mappa@example.com"
                 };
 
