@@ -40,10 +40,9 @@ describe('mixer', () => {
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    display_name: 'Mappa',
-                    username: 'Mappa',
-                    name: 'Mappa',
-                    email: 'Mappa@example.com'
+                    id: 930,
+                    username: "Nick",
+                    email: "mappa@example.com"
                 };
 
                 Mock.override('https://mixer.com/api/v1/users/current', profile);
