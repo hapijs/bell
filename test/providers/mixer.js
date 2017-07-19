@@ -41,8 +41,8 @@ describe('mixer', () => {
 
                 const profile = {
                     id: 930,
-                    username: "Mappa",
-                    email: "mappa@example.com"
+                    username: 'Mappa',
+                    email: 'mappa@example.com'
                 };
 
                 Mock.override('https://mixer.com/api/v1/users/current', profile);
