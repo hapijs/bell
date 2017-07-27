@@ -1230,6 +1230,48 @@ describe('Bell', () => {
             });
         });
 
+        it('ignores empty string returned by location setting (function)', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider,
+                        providerParams: { special: true },
+                        location: () => ''
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
         it('uses location setting (function) in redirect_uri when set in options', (done) => {
 
             const mock = new Mock.V2();
