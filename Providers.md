@@ -570,6 +570,33 @@ credentials.profile = {
 }
 ```
 
+### trakt.tv
+
+[Provider Documentation](http://docs.trakt.apiary.io/#reference/authentication-oauth)
+
+- `scope`: not applicable
+- `config`: not applicable
+- `auth`: https://api.trakt.tv/oauth/authorize
+- `token`: https://api.trakt.tv/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    username: profile.username,
+    private: profile.private,
+    joined_at: profile.joined_at,
+    name: profile.name,
+    vip: profile.vip,
+    ids: profile.ids,
+    location: profile.location,
+    about: profile.about,
+    gender: profile.gender,
+    age: profile.age,
+    images: profile.images
+};
+```
+
 ### Twitter
 
 [Provider Documentation](https://dev.twitter.com/oauth)
