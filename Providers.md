@@ -698,6 +698,27 @@ credentials.profile = {
 };
 ```
 
+### Stripe
+
+[Provider Documentation](https://stripe.com/docs/connect/oauth-reference)
+
+- `scope`: defaults to `read_only` scope
+- `config`: not applicable
+- `auth`: https://connect.stripe.com/oauth/authorize
+- `token`: https://connect.stripe.com/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.id,
+    legalName: profile.business_name,
+    displayName: profile.display_name,
+    email: profile.email,
+    raw: profile
+};
+```
+
 ### Office 365
 
 [Provider Documentation](https://msdn.microsoft.com/en-us/library/azure/dn645545.aspx)
