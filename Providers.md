@@ -442,6 +442,21 @@ credentials.profile = {
 };
 ```
 
+### Mixer
+
+[Provider Documentation](https://dev.mixer.com/reference/oauth/index.html)
+
+- `scope`: Defaults to `['user:details:self']`
+- `config`: not applicable
+- `auth`: https://mixer.com/oauth/authorize
+- `token`: https://mixer.com/api/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+//Default profile response from Mixer
+```
+
 ### Nest
 
 [Provider Documentation](https://developer.nest.com/documentation/cloud/how-to-auth)
