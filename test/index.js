@@ -327,7 +327,7 @@ describe('Bell', () => {
 
     it('authenticates an endpoint via oauth2 with custom client secret options and params auth', (done) => {
 
-        const mock = new Mock.V2(true);
+        const mock = new Mock.V2(true); // will set useParamsAuth = true
         mock.start((provider) => {
 
             const server = new Hapi.Server();
