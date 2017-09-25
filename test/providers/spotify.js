@@ -17,7 +17,8 @@ const describe = lab.describe;
 const it = lab.it;
 const expect = Code.expect;
 
-describe('facebook', () => {
+
+describe('spotify', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
@@ -30,24 +31,22 @@ describe('facebook', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.facebook();
+                const custom = Bell.providers.spotify();
                 Hoek.merge(custom, provider);
 
                 const profile = {
                     id: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    first_name: 'steve',
-                    last_name: 'smith',
+                    username: '1234567890',
+                    display_name: 'steve',
                     email: 'steve@example.com'
                 };
 
-                Mock.override('https://graph.facebook.com/v2.9/me', profile);
+                Mock.override('https://api.spotify.com/v1/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'facebook',
+                    clientId: 'spotify',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -80,18 +79,12 @@ describe('facebook', () => {
                                 query: {},
                                 profile: {
                                     id: '1234567890',
-                                    username: 'steve',
+                                    username: '1234567890',
                                     displayName: 'steve',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith',
-                                        middle: undefined
-                                    },
                                     email: 'steve@example.com',
                                     raw: profile
                                 }
                             });
-
                             mock.stop(done);
                         });
                     });
@@ -100,7 +93,7 @@ describe('facebook', () => {
         });
     });
 
-    it('authenticates with mock (with custom fields)', { parallel: false }, (done) => {
+    it('authenticates with mock and custom uri', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -111,30 +104,22 @@ describe('facebook', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.facebook({ fields: 'id,name,email,first_name,last_name,middle_name,picture' });
+                const custom = Bell.providers.spotify({ uri: 'http://api.example.com' });
                 Hoek.merge(custom, provider);
 
                 const profile = {
                     id: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    first_name: 'steve',
-                    last_name: 'smith',
-                    email: 'steve@example.com',
-                    picture: {
-                        data: {
-                            is_silhouette: false,
-                            url: 'https://example.com/profile.png'
-                        }
-                    }
+                    username: '1234567890',
+                    display_name: 'steve',
+                    email: 'steve@example.com'
                 };
 
-                Mock.override('https://graph.facebook.com/v2.9/me', profile);
+                Mock.override('http://api.example.com/v1/me', profile);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'facebook',
+                    clientId: 'spotify',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -167,13 +152,8 @@ describe('facebook', () => {
                                 query: {},
                                 profile: {
                                     id: '1234567890',
-                                    username: 'steve',
+                                    username: '1234567890',
                                     displayName: 'steve',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith',
-                                        middle: undefined
-                                    },
                                     email: 'steve@example.com',
                                     raw: profile
                                 }

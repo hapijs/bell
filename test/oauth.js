@@ -1230,6 +1230,113 @@ describe('Bell', () => {
             });
         });
 
+        it('ignores empty string returned by location setting (function)', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider,
+                        providerParams: { special: true },
+                        location: () => ''
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+                        mock.stop(done);
+                    });
+                });
+            });
+        });
+
+        it('uses location setting (function) in redirect_uri when set in options', (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'test',
+                        clientSecret: 'secret',
+                        provider,
+                        providerParams: { special: true },
+                        location: (request) => 'https://differenthost:8888' + request.path.replace(/(\/again)?$/, '/again')
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login/again',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin%2Fagain&state=');
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            expect(mockRes.headers.location).to.contain('https://differenthost:8888/login/again?code=1&state=');
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                                expect(response.statusCode).to.equal(200);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
         it('authenticates an endpoint with custom scope', (done) => {
 
             const mock = new Mock.V2();
@@ -1757,7 +1864,7 @@ describe('Bell', () => {
             });
         });
 
-        it('errors on errored token request', { parallel: false }, (done) => {
+        it('errors on errored token request (500)', { parallel: false }, (done) => {
 
             const mock = new Mock.V2();
             mock.start((provider) => {
@@ -1772,6 +1879,62 @@ describe('Bell', () => {
                     Hoek.merge(custom, provider);
 
                     Mock.override(provider.token, Boom.badRequest());
+
+                    server.auth.strategy('custom', 'bell', {
+                        password: 'cookie_encryption_password_secure',
+                        isSecure: false,
+                        clientId: 'facebook',
+                        clientSecret: 'secret',
+                        provider: custom
+                    });
+
+                    server.route({
+                        method: '*',
+                        path: '/login',
+                        config: {
+                            auth: 'custom',
+                            handler: function (request, reply) {
+
+                                reply(request.auth.credentials);
+                            }
+                        }
+                    });
+
+                    server.inject('/login', (res) => {
+
+                        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+                        mock.server.inject(res.headers.location, (mockRes) => {
+
+                            server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                                Mock.clear();
+                                expect(response.statusCode).to.equal(500);
+                                mock.stop(done);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('errors on errored token request (<200)', { parallel: false }, (done) => {
+
+            const mock = new Mock.V2();
+            mock.start((provider) => {
+
+                const server = new Hapi.Server();
+                server.connection({ host: 'localhost', port: 80 });
+                server.register(Bell, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    const custom = Bell.providers.facebook();
+                    Hoek.merge(custom, provider);
+
+                    const error = Boom.badRequest();
+                    error.output.statusCode = 199;
+                    Mock.override(provider.token, error);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
@@ -1927,7 +2090,7 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.3/me', null);
+                    Mock.override('https://graph.facebook.com/v2.9/me', null);
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
@@ -1981,7 +2144,7 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.3/me', Boom.badRequest());
+                    Mock.override('https://graph.facebook.com/v2.9/me', Boom.badRequest());
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
@@ -2035,7 +2198,7 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.3/me', '{c');
+                    Mock.override('https://graph.facebook.com/v2.9/me', '{c');
 
                     server.auth.strategy('custom', 'bell', {
                         password: 'cookie_encryption_password_secure',
@@ -2285,10 +2448,10 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.3/me', (uri) => {
+                    Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
 
                         Mock.clear();
-                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+                        expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         mock.stop(done);
                     });
 
@@ -2342,10 +2505,10 @@ describe('Bell', () => {
                     const custom = Bell.providers.facebook();
                     Hoek.merge(custom, provider);
 
-                    Mock.override('https://graph.facebook.com/v2.3/me', (uri) => {
+                    Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
 
                         Mock.clear();
-                        expect(uri).to.equal('https://graph.facebook.com/v2.3/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+                        expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
                         mock.stop(done);
                     });
 

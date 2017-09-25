@@ -224,7 +224,7 @@ describe('Bell', () => {
 
     it('authenticates an endpoint via oauth2 and basic authentication', (done) => {
 
-        const mock = new Mock.V2(false);
+        const mock = new Mock.V2({ useParamsAuth: false });
         mock.start((provider) => {
 
             const server = new Hapi.Server();

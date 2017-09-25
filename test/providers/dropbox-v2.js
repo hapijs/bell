@@ -18,25 +18,7 @@ const it = lab.it;
 const expect = Code.expect;
 
 
-describe('auth0', () => {
-
-    it('fails with no domain', { parallel: false }, (done) => {
-
-        const mock = new Mock.V2();
-        mock.start((provider) => {
-
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                expect(Bell.providers.auth0).to.throw(Error);
-
-                mock.stop(done);
-            });
-        });
-    });
+describe('dropbox-v2', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
@@ -49,26 +31,24 @@ describe('auth0', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.auth0({ domain: 'example.auth0.com' });
+                const custom = Bell.providers.dropboxV2();
                 Hoek.merge(custom, provider);
 
                 const profile = {
-                    user_id: 'auth0|1234567890',
-                    name: 'steve smith',
-                    given_name: 'steve',
-                    family_name: 'smith',
+                    display_name: '1234567890',
+                    username: 'steve',
+                    name: 'steve',
+                    first_name: 'steve',
+                    last_name: 'smith',
                     email: 'steve@example.com'
                 };
 
-                Mock.override('https://example.auth0.com/userinfo', profile);
+                Mock.override('https://api.dropboxapi.com/2/users/get_current_account', profile);
 
                 server.auth.strategy('custom', 'bell', {
-                    config: {
-                        domain: 'example.auth0.com'
-                    },
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: '123',
+                    clientId: 'dropbox',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -80,7 +60,7 @@ describe('auth0', () => {
                         auth: 'custom',
                         handler: function (request, reply) {
 
-                            reply(request.auth);
+                            reply(request.auth.credentials);
                         }
                     }
                 });
@@ -93,27 +73,15 @@ describe('auth0', () => {
                         server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
                             Mock.clear();
-                            expect(response.result.credentials).to.equal({
+                            expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
                                 refreshToken: undefined,
                                 query: {},
-                                profile: {
-                                    id: 'auth0|1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
-                                }
+                                profile
                             });
-                            expect(response.result.artifacts).to.equal({
-                                'access_token': '456',
-                                'expires_in': 3600
-                            });
+
                             mock.stop(done);
                         });
                     });

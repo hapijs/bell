@@ -82,7 +82,7 @@ The default response would look like this in the `profile` object obtained
 credentials.profile = {
     id: profile.oid,
     displayName: profile.name,
-    email: profile.upn,
+    email: profile.upn || profile.email,
     raw: profile
 };
 ```
@@ -105,6 +105,27 @@ credentials.profile = {
     username: profile.username,
     displayName: profile.display_name,
     raw: profile
+};
+```
+
+### DigitalOcean
+
+[Provider Documentation](https://developers.digitalocean.com/documentation/oauth)
+
+- `scope`: defaults to `read` scope
+- `config`: not applicable
+- `auth`: https://cloud.digitalocean.com/v1/oauth/authorize
+- `token`: https://cloud.digitalocean.com/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.account.uuid,
+    email: profile.account.email,
+    status: profile.account.status,
+    dropletLimit: profile.account.droplet_limit,
+    raw: profile.account
 };
 ```
 
@@ -155,7 +176,8 @@ The default profile response will look like this:
 [Provider Documentation](https://developers.facebook.com/docs/facebook-login/access-tokens)
 
 - `scope`: Defaults to `['email']`
-- `config`: not applicable
+- `config`:
+  - `fields`: List of profile fields to retrieve, as described in [Facebook's documentation](https://developers.facebook.com/docs/graph-api/reference/user). Defaults to `'id,name,email,first_name,last_name,middle_name,gender,link,locale,timezone,updated_time,verified'`.
 - `auth`: https://www.facebook.com/v2.3/dialog/oauth
 - `token`: https://graph.facebook.com/v2.3/oauth/access_token
 
@@ -180,7 +202,7 @@ credentials.profile = {
 
 [Provider Documentation](https://dev.fitbit.com/docs/oauth2/)
 
-- `scope`: Defaults to `['activity', 'profile']` 
+- `scope`: Defaults to `['activity', 'profile']`
 - `config`: not applicable
 - `auth`: https://www.fitbit.com/oauth2/authorize
 - `token`: https://api.fitbit.com/oauth2/token
@@ -271,7 +293,7 @@ The default profile response will look like this:
 ```javascript
 credentials.profile = {
     id: profile.id,
-    displayName: profile.name
+    displayName: profile.name,
     name: {
         given_name: profile.given_name,
         family_name: profile.family_name
@@ -361,6 +383,26 @@ providerParams: {
 }
 ```
 
+### Medium
+
+[Provider Documentation](https://github.com/Medium/medium-api-docs)
+
+ - `scope`: Defaults to `['basicProfile']`
+ - `config`: not applicable
+ - `auth`: https://medium.com/m/oauth/authorize
+ - `token`: https://medium.com/v1/tokens
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.data.id,
+    username: profile.data.username,
+    displayName: profile.data.name,
+    raw: profile.data
+};
+```
+
 ### Meetup
 
 [Provider Documentation](http://www.meetup.com/meetup_api/auth)
@@ -399,6 +441,21 @@ credentials.profile = {
     email: profile.emails && (profile.emails.preferred || profile.emails.account),
     raw: profile
 };
+```
+
+### Mixer
+
+[Provider Documentation](https://dev.mixer.com/reference/oauth/index.html)
+
+- `scope`: Defaults to `['user:details:self']`
+- `config`: not applicable
+- `auth`: https://mixer.com/oauth/authorize
+- `token`: https://mixer.com/api/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+//Default profile response from Mixer
 ```
 
 ### Nest
@@ -505,6 +562,28 @@ credentials.profile = {
 }
 
 // credentials.profile.raw will contain all of the keys sent by Slack for the `auth.test` method
+```
+
+### Spotify
+
+[Provider Documentation](https://developer.spotify.com/web-api/)
+
+- `scope`: Defaults to `-` allowing to read the public information only. [Spotify Scopes](https://developer.spotify.com/web-api/using-scopes/)
+- `auth`: https://accounts.spotify.com/authorize
+- `token`: https://accounts.spotify.com/api/token
+
+Read more about the Spotify Web API's Authorization Flow here: [https://developer.spotify.com/web-api/authorization-guide/](https://developer.spotify.com/web-api/authorization-guide/)
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+  id: profile.id,
+  username: profile.id,
+  displayName: profile.display_name,
+  email: profile.email,
+  raw: profile
+}
 ```
 
 ### Twitter
@@ -617,23 +696,70 @@ The default profile response will look like this:
 
 - `scope`: not applicable
 - `config`:
-  - `uri`: Point to your Salesforce org. Defaults to `https://login.salesforce.com`.
+  - `uri`: Point to your Salesforce org. Defaults to `https://login.salesforce.com`
+  - `extendedProfile`: Request for more profile information. Defaults to true
+  - `identityServiceProfile`: Determines if the profile information fetch uses the [Force.com Identity Service](https://developer.salesforce.com/page/Digging_Deeper_into_OAuth_2.0_on_Force.com#The_Force.com_Identity_Service). Defaults to false (UserInfo Endpoint)
 - `auth`: /services/oauth2/authorize
 - `token`: /services/oauth2/token
+
+The default profile response will look like this: [UserInfo Response](https://developer.salesforce.com/page/Inside_OpenID_Connect_on_Force.com#User_Profile_Service)
+
+```javascript
+credentials.profile = {
+    "sub": "https://login.salesforce.com/id/00Dx0000000A9y0EAC/005x0000000UnYmAAK",
+    "user_id": "005x0000000UnYmAAK",
+    "organization_id": "00Dx0000000A9y0EAC",
+    "preferred_username": "user@ example.com",
+    "nickname": "user",
+    "name": "Pat Patterson",
+    "email": "user@ example.com",
+    "email_verified": true,
+    "given_name": "Pat",
+    "family_name": "Patterson",
+    ...
+}
+```
+
+The Force.com Identity profile response will look like this: [Force.com Identity Response](https://developer.salesforce.com/page/Digging_Deeper_into_OAuth_2.0_on_Force.com#The_Force.com_Identity_Service)
+
+```javascript
+credentials.profile = {
+    "id":"https://login.salesforce.com/id/00D50000000IZ3ZEAW/00550000001fg5OAAQ",
+    "asserted_user":true,
+    "user_id":"00550000001fg5OAAQ",
+    "organization_id":"00D50000000IZ3ZEAW",
+    "username":"user@ example. com",
+    "nick_name":"user1.2950476911907334E12",
+    "display_name":"Sample User",
+    "email":"user@ example. com",
+    "email_verified": true,
+    "first_name": "Sample",
+    "last_name": "User",
+    ...
+}
+```
+
+### Stripe
+
+[Provider Documentation](https://stripe.com/docs/connect/oauth-reference)
+
+- `scope`: defaults to `read_only` scope
+- `config`: not applicable
+- `auth`: https://connect.stripe.com/oauth/authorize
+- `token`: https://connect.stripe.com/oauth/token
 
 The default profile response will look like this:
 
 ```javascript
 credentials.profile = {
-    id: profile.user_id,
-    username: profile.username,
+    id: profile.id,
+    legalName: profile.business_name,
     displayName: profile.display_name,
-    firstName: profile.first_name,
-    lastName: profile.last_name,
     email: profile.email,
     raw: profile
 };
 ```
+
 ### Office 365
 
 [Provider Documentation](https://msdn.microsoft.com/en-us/library/azure/dn645545.aspx)
@@ -655,6 +781,29 @@ credentials.profile = {
 };
 ```
 
+### Okta
+
+[Provider Documentation](http://developer.okta.com/use_cases/authentication/)
+
+- `scope`: Defaults to `['openid', 'email', 'offline_access']`
+- `config`:
+  - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific..
+- `auth`: https://your-organization.okta.com/oauth2/v1/authorize
+- `token`: https://your-organization.okta.com/oauth2/v1/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.sub,
+    username: profile.email,
+    displayName: profile.nickname,
+    firstName: profile.given_name,
+    lastName: profile.family_name,
+    email: profile.email,
+    raw: profile
+};
+```
 
 ### WordPress
 

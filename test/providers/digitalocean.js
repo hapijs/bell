@@ -17,7 +17,8 @@ const describe = lab.describe;
 const it = lab.it;
 const expect = Code.expect;
 
-describe('facebook', () => {
+
+describe('digitalocean', () => {
 
     it('authenticates with mock', { parallel: false }, (done) => {
 
@@ -30,24 +31,24 @@ describe('facebook', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.facebook();
+                const custom = Bell.providers.digitalocean();
                 Hoek.merge(custom, provider);
 
-                const profile = {
-                    id: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    first_name: 'steve',
-                    last_name: 'smith',
-                    email: 'steve@example.com'
+                const data = {
+                    account: {
+                        uuid: '1234',
+                        email: 'stevesmith@test.com',
+                        status: 'active',
+                        droplet_limit: 3
+                    }
                 };
 
-                Mock.override('https://graph.facebook.com/v2.9/me', profile);
+                Mock.override('https://api.digitalocean.com/v2/account', data);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'facebook',
+                    clientId: 'digitalocean',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -76,19 +77,15 @@ describe('facebook', () => {
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
-                                refreshToken: undefined,
+                                secret: 'secret',
                                 query: {},
                                 profile: {
-                                    id: '1234567890',
-                                    username: 'steve',
-                                    displayName: 'steve',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith',
-                                        middle: undefined
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
+
+                                    id: data.account.uuid,
+                                    email: data.account.email,
+                                    status: data.account.status,
+                                    dropletLimit: data.account.droplet_limit,
+                                    raw: data.account
                                 }
                             });
 
@@ -100,7 +97,7 @@ describe('facebook', () => {
         });
     });
 
-    it('authenticates with mock (with custom fields)', { parallel: false }, (done) => {
+    it('authenticates with mock when user has no email set', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -111,30 +108,23 @@ describe('facebook', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.facebook({ fields: 'id,name,email,first_name,last_name,middle_name,picture' });
+                const custom = Bell.providers.digitalocean();
                 Hoek.merge(custom, provider);
 
-                const profile = {
-                    id: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    first_name: 'steve',
-                    last_name: 'smith',
-                    email: 'steve@example.com',
-                    picture: {
-                        data: {
-                            is_silhouette: false,
-                            url: 'https://example.com/profile.png'
-                        }
+                const data = {
+                    account: {
+                        uuid: '1234',
+                        status: 'active',
+                        dropletLimit: 3
                     }
                 };
 
-                Mock.override('https://graph.facebook.com/v2.9/me', profile);
+                Mock.override('https://api.digitalocean.com/v2/account', data);
 
                 server.auth.strategy('custom', 'bell', {
                     password: 'cookie_encryption_password_secure',
                     isSecure: false,
-                    clientId: 'facebook',
+                    clientId: 'digitalocean',
                     clientSecret: 'secret',
                     provider: custom
                 });
@@ -147,6 +137,7 @@ describe('facebook', () => {
                         handler: function (request, reply) {
 
                             reply(request.auth.credentials);
+
                         }
                     }
                 });
@@ -163,19 +154,15 @@ describe('facebook', () => {
                                 provider: 'custom',
                                 token: '456',
                                 expiresIn: 3600,
-                                refreshToken: undefined,
+                                secret: 'secret',
                                 query: {},
                                 profile: {
-                                    id: '1234567890',
-                                    username: 'steve',
-                                    displayName: 'steve',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith',
-                                        middle: undefined
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
+
+                                    id: data.account.uuid,
+                                    email: undefined,
+                                    status: data.account.status,
+                                    dropletLimit: data.account.droplet_limit,
+                                    raw: data.account
                                 }
                             });
 
