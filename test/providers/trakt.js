@@ -20,7 +20,23 @@ const expect = Code.expect;
 
 describe('trakt', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('fails with no API key', { parallel: false }, (done) => {
+
+        const mock = new Mock.V2();
+        mock.start(() => {
+
+            const server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+                expect(Bell.providers.trakt).to.throw(Error);
+                mock.stop(done);
+            });
+        });
+    });
+
+    it('authenticates with mock and API key', { parallel: false }, (done) => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
