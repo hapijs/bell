@@ -83,6 +83,7 @@ The `server.auth.strategy()` method requires the following strategy options:
       Defaults to space (Facebook and GitHub default to comma).
     - `headers` - a headers object with additional headers required by the provider (e.g. GitHub required the 'User-Agent' header which is
       set by default).
+    - `profileMethod` - `get` or `post` for obtaining user profile by `profile` function. Default is `get`.
     - `profile` - a function used to obtain user profile information and normalize it. The function signature is
       `function(credentials, params, get, callback)` where:
         - `credentials` - the credentials object. Change the object directly within the function (profile information is typically stored
@@ -94,13 +95,14 @@ The `server.auth.strategy()` method requires the following strategy options:
             - `params` - any URI query parameters (cannot include them in the URI due to signature requirements).
             - `callback` - request callback with signature `function(response)` where `response` is the parsed payload (any errors are
               handled internally).
+          If `profileMethod` is set to `post` the helper function sends a POST request for obtaining the user profile.
         - `callback` - the callback function which much be called once profile processing is complete.
 - `password` - the cookie encryption password. Used to encrypt the temporary state cookie used by the module in between the authorization
   protocol steps.
 - `clientId` - the OAuth client identifier (consumer key).
 - `clientSecret` - the OAuth client secret (consumer secret).
 - `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to https. Useful if your hapi application runs as http, but is accessed through https.
-- `location` - Set the base redirect_uri manually if it cannot be inferred properly from server settings. Useful to override port, protocol, and host if proxied or forwarded.
+- `location` - Set the base redirect_uri manually if it cannot be inferred properly from server settings. Useful to override port, protocol, and host if proxied or forwarded. It may be passed either as a string (in which case request.path is appended for you), or a function which takes the client's `request` and returns a non-empty string, which is used as provided. In both cases, an empty string will result in default processing just as if the `location` option had not been specified.
 
 Each strategy accepts the following optional settings:
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to `'bell-provider'` where 'provider' is the provider name

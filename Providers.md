@@ -176,7 +176,8 @@ The default profile response will look like this:
 [Provider Documentation](https://developers.facebook.com/docs/facebook-login/access-tokens)
 
 - `scope`: Defaults to `['email']`
-- `config`: not applicable
+- `config`:
+  - `fields`: List of profile fields to retrieve, as described in [Facebook's documentation](https://developers.facebook.com/docs/graph-api/reference/user). Defaults to `'id,name,email,first_name,last_name,middle_name,gender,link,locale,timezone,updated_time,verified'`.
 - `auth`: https://www.facebook.com/v2.3/dialog/oauth
 - `token`: https://graph.facebook.com/v2.3/oauth/access_token
 
@@ -292,7 +293,7 @@ The default profile response will look like this:
 ```javascript
 credentials.profile = {
     id: profile.id,
-    displayName: profile.name
+    displayName: profile.name,
     name: {
         given_name: profile.given_name,
         family_name: profile.family_name
@@ -440,6 +441,21 @@ credentials.profile = {
     email: profile.emails && (profile.emails.preferred || profile.emails.account),
     raw: profile
 };
+```
+
+### Mixer
+
+[Provider Documentation](https://dev.mixer.com/reference/oauth/index.html)
+
+- `scope`: Defaults to `['user:details:self']`
+- `config`: not applicable
+- `auth`: https://mixer.com/oauth/authorize
+- `token`: https://mixer.com/api/v1/oauth/token
+
+The default profile response will look like this:
+
+```javascript
+//Default profile response from Mixer
 ```
 
 ### Nest
@@ -707,19 +723,65 @@ The default profile response will look like this:
 
 - `scope`: not applicable
 - `config`:
-  - `uri`: Point to your Salesforce org. Defaults to `https://login.salesforce.com`.
+  - `uri`: Point to your Salesforce org. Defaults to `https://login.salesforce.com`
+  - `extendedProfile`: Request for more profile information. Defaults to true
+  - `identityServiceProfile`: Determines if the profile information fetch uses the [Force.com Identity Service](https://developer.salesforce.com/page/Digging_Deeper_into_OAuth_2.0_on_Force.com#The_Force.com_Identity_Service). Defaults to false (UserInfo Endpoint)
 - `auth`: /services/oauth2/authorize
 - `token`: /services/oauth2/token
+
+The default profile response will look like this: [UserInfo Response](https://developer.salesforce.com/page/Inside_OpenID_Connect_on_Force.com#User_Profile_Service)
+
+```javascript
+credentials.profile = {
+    "sub": "https://login.salesforce.com/id/00Dx0000000A9y0EAC/005x0000000UnYmAAK",
+    "user_id": "005x0000000UnYmAAK",
+    "organization_id": "00Dx0000000A9y0EAC",
+    "preferred_username": "user@ example.com",
+    "nickname": "user",
+    "name": "Pat Patterson",
+    "email": "user@ example.com",
+    "email_verified": true,
+    "given_name": "Pat",
+    "family_name": "Patterson",
+    ...
+}
+```
+
+The Force.com Identity profile response will look like this: [Force.com Identity Response](https://developer.salesforce.com/page/Digging_Deeper_into_OAuth_2.0_on_Force.com#The_Force.com_Identity_Service)
+
+```javascript
+credentials.profile = {
+    "id":"https://login.salesforce.com/id/00D50000000IZ3ZEAW/00550000001fg5OAAQ",
+    "asserted_user":true,
+    "user_id":"00550000001fg5OAAQ",
+    "organization_id":"00D50000000IZ3ZEAW",
+    "username":"user@ example. com",
+    "nick_name":"user1.2950476911907334E12",
+    "display_name":"Sample User",
+    "email":"user@ example. com",
+    "email_verified": true,
+    "first_name": "Sample",
+    "last_name": "User",
+    ...
+}
+```
+
+### Stripe
+
+[Provider Documentation](https://stripe.com/docs/connect/oauth-reference)
+
+- `scope`: defaults to `read_only` scope
+- `config`: not applicable
+- `auth`: https://connect.stripe.com/oauth/authorize
+- `token`: https://connect.stripe.com/oauth/token
 
 The default profile response will look like this:
 
 ```javascript
 credentials.profile = {
-    id: profile.user_id,
-    username: profile.username,
+    id: profile.id,
+    legalName: profile.business_name,
     displayName: profile.display_name,
-    firstName: profile.first_name,
-    lastName: profile.last_name,
     email: profile.email,
     raw: profile
 };
