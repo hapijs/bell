@@ -31,7 +31,7 @@ describe('trakt', () => {
 
                 expect(err).to.not.exist();
 
-                const custom = Bell.providers.trakt();
+                const custom = Bell.providers.trakt({ apiKey: 'trakt-api-key' });
                 Hoek.merge(custom, provider);
 
                 const profile = {
@@ -80,6 +80,7 @@ describe('trakt', () => {
                                 query: {},
                                 profile
                             });
+
                             mock.stop(done);
                         });
                     });
