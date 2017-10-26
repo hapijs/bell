@@ -6,7 +6,7 @@ Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 
-**bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`, `Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`, `VK`, `ArcGIS Online`, `Windows Live`, `Nest`, `Phabricator`, `BitBucket`, `Dropbox`, `Reddit`, `Tumblr`, `Twitch`, `Mixer`, `Salesforce`, `Pinterest`, `Discord`, `DigitalOcean`, and `Okta`. It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple configuration object.
+**bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`, `Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`, `VK`, `ArcGIS Online`, `Windows Live`, `Nest`, `Phabricator`, `BitBucket`, `Dropbox`, `Reddit`, `Tumblr`, `Twitch`, `Mixer`, `Salesforce`, `Pinterest`, `Discord`, `DigitalOcean`, `AzureAD` and `Okta`. It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple configuration object.
 
 ## Documentation
 
