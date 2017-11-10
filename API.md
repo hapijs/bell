@@ -14,7 +14,7 @@ combine **bell** with the [**hapi-auth-cookie**](https://github.com/hapijs/hapi-
 
 ```javascript
 var Hapi = require('hapi');
-var server = new Hapi.Server({ port: 8000 });
+var server = Hapi.Server({ port: 8000 });
 
 // Register bell with the server
 server.register(require('bell'), function (err) {
