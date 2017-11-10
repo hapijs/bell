@@ -4,7 +4,7 @@
 
 const Bell = require('../');
 const Boom = require('boom');
-const Code = require('code');
+const { expect } = require('code');
 const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
@@ -17,8 +17,6 @@ const OAuth = require('../lib/oauth');
 const lab = exports.lab = Lab.script();
 const describe = lab.describe;
 const it = lab.it;
-const expect = Code.expect;
-
 const privateKey = require('./constants.json').privateKey;
 
 describe('Bell', () => {
