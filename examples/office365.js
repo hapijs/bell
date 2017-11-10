@@ -7,7 +7,7 @@ const Hoek = require('hoek');
 const Bell = require('../');
 
 
-const server = new Hapi.Server({ host: 'localhost', port: 4567 });
+const server = Hapi.Server({ host: 'localhost', port: 4567 });
 
 server.register(Bell, (err) => {
 

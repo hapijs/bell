@@ -30,7 +30,7 @@ exports.V1 = internals.V1 = function (options) {
 
     this.tokens = {};
 
-    this.server = new Hapi.Server({ host: 'localhost' });
+    this.server = Hapi.Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'POST',
@@ -162,7 +162,7 @@ exports.V2 = internals.V2 = function (options) {
     this.codes = {};
 
     this.useParamsAuth = (options.useParamsAuth === false ? false : true);
-    this.server = new Hapi.Server({ host: 'localhost' });
+    this.server = Hapi.Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'GET',
