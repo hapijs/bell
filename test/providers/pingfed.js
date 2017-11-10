@@ -3,7 +3,7 @@
 // Load modules
 
 const Bell = require('../../');
-const Code = require('code');
+const { expect } = require('code');
 const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
@@ -15,7 +15,6 @@ const Mock = require('../mock');
 const lab = exports.lab = Lab.script();
 const describe = lab.describe;
 const it = lab.it;
-const expect = Code.expect;
 
 
 describe('pingfed', () => {

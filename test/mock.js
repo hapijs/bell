@@ -4,7 +4,7 @@
 
 const Querystring = require('querystring');
 const Boom = require('boom');
-const Code = require('code');
+const { expect } = require('code');
 const { Server } = require('hapi');
 const Hawk = require('hawk');
 const Hoek = require('hoek');
@@ -14,11 +14,6 @@ const Wreck = require('wreck');
 // Declare internals
 
 const internals = {};
-
-
-// Test shortcuts
-
-const expect = Code.expect;
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
