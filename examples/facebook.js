@@ -2,12 +2,12 @@
 
 // Load modules
 
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Bell = require('../');
 
 
-const server = Hapi.Server({ host: 'localhost', port: 3456 });
+const server = Server({ host: 'localhost', port: 3456 });
 
 server.register(Bell, (err) => {
 

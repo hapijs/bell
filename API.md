@@ -13,8 +13,8 @@ that require loading a single resource. Once the handler is called, the applicat
 combine **bell** with the [**hapi-auth-cookie**](https://github.com/hapijs/hapi-auth-cookie) authentication scheme plugin.
 
 ```javascript
-var Hapi = require('hapi');
-var server = Hapi.Server({ port: 8000 });
+var { Server } = require('hapi');
+var server = Server({ port: 8000 });
 
 // Register bell with the server
 server.register(require('bell'), function (err) {

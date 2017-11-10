@@ -5,7 +5,7 @@
 const Querystring = require('querystring');
 const Boom = require('boom');
 const Code = require('code');
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hawk = require('hawk');
 const Hoek = require('hoek');
 const Wreck = require('wreck');
@@ -30,7 +30,7 @@ exports.V1 = internals.V1 = function (options) {
 
     this.tokens = {};
 
-    this.server = Hapi.Server({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'POST',
@@ -162,7 +162,7 @@ exports.V2 = internals.V2 = function (options) {
     this.codes = {};
 
     this.useParamsAuth = (options.useParamsAuth === false ? false : true);
-    this.server = Hapi.Server({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'GET',
