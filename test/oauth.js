@@ -14,9 +14,7 @@ const OAuth = require('../lib/oauth');
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const privateKey = require('./constants.json').privateKey;
 
 describe('Bell', () => {

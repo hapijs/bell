@@ -11,9 +11,7 @@ const Mock = require('../mock');
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 
 describe('Okta', () => {
 
