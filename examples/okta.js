@@ -2,11 +2,11 @@
 
 // Load modules
 
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Boom = require('boom');
 
-const server = Hapi.Server({ port: 8000 });
+const server = Server({ port: 8000 });
 
 server.register([require('hapi-auth-cookie'), require('../')], (err) => {
 

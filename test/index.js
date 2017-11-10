@@ -5,7 +5,7 @@
 const Bell = require('../');
 const Boom = require('boom');
 const Code = require('code');
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
 const Sinon = require('sinon');
@@ -30,7 +30,7 @@ describe('Bell', () => {
         const mock = new Mock.V1();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -71,7 +71,7 @@ describe('Bell', () => {
         const mock = new Mock.V1();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -122,7 +122,7 @@ describe('Bell', () => {
         const mock = new Mock.V1({ signatureMethod: 'RSA-SHA1' });
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -173,7 +173,7 @@ describe('Bell', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -223,7 +223,7 @@ describe('Bell', () => {
         const mock = new Mock.V2({ useParamsAuth: false });
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -273,7 +273,7 @@ describe('Bell', () => {
         const mock = new Mock.V1();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -313,7 +313,7 @@ describe('Bell', () => {
         const mock = new Mock.V1();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -381,7 +381,7 @@ describe('Bell', () => {
 
     it('exposes OAuth via plugin', (done) => {
 
-        const server = Hapi.Server({ host: 'localhost', port: 80 });
+        const server = Server({ host: 'localhost', port: 80 });
         server.register(Bell, (err) => {
 
             expect(err).to.not.exist();
@@ -395,7 +395,7 @@ describe('Bell', () => {
         const mock = new Mock.V1();
         mock.start((provider) => {
 
-            const server = Hapi.Server({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -436,7 +436,7 @@ describe('Bell', () => {
                 return next(null, { some: 'value' });
             });
 
-            const server = Hapi.Server();
+            const server = Server();
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -486,7 +486,7 @@ describe('Bell', () => {
                 return next(null, { some: 'value' });
             });
 
-            const server = Hapi.Server();
+            const server = Server();
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -537,7 +537,7 @@ describe('Bell', () => {
                 return next(Boom.badRequest());
             });
 
-            const server = Hapi.Server();
+            const server = Server();
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
