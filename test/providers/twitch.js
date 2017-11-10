@@ -27,8 +27,7 @@ describe('twitch', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = new Hapi.Server();
-            server.connection({
+            const server = new Hapi.Server({
                 host: 'localhost',
                 port: 80
             });

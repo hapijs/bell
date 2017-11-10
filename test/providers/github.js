@@ -25,8 +25,7 @@ describe('github', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
+            const server = new Hapi.Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -98,8 +97,7 @@ describe('github', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
+            const server = new Hapi.Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
