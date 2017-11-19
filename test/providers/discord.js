@@ -81,7 +81,7 @@ describe('discord', () => {
                                     mfa_enabled: false,
                                     avatar: {
                                         id: '8342729096ea3675442027381ff50dfe',
-                                        url: 'https://discordapp.com/api/users/80351110224678912/avatars/8342729096ea3675442027381ff50dfe.jpg'
+                                        url: 'https://cdn.discordapp.com/avatars/80351110224678912/8342729096ea3675442027381ff50dfe.png'
                                     },
                                     verified: true,
                                     email: 'nelly@discordapp.com',
