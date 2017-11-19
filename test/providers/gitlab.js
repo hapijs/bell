@@ -3,8 +3,8 @@
 // Load modules
 
 const Bell = require('../../');
-const Code = require('code');
-const Hapi = require('hapi');
+const { expect } = require('code');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
 const Mock = require('../mock');
@@ -12,10 +12,7 @@ const Mock = require('../mock');
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
-const expect = Code.expect;
+const { describe, it } = exports.lab = Lab.script();
 
 
 describe('gitlab', () => {
@@ -25,8 +22,7 @@ describe('gitlab', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();
@@ -93,8 +89,7 @@ describe('gitlab', () => {
         const mock = new Mock.V2();
         mock.start((provider) => {
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
+            const server = Server({ host: 'localhost', port: 80 });
             server.register(Bell, (err) => {
 
                 expect(err).to.not.exist();

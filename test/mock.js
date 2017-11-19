@@ -4,8 +4,8 @@
 
 const Querystring = require('querystring');
 const Boom = require('boom');
-const Code = require('code');
-const Hapi = require('hapi');
+const { expect } = require('code');
+const { Server } = require('hapi');
 const Hawk = require('hawk');
 const Hoek = require('hoek');
 const Wreck = require('wreck');
@@ -14,11 +14,6 @@ const Wreck = require('wreck');
 // Declare internals
 
 const internals = {};
-
-
-// Test shortcuts
-
-const expect = Code.expect;
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
@@ -30,8 +25,7 @@ exports.V1 = internals.V1 = function (options) {
 
     this.tokens = {};
 
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'POST',
@@ -163,8 +157,7 @@ exports.V2 = internals.V2 = function (options) {
     this.codes = {};
 
     this.useParamsAuth = (options.useParamsAuth === false ? false : true);
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'GET',

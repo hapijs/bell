@@ -25,10 +25,8 @@ Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 Twitter:
 
 ```javascript
-var Hapi = require('hapi');
-var server = new Hapi.Server();
-
-server.connection({ port: 8000 });
+var { Server } = require('hapi');
+var server = Server({ port: 8000 });
 
 // Register bell with the server
 server.register(require('bell'), function (err) {
