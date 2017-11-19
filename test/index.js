@@ -273,6 +273,110 @@ describe('Bell', () => {
         });
     });
 
+    it('authenticates an endpoint via oauth2 with custom client secret options', (done) => {
+
+        const mock = new Mock.V2(false);
+        mock.start((provider) => {
+
+            const server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'cookie_encryption_password_secure',
+                    isSecure: false,
+                    clientId: 'customSecret',
+                    clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
+                    provider
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login', (res) => {
+
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+                    mock.server.inject(res.headers.location, (mockRes) => {
+
+                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                            expect(response.result.provider).to.equal('custom');
+                            expect(response.result.token).to.equal('mycustomtoken');
+                            mock.stop(done);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    it('authenticates an endpoint via oauth2 with custom client secret options and params auth', (done) => {
+
+        const mock = new Mock.V2(true); // will set useParamsAuth = true
+        mock.start((provider) => {
+
+            const server = new Hapi.Server();
+            server.connection({ host: 'localhost', port: 80 });
+            server.register(Bell, (err) => {
+
+                expect(err).to.not.exist();
+
+                server.auth.strategy('custom', 'bell', {
+                    password: 'cookie_encryption_password_secure',
+                    isSecure: false,
+                    clientId: 'customSecret',
+                    clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
+                    provider
+                });
+
+                server.route({
+                    method: '*',
+                    path: '/login',
+                    config: {
+                        auth: 'custom',
+                        handler: function (request, reply) {
+
+                            reply(request.auth.credentials);
+                        }
+                    }
+                });
+
+                server.inject('/login', (res) => {
+
+                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+                    mock.server.inject(res.headers.location, (mockRes) => {
+
+                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                            expect(response.result.provider).to.equal('custom');
+                            expect(response.result.token).to.equal('mycustomtoken');
+                            mock.stop(done);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
     it('overrides cookie name', (done) => {
 
         const mock = new Mock.V1();

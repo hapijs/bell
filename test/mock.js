@@ -222,6 +222,10 @@ exports.V2 = internals.V2 = function (options) {
                         payload.email = 'steve@example.com';
                     }
 
+                    if (code.client_id === 'customSecret') {
+                        payload.access_token = request.headers.mycustomtoken;
+                    }
+
                     if (code.client_id === internals.CLIENT_ID_TESTER) {
                         expect(internals.CLIENT_SECRET_TESTER).to.equal(request.payload.client_secret);
                     }
