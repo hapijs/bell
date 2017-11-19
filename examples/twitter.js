@@ -28,7 +28,7 @@ server.register(Bell, (err) => {
         path: '/bell/door',
         config: {
             auth: 'twitter',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
             }

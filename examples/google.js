@@ -37,7 +37,7 @@ server.register(Bell, (err) => {
                 strategy: 'google',
                 mode: 'try'
             },
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);

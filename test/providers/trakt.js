@@ -20,7 +20,7 @@ const expect = Code.expect;
 
 describe('trakt', () => {
 
-    it('fails with no API key', { parallel: false }, (done) => {
+    it('fails with no API key', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start(() => {
@@ -36,7 +36,7 @@ describe('trakt', () => {
         });
     });
 
-    it('authenticates with mock and API key', { parallel: false }, (done) => {
+    it('authenticates with mock and API key', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -73,35 +73,35 @@ describe('trakt', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile
-                            });
-
-                            mock.stop(done);
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            refreshToken: undefined,
+                            query: {},
+                            profile
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 });

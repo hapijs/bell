@@ -22,7 +22,7 @@ const privateKey = require('./constants.json').privateKey;
 
 describe('Bell', () => {
 
-    it('supports string representations of boolean and number strategy options', (done) => {
+    it('supports string representations of boolean and number strategy options', async () => {
 
         const mock = new Mock.V1();
         mock.start((provider) => {
@@ -58,12 +58,12 @@ describe('Bell', () => {
 
                 spy.restore();
 
-                mock.stop(done);
+                mock.stopasync();
             });
         });
     });
 
-    it('authenticates an endpoint via oauth', (done) => {
+    it('authenticates an endpoint via oauth', async () => {
 
         const mock = new Mock.V1();
         mock.start((provider) => {
@@ -86,591 +86,584 @@ describe('Bell', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login?next=%2Fhome', (res) => {
+                const res = await server.inject('/login?next=%2Fhome');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+                    expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            expect(response.result.provider).to.equal('custom');
-                            expect(response.result.query.next).to.equal('/home');
-                            mock.stop(done);
-                        });
+                        expect(response.result.provider).to.equal('custom');
+                        expect(response.result.query.next).to.equal('/home');
+                        mock.stopasync();
                     });
                 });
             });
         });
     });
+});
 
-    it('authenticates an endpoint via oauth using RSA-SHA1 signing', (done) => {
+it('authenticates an endpoint via oauth using RSA-SHA1 signing', async () => {
 
-        const mock = new Mock.V1({ signatureMethod: 'RSA-SHA1' });
-        mock.start((provider) => {
-
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: privateKey,
-                    provider
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login?next=%2Fhome', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
-
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result.provider).to.equal('custom');
-                            expect(response.result.query.next).to.equal('/home');
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    it('authenticates an endpoint via oauth2', (done) => {
-
-        const mock = new Mock.V2();
-        mock.start((provider) => {
-
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result.provider).to.equal('custom');
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    it('authenticates an endpoint via oauth2 and basic authentication', (done) => {
-
-        const mock = new Mock.V2({ useParamsAuth: false });
-        mock.start((provider) => {
-
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result.provider).to.equal('custom');
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    it('authenticates an endpoint via oauth2 with custom client secret options', (done) => {
-
-        const mock = new Mock.V2(false);
-        mock.start((provider) => {
-
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'customSecret',
-                    clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
-                    provider
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result.provider).to.equal('custom');
-                            expect(response.result.token).to.equal('mycustomtoken');
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    it('authenticates an endpoint via oauth2 with custom client secret options and params auth', (done) => {
-
-        const mock = new Mock.V2(true); // will set useParamsAuth = true
-        mock.start((provider) => {
-
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'customSecret',
-                    clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
-                    provider
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result.provider).to.equal('custom');
-                            expect(response.result.token).to.equal('mycustomtoken');
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    it('overrides cookie name', (done) => {
-
-        const mock = new Mock.V1();
-        mock.start((provider) => {
-
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider,
-                    cookie: 'ring'
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    expect(res.headers['set-cookie'][0]).to.contain('ring=');
-                    mock.stop(done);
-                });
-            });
-        });
-    });
-
-    it('allows multiple custom provider names', (done) => {
-
-        const mock = new Mock.V1();
-        mock.start((provider) => {
-
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('custom_1', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_1' }),
-                    cookie: 'ring_1'
-                });
-
-                server.auth.strategy('custom_2', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_2' }),
-                    cookie: 'ring_2'
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login_1',
-                    config: {
-                        auth: 'custom_1',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login_2',
-                    config: {
-                        auth: 'custom_2',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login_1', (res) => {
-
-                    expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
-                    server.inject('/login_2', (response) => {
-
-                        expect(response.headers['set-cookie'][0]).to.contain('ring_2=');
-                        mock.stop(done);
-                    });
-                });
-            });
-        });
-    });
-
-    it('exposes OAuth implementation', (done) => {
-
-        expect(Bell.oauth.Client).to.be.function();
-        done();
-    });
-
-    it('exposes OAuth via plugin', (done) => {
+    const mock = new Mock.V1({ signatureMethod: 'RSA-SHA1' });
+    mock.start((provider) => {
 
         const server = Server({ host: 'localhost', port: 80 });
         server.register(Bell, (err) => {
 
             expect(err).to.not.exist();
-            expect(server.plugins.bell.oauth.Client).to.be.function();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: privateKey,
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login?next=%2Fhome');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                expect(mockRes.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    expect(response.result.provider).to.equal('custom');
+                    expect(response.result.query.next).to.equal('/home');
+                    mock.stopasync();
+                });
+            });
+        });
+    });
+});
+    });
+
+it('authenticates an endpoint via oauth2', async () => {
+
+    const mock = new Mock.V2();
+    mock.start((provider) => {
+
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    expect(response.result.provider).to.equal('custom');
+                    mock.stopasync();
+                });
+            });
+        });
+    });
+});
+    });
+
+it('authenticates an endpoint via oauth2 and basic authentication', async () => {
+
+    const mock = new Mock.V2({ useParamsAuth: false });
+    mock.start((provider) => {
+
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    expect(response.result.provider).to.equal('custom');
+                    mock.stopasync();
+                });
+            });
+        });
+    });
+});
+    });
+
+it('authenticates an endpoint via oauth2 with custom client secret options', async () => {
+
+    const mock = new Mock.V2(false);
+    mock.start((provider) => {
+
+        const server = new Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'customSecret',
+                clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    expect(response.result.provider).to.equal('custom');
+                    expect(response.result.token).to.equal('mycustomtoken');
+                    mock.stopasync();
+                });
+            });
+        });
+    });
+});
+    });
+
+it('authenticates an endpoint via oauth2 with custom client secret options and params auth', async () => {
+
+    const mock = new Mock.V2(true); // will set useParamsAuth = true
+    mock.start((provider) => {
+
+        const server = new Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'customSecret',
+                clientSecret: { headers: { mycustomtoken: 'mycustomtoken' } },
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    expect(response.result.provider).to.equal('custom');
+                    expect(response.result.token).to.equal('mycustomtoken');
+                    mock.stopasync();
+                });
+            });
+        });
+    });
+});
+    });
+
+it('overrides cookie name', async () => {
+
+    const mock = new Mock.V1();
+    mock.start((provider) => {
+
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider,
+                cookie: 'ring'
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            expect(res.headers['set-cookie'][0]).to.contain('ring=');
+            mock.stopasync();
+        });
+    });
+});
+    });
+
+it('allows multiple custom provider names', async () => {
+
+    const mock = new Mock.V1();
+    mock.start((provider) => {
+
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('custom_1', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_1' }),
+                cookie: 'ring_1'
+            });
+
+            server.auth.strategy('custom_2', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: Hoek.merge(Hoek.clone(provider), { name: 'custom_2' }),
+                cookie: 'ring_2'
+            });
+
+            server.route({
+                method: '*',
+                path: '/login_1',
+                config: {
+                    auth: 'custom_1',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            server.route({
+                method: '*',
+                path: '/login_2',
+                config: {
+                    auth: 'custom_2',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login_1');
+
+            expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
+            server.inject('/login_2', (response) => {
+
+                expect(response.headers['set-cookie'][0]).to.contain('ring_2=');
+                mock.stopasync();
+            });
+        });
+    });
+});
+    });
+
+it('exposes OAuth implementation', () => {
+
+    expect(Bell.oauth.Client).to.be.function();
+});
+
+it('exposes OAuth via plugin', async () => {
+
+    const server = Server({ host: 'localhost', port: 80 });
+    await server.register(Bell);
+    expect(server.plugins.bell.oauth.Client).to.be.function();
+});
+
+it('allows null for cookie domain value', async () => {
+
+    const mock = new Mock.V1();
+    mock.start((provider) => {
+
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            const spy = Sinon.spy(OAuth, 'v1');
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: 'false',
+                clientId: 'test',
+                clientSecret: 'secret',
+                ttl: '1234567890',
+                forceHttps: 'true',
+                provider,
+                domain: null
+            });
+
+            expect(spy.calledOnce).to.be.true();
+            expect(spy.getCall(0).args[0]).to.be.an.object();
+            expect(spy.getCall(0).args[0].isSecure).to.be.false();
+            expect(spy.getCall(0).args[0].ttl).to.be.equal(1234567890);
+            expect(spy.getCall(0).args[0].forceHttps).to.be.true();
+            expect(spy.getCall(0).args[0].domain).to.be.null();
+
+            spy.restore();
+
+            mock.stopasync();
+        });
+    });
+});
+
+describe('simulate()', () => {
+
+    it('authenticates an endpoint via oauth', { parallel: false }, async () => {
+
+        Bell.simulate((request, next) => {
+
+            return next(null, { some: 'value' });
+        });
+
+        const server = Server();
+        server.register(Bell, (err) => {
+
+            expect(err).to.not.exist();
+
+            server.auth.strategy('twitter', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: 'twitter'
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'twitter',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login?next=%2Fhome');
+
+            expect(res.result).to.equal({
+                provider: 'twitter',
+                token: 'oauth_token',
+                query: {
+                    next: '/home'
+                },
+                secret: 'token_secret',
+                some: 'value'
+            });
+
+            Bell.simulate(false);
             done();
         });
     });
+});
 
-    it('allows null for cookie domain value', (done) => {
+it('authenticates an endpoint via oauth2', { parallel: false }, async () => {
 
-        const mock = new Mock.V1();
-        mock.start((provider) => {
+    Bell.simulate((request, next) => {
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                const spy = Sinon.spy(OAuth, 'v1');
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: 'false',
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    ttl: '1234567890',
-                    forceHttps: 'true',
-                    provider,
-                    domain: null
-                });
-
-                expect(spy.calledOnce).to.be.true();
-                expect(spy.getCall(0).args[0]).to.be.an.object();
-                expect(spy.getCall(0).args[0].isSecure).to.be.false();
-                expect(spy.getCall(0).args[0].ttl).to.be.equal(1234567890);
-                expect(spy.getCall(0).args[0].forceHttps).to.be.true();
-                expect(spy.getCall(0).args[0].domain).to.be.null();
-
-                spy.restore();
-
-                mock.stop(done);
-            });
-        });
+        return next(null, { some: 'value' });
     });
 
-    describe('simulate()', () => {
+    const server = Server();
+    server.register(Bell, (err) => {
 
-        it('authenticates an endpoint via oauth', { parallel: false }, (done) => {
+        expect(err).to.not.exist();
 
-            Bell.simulate((request, next) => {
-
-                return next(null, { some: 'value' });
-            });
-
-            const server = Server();
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('twitter', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'twitter'
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'twitter',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login?next=%2Fhome', (res) => {
-
-                    expect(res.result).to.equal({
-                        provider: 'twitter',
-                        token: 'oauth_token',
-                        query: {
-                            next: '/home'
-                        },
-                        secret: 'token_secret',
-                        some: 'value'
-                    });
-
-                    Bell.simulate(false);
-                    done();
-                });
-            });
+        server.auth.strategy('github', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider: 'github'
         });
 
-        it('authenticates an endpoint via oauth2', { parallel: false }, (done) => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'github',
+                handler: function (request, h) {
 
-            Bell.simulate((request, next) => {
-
-                return next(null, { some: 'value' });
-            });
-
-            const server = Server();
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                server.auth.strategy('github', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'github'
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'github',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login?next=%2Fhome', (res) => {
-
-                    expect(res.result).to.equal({
-                        provider: 'github',
-                        token: 'oauth_token',
-                        query: {
-                            next: '/home'
-                        },
-                        refreshToken: 'refresh_token',
-                        expiresIn: 3600,
-                        some: 'value'
-                    });
-
-                    Bell.simulate(false);
-                    done();
-                });
-            });
+                    return request.auth.credentials;
+                }
+            }
         });
 
-        it('simulates error', { parallel: false }, (done) => {
+        const res = await server.inject('/login?next=%2Fhome');
 
-            Bell.simulate((request, next) => {
+        expect(res.result).to.equal({
+            provider: 'github',
+            token: 'oauth_token',
+            query: {
+                next: '/home'
+            },
+            refreshToken: 'refresh_token',
+            expiresIn: 3600,
+            some: 'value'
+        });
 
-                return next(Boom.badRequest());
-            });
+        Bell.simulate(false);
+        done();
+    });
+});
+        });
 
-            const server = Server();
-            server.register(Bell, (err) => {
+it('simulates error', { parallel: false }, async () => {
 
-                expect(err).to.not.exist();
+    Bell.simulate((request, next) => {
 
-                server.auth.strategy('twitter', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'test',
-                    clientSecret: 'secret',
-                    provider: 'twitter'
-                });
+        return next(Boom.badRequest());
+    });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'twitter',
-                        handler: function (request, reply) {
+    const server = Server();
+    server.register(Bell, (err) => {
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        expect(err).to.not.exist();
 
-                server.inject('/login?next=%2Fhome', (res) => {
+        server.auth.strategy('twitter', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider: 'twitter'
+        });
 
-                    expect(res.statusCode).to.equal(400);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'twitter',
+                handler: function (request, h) {
 
-                    Bell.simulate(false);
-                    done();
-                });
-            });
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?next=%2Fhome');
+
+        expect(res.statusCode).to.equal(400);
+
+        Bell.simulate(false);
+        done();
+    });
+});
         });
     });
 });

@@ -40,7 +40,7 @@ server.register(require('bell'), function (err) {
         path: '/login',          // The callback endpoint registered with the provider
         config: {
             auth: 'twitter',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);

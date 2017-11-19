@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('google', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -53,45 +53,45 @@ describe('google', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        given_name: 'steve',
-                                        family_name: 'smith'
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            refreshToken: undefined,
+                            query: {},
+                            profile: {
+                                id: '1234567890',
+                                displayName: 'steve smith',
+                                name: {
+                                    given_name: 'steve',
+                                    family_name: 'smith'
+                                },
+                                email: 'steve@example.com',
+                                raw: profile
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 
 });

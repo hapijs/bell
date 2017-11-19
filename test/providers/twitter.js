@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('twitter', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V1();
         mock.start((provider) => {
@@ -47,242 +47,242 @@ describe('twitter', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: 'final',
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    username: 'Steve Stevens',
-                                    displayName: undefined,
-                                    raw: {
-                                        property: 'something'
-                                    }
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: 'final',
+                            secret: 'secret',
+                            query: {},
+                            profile: {
+                                id: '1234567890',
+                                username: 'Steve Stevens',
+                                displayName: undefined,
+                                raw: {
+                                    property: 'something'
                                 }
-                            });
-
-                            mock.stop(done);
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 
-    it('authenticates with mock and custom method', { parallel: false }, (done) => {
+it('authenticates with mock and custom method', { parallel: false }, async () => {
 
-        const mock = new Mock.V1();
-        mock.start((provider) => {
+    const mock = new Mock.V1();
+    mock.start((provider) => {
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
 
-                expect(err).to.not.exist();
+            expect(err).to.not.exist();
 
-                const custom = Bell.providers.twitter({ getMethod: 'custom/method' });
-                Hoek.merge(custom, provider);
+            const custom = Bell.providers.twitter({ getMethod: 'custom/method' });
+            Hoek.merge(custom, provider);
 
-                Mock.override('https://api.twitter.com/1.1/custom/method.json', {
-                    property: 'something'
-                });
+            Mock.override('https://api.twitter.com/1.1/custom/method.json', {
+                property: 'something'
+            });
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'twitter',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'twitter',
+                clientSecret: 'secret',
+                provider: custom
+            });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
 
-                            reply(request.auth.credentials);
-                        }
+                        return request.auth.credentials;
                     }
-                });
+                }
+            });
 
-                server.inject('/login', (res) => {
+            const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: 'final',
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    username: 'Steve Stevens',
-                                    displayName: undefined,
-                                    raw: {
-                                        property: 'something'
-                                    }
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
+                    Mock.clear();
+                    expect(response.result).to.equal({
+                        provider: 'custom',
+                        token: 'final',
+                        secret: 'secret',
+                        query: {},
+                        profile: {
+                            id: '1234567890',
+                            username: 'Steve Stevens',
+                            displayName: undefined,
+                            raw: {
+                                property: 'something'
+                            }
+                        }
                     });
+
+                    mock.stop(done);
                 });
             });
         });
     });
+});
+    });
 
-    it('authenticates with mock and custom method with custom GET parameters', { parallel: false }, (done) => {
+it('authenticates with mock and custom method with custom GET parameters', { parallel: false }, async () => {
 
-        const mock = new Mock.V1();
-        mock.start((provider) => {
+    const mock = new Mock.V1();
+    mock.start((provider) => {
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
 
-                expect(err).to.not.exist();
+            expect(err).to.not.exist();
 
-                const custom = Bell.providers.twitter({
-                    getMethod: 'custom/method',
-                    getParams: {
-                        param1: 'custom',
-                        param2: 'params'
+            const custom = Bell.providers.twitter({
+                getMethod: 'custom/method',
+                getParams: {
+                    param1: 'custom',
+                    param2: 'params'
+                }
+            });
+            Hoek.merge(custom, provider);
+
+            Mock.override('https://api.twitter.com/1.1/custom/method.json', {
+                property: 'something'
+            });
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'twitter',
+                clientSecret: 'secret',
+                provider: custom
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
                     }
-                });
-                Hoek.merge(custom, provider);
+                }
+            });
 
-                Mock.override('https://api.twitter.com/1.1/custom/method.json', {
-                    property: 'something'
-                });
+            const res = await server.inject('/login');
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'twitter',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            mock.server.inject(res.headers.location, (mockRes) => {
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            reply(request.auth.credentials);
+                    Mock.clear();
+                    expect(response.result).to.equal({
+                        provider: 'custom',
+                        token: 'final',
+                        secret: 'secret',
+                        query: {},
+                        profile: {
+                            id: '1234567890',
+                            username: 'Steve Stevens',
+                            displayName: undefined,
+                            raw: {
+                                property: 'something'
+                            }
                         }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: 'final',
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    username: 'Steve Stevens',
-                                    displayName: undefined,
-                                    raw: {
-                                        property: 'something'
-                                    }
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
                     });
+
+                    mock.stop(done);
                 });
             });
         });
     });
+});
+    });
 
-    it('authenticates with mock (without extended profile)', { parallel: false }, (done) => {
+it('authenticates with mock (without extended profile)', { parallel: false }, async () => {
 
-        const mock = new Mock.V1();
-        mock.start((provider) => {
+    const mock = new Mock.V1();
+    mock.start((provider) => {
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
 
-                expect(err).to.not.exist();
+            expect(err).to.not.exist();
 
-                const custom = Bell.providers.twitter({ extendedProfile: false });
-                Hoek.merge(custom, provider);
+            const custom = Bell.providers.twitter({ extendedProfile: false });
+            Hoek.merge(custom, provider);
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'twitter',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'twitter',
+                clientSecret: 'secret',
+                provider: custom
+            });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
 
-                            reply(request.auth.credentials);
-                        }
+                        return request.auth.credentials;
                     }
-                });
+                }
+            });
 
-                server.inject('/login', (res) => {
+            const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: 'final',
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    username: 'Steve Stevens'
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
+                    expect(response.result).to.equal({
+                        provider: 'custom',
+                        token: 'final',
+                        secret: 'secret',
+                        query: {},
+                        profile: {
+                            id: '1234567890',
+                            username: 'Steve Stevens'
+                        }
                     });
+
+                    mock.stop(done);
                 });
             });
         });
+    });
+});
     });
 });

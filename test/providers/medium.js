@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('medium', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2({ code: 201 });
         mock.start((provider) => {
@@ -55,46 +55,46 @@ describe('medium', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            refreshToken: undefined,
+                            query: {},
+                            profile: {
+                                id: '5303d74c64f66366f00cb9b2a94f3251bf5',
+                                username: 'majelbstoat',
+                                displayName: 'Jamie Talbot',
+                                raw: {
                                     id: '5303d74c64f66366f00cb9b2a94f3251bf5',
                                     username: 'majelbstoat',
-                                    displayName: 'Jamie Talbot',
-                                    raw: {
-                                        id: '5303d74c64f66366f00cb9b2a94f3251bf5',
-                                        username: 'majelbstoat',
-                                        name: 'Jamie Talbot',
-                                        url: 'https://medium.com/@majelbstoat',
-                                        imageUrl: 'https://images.medium.com/0*fkfQiTzT7TlUGGyI.png'
-                                    }
+                                    name: 'Jamie Talbot',
+                                    url: 'https://medium.com/@majelbstoat',
+                                    imageUrl: 'https://images.medium.com/0*fkfQiTzT7TlUGGyI.png'
                                 }
-                            });
-
-                            mock.stop(done);
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 });

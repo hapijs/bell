@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('discord', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -53,55 +53,55 @@ describe('discord', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                refreshToken: undefined,
-                                expiresIn: 3600,
-                                query: {},
-                                profile: {
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            refreshToken: undefined,
+                            expiresIn: 3600,
+                            query: {},
+                            profile: {
+                                id: '80351110224678912',
+                                username: 'Nelly',
+                                discriminator: '1337',
+                                mfa_enabled: false,
+                                avatar: {
+                                    id: '8342729096ea3675442027381ff50dfe',
+                                    url: 'https://cdn.discordapp.com/avatars/80351110224678912/8342729096ea3675442027381ff50dfe.png'
+                                },
+                                verified: true,
+                                email: 'nelly@discordapp.com',
+                                raw: {
                                     id: '80351110224678912',
                                     username: 'Nelly',
                                     discriminator: '1337',
                                     mfa_enabled: false,
-                                    avatar: {
-                                        id: '8342729096ea3675442027381ff50dfe',
-                                        url: 'https://cdn.discordapp.com/avatars/80351110224678912/8342729096ea3675442027381ff50dfe.png'
-                                    },
+                                    avatar: '8342729096ea3675442027381ff50dfe',
                                     verified: true,
-                                    email: 'nelly@discordapp.com',
-                                    raw: {
-                                        id: '80351110224678912',
-                                        username: 'Nelly',
-                                        discriminator: '1337',
-                                        mfa_enabled: false,
-                                        avatar: '8342729096ea3675442027381ff50dfe',
-                                        verified: true,
-                                        email: 'nelly@discordapp.com'
-                                    }
+                                    email: 'nelly@discordapp.com'
                                 }
-                            });
-
-                            mock.stop(done);
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 });

@@ -48,34 +48,34 @@ const testProfile = function (opts) {
                 path: '/login',
                 config: {
                     auth: 'custom',
-                    handler: function (request, reply) {
+                    handler: function (request, h) {
 
-                        reply(request.auth.credentials);
+                        return request.auth.credentials;
                     }
                 }
             });
 
-            server.inject('/login', (res) => {
+            const res = await server.inject('/login');
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            mock.server.inject(res.headers.location, (mockRes) => {
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                        Mock.clear();
-                        expect(response.result).to.equal(expectedResult);
+                    Mock.clear();
+                    expect(response.result).to.equal(expectedResult);
 
-                        mock.stop(done);
-                    });
+                    mock.stop(done);
                 });
             });
         });
     });
+});
 };
 
 describe('azuread', () => {
 
-    it('authenticates with mock Azure AD', { parallel: false }, (done) => {
+    it('authenticates with mock Azure AD', { parallel: false }, async () => {
 
         const profile = {
             oid: '1234567890',
@@ -101,7 +101,7 @@ describe('azuread', () => {
         });
     });
 
-    it('authenticates with mock Azure AD email', { parallel: false }, (done) => {
+    it('authenticates with mock Azure AD email', { parallel: false }, async () => {
 
         const profile = {
             oid: '1234567890',
@@ -127,7 +127,7 @@ describe('azuread', () => {
         });
     });
 
-    it('authenticates with mock azure AD and custom tenant', { parallel: false }, (done) => {
+    it('authenticates with mock azure AD and custom tenant', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -161,41 +161,41 @@ describe('azuread', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    displayName: 'Sample AD User',
-                                    email: 'sample@microsoft.com',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            refreshToken: undefined,
+                            query: {},
+                            profile: {
+                                id: '1234567890',
+                                displayName: 'Sample AD User',
+                                email: 'sample@microsoft.com',
+                                raw: profile
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
-
         });
+
     });
+});
 });

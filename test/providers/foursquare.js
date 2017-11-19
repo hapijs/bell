@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('foursquare', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -64,135 +64,135 @@ describe('foursquare', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                secret: 'secret',
-                                query: {},
-                                profile: {
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            secret: 'secret',
+                            query: {},
+                            profile: {
 
-                                    id: '1234',
-                                    displayName: 'Steve Smith',
-                                    name: {
-                                        first: 'Steve',
-                                        last: 'Smith'
-                                    },
-                                    email: data.response.user.contact.email,
-                                    raw: data.response.user
-                                }
-                            });
-
-                            mock.stop(done);
+                                id: '1234',
+                                displayName: 'Steve Smith',
+                                name: {
+                                    first: 'Steve',
+                                    last: 'Smith'
+                                },
+                                email: data.response.user.contact.email,
+                                raw: data.response.user
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 
-    it('authenticates with mock when user has no email set', { parallel: false }, (done) => {
+it('authenticates with mock when user has no email set', { parallel: false }, async () => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+    const mock = new Mock.V2();
+    mock.start((provider) => {
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        server.register(Bell, (err) => {
 
-                expect(err).to.not.exist();
+            expect(err).to.not.exist();
 
-                const custom = Bell.providers.foursquare();
-                Hoek.merge(custom, provider);
+            const custom = Bell.providers.foursquare();
+            Hoek.merge(custom, provider);
 
-                const data = {
-                    response: {
-                        user: {
+            const data = {
+                response: {
+                    user: {
+                        id: '1234',
+                        firstName: 'Steve',
+                        lastName: 'Smith',
+                        gender: 'male',
+                        relationship: 'self',
+                        photo: {
+                            prefix: 'https://irs0.4sqi.net/img/user/',
+                            suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
+                        },
+                        contact: {
+                            facebook: 'http://facebook.com/stevesmith.test'
+                        }
+                    }
+                }
+            };
+
+            Mock.override('https://api.foursquare.com/v2/users/self', data);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'foursquare',
+                clientSecret: 'secret',
+                provider: custom
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                config: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+
+                    }
+                }
+            });
+
+            const res = await server.inject('/login');
+
+            const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+            mock.server.inject(res.headers.location, (mockRes) => {
+
+                server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+
+                    Mock.clear();
+                    expect(response.result).to.equal({
+                        provider: 'custom',
+                        token: '456',
+                        expiresIn: 3600,
+                        secret: 'secret',
+                        query: {},
+                        profile: {
+
                             id: '1234',
-                            firstName: 'Steve',
-                            lastName: 'Smith',
-                            gender: 'male',
-                            relationship: 'self',
-                            photo: {
-                                prefix: 'https://irs0.4sqi.net/img/user/',
-                                suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
+                            displayName: 'Steve Smith',
+                            name: {
+                                first: 'Steve',
+                                last: 'Smith'
                             },
-                            contact: {
-                                facebook: 'http://facebook.com/stevesmith.test'
-                            }
+                            email: undefined,
+                            raw: data.response.user
                         }
-                    }
-                };
-
-                Mock.override('https://api.foursquare.com/v2/users/self', data);
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'foursquare',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-
-                                    id: '1234',
-                                    displayName: 'Steve Smith',
-                                    name: {
-                                        first: 'Steve',
-                                        last: 'Smith'
-                                    },
-                                    email: undefined,
-                                    raw: data.response.user
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
                     });
+
+                    mock.stop(done);
                 });
             });
         });
+    });
+});
     });
 });

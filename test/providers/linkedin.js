@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 describe('linkedin', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
         mock.start((provider) => {
@@ -53,73 +53,73 @@ describe('linkedin', () => {
                     path: '/login',
                     config: {
                         auth: 'custom',
-                        handler: function (request, reply) {
+                        handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                            return request.auth.credentials;
                         }
                     }
                 });
 
-                server.inject('/login', (res) => {
+                const res = await server.inject('/login');
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+                mock.server.inject(res.headers.location, (mockRes) => {
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
-                                    email: 'steve.smith@domain.com',
-                                    headline: 'Master of the universe',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
+                        Mock.clear();
+                        expect(response.result).to.equal({
+                            provider: 'custom',
+                            token: '456',
+                            expiresIn: 3600,
+                            refreshToken: undefined,
+                            query: {},
+                            profile: {
+                                id: '1234567890',
+                                name: {
+                                    first: 'steve',
+                                    last: 'smith'
+                                },
+                                email: 'steve.smith@domain.com',
+                                headline: 'Master of the universe',
+                                raw: profile
+                            }
                         });
+
+                        mock.stop(done);
                     });
                 });
             });
         });
     });
+});
 
-    it('adds profile fields', { parallel: false }, (done) => {
+it('adds profile fields', { parallel: false }, async () => {
 
-        const custom = Bell.providers.linkedin();
+    const custom = Bell.providers.linkedin();
 
-        const strategyOptions = {
-            clientSecret: 'secret',
-            providerParams: {
-                fields: '(id,firstName)'
-            }
-        };
-        Hoek.merge(custom, strategyOptions);
+    const strategyOptions = {
+        clientSecret: 'secret',
+        providerParams: {
+            fields: '(id,firstName)'
+        }
+    };
+    Hoek.merge(custom, strategyOptions);
 
-        const profile = {
-            id: '1234567890',
-            firstName: 'steve',
-            lastName: 'smith',
-            headline: 'Master of the universe'
-        };
+    const profile = {
+        id: '1234567890',
+        firstName: 'steve',
+        lastName: 'smith',
+        headline: 'Master of the universe'
+    };
 
-        custom.profile({ token: '456' }, null, (url, query, callback) => {
+    custom.profile({ token: '456' }, null, (url, query, callback) => {
 
-            expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
-            callback(profile);
-        }, () => {
+        expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
+        callback(profile);
+    }, () => {
 
-            done();
-        });
+        done();
     });
+});
 });

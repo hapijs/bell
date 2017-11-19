@@ -28,7 +28,7 @@ server.register(Bell, (err) => {
         path: '/bell/door',
         config: {
             auth: 'twitch',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);

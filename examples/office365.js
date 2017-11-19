@@ -20,7 +20,7 @@ server.register(Bell, (err) => {
         providerParams: {
             response_type: 'code'
         },
-        scope: ['openid','offline_access', 'profile']
+        scope: ['openid', 'offline_access', 'profile']
         /**
          *You'll need an Office 365 account to set up an application and get a clientID and ClientSecret
          *This is a helpful tutorial for the whole process: https://dev.outlook.com/restapi/tutorial/node
@@ -37,7 +37,7 @@ server.register(Bell, (err) => {
                 strategy: 'office',
                 mode: 'try'
             },
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);
