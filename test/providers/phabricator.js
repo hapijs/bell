@@ -20,89 +20,89 @@ describe('phabricator', () => {
     it('fails with no uri', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                expect(Bell.providers.phabricator).to.throw(Error);
 
-                mock.stop(done);
-            });
-        });
+        expect(Bell.providers.phabricator).to.throw(Error);
+
+        await mock.stop();
+    });
+});
     });
 
-    it('authenticates with mock and custom uri', { parallel: false }, async () => {
+it('authenticates with mock and custom uri', { parallel: false }, async () => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+    const mock = new Mock.V2();
+    const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+    const server = Server({ host: 'localhost', port: 80 });
+    await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.phabricator({ uri: 'http://example.com' });
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    result: {
-                        phid: '1234567890',
-                        userName: 'steve',
-                        realName: 'steve',
-                        primaryEmail: 'steve@example.com'
-                    }
-                };
+    const custom = Bell.providers.phabricator({ uri: 'http://example.com' });
+    Hoek.merge(custom, provider);
 
-                Mock.override('http://example.com/api/user.whoami', profile);
+    const profile = {
+        result: {
+            phid: '1234567890',
+            userName: 'steve',
+            realName: 'steve',
+            primaryEmail: 'steve@example.com'
+        }
+    };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'phabricator',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+    Mock.override('http://example.com/api/user.whoami', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, h) {
+    server.auth.strategy('custom', 'bell', {
+        password: 'cookie_encryption_password_secure',
+        isSecure: false,
+        clientId: 'phabricator',
+        clientSecret: 'secret',
+        provider: custom
+    });
 
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+    server.route({
+        method: '*',
+        path: '/login',
+        config: {
+            auth: 'custom',
+            handler: function (request, h) {
 
-                const res = await server.inject('/login');
+                return request.auth.credentials;
+            }
+        }
+    });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+    const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+    const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: '456',
-                            expiresIn: 3600,
-                            refreshToken: undefined,
-                            query: {},
-                            profile: {
-                                id: '1234567890',
-                                username: 'steve',
-                                displayName: 'steve',
-                                email: 'steve@example.com',
-                                raw: profile
-                            }
-                        });
+    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        mock.stop(done);
-                    });
+    Mock.clear();
+    expect(response.result).to.equal({
+        provider: 'custom',
+        token: '456',
+        expiresIn: 3600,
+        refreshToken: undefined,
+        query: {},
+        profile: {
+            id: '1234567890',
+            username: 'steve',
+            displayName: 'steve',
+            email: 'steve@example.com',
+            raw: profile
+        }
+    });
+
+    await mock.stop();
+});
                 });
             });
         });

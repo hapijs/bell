@@ -19,75 +19,75 @@ describe('pinterest', () => {
     it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const pinterest = Bell.providers.pinterest();
-                Hoek.merge(pinterest, provider);
 
-                const profile = {
-                    data: {
-                        id: '1234567890',
-                        username: 'steve',
-                        first_name: 'steve',
-                        last_name: 'smith'
-                    }
-                };
+        const pinterest = Bell.providers.pinterest();
+        Hoek.merge(pinterest, provider);
 
-                Mock.override('https://api.pinterest.com/v1/me/', profile);
+        const profile = {
+            data: {
+                id: '1234567890',
+                username: 'steve',
+                first_name: 'steve',
+                last_name: 'smith'
+            }
+        };
 
-                server.auth.strategy('pinterest', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'pinterest',
-                    clientSecret: 'secret',
-                    provider: pinterest
-                });
+        Mock.override('https://api.pinterest.com/v1/me/', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'pinterest',
-                        handler: function (request, h) {
+        server.auth.strategy('pinterest', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'pinterest',
+            clientSecret: 'secret',
+            provider: pinterest
+        });
 
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'pinterest',
+                handler: function (request, h) {
 
-                const res = await server.inject('/login');
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+        const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'pinterest',
-                            token: '456',
-                            expiresIn: 3600,
-                            refreshToken: undefined,
-                            query: {},
-                            profile: {
-                                id: '1234567890',
-                                username: 'steve',
-                                name: {
-                                    first: 'steve',
-                                    last: 'smith'
-                                },
-                                raw: profile
-                            }
-                        });
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        mock.stop(done);
-                    });
-                });
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'pinterest',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: '1234567890',
+                username: 'steve',
+                name: {
+                    first: 'steve',
+                    last: 'smith'
+                },
+                raw: profile
+            }
+        });
+
+        await mock.stop();
+    });
+});
             });
         });
     });

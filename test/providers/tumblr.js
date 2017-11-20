@@ -20,68 +20,68 @@ describe('tumblr', () => {
     it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V1();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.tumblr();
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    response: {
-                        user: { name: 'username' }
-                    }
-                };
+        const custom = Bell.providers.tumblr();
+        Hoek.merge(custom, provider);
 
-                Mock.override('https://api.tumblr.com/v2/user/info', profile);
+        const profile = {
+            response: {
+                user: { name: 'username' }
+            }
+        };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'tumblr',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        Mock.override('https://api.tumblr.com/v2/user/info', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, h) {
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'tumblr',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                const res = await server.inject('/login');
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+        const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: 'final',
-                            secret: 'secret',
-                            query: {},
-                            profile: {
-                                username: 'username',
-                                raw: {
-                                    name: 'username'
-                                }
-                            }
-                        });
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        mock.stop(done);
-                    });
-                });
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: 'final',
+            secret: 'secret',
+            query: {},
+            profile: {
+                username: 'username',
+                raw: {
+                    name: 'username'
+                }
+            }
+        });
+
+        await mock.stop();
+    });
+});
             });
         });
     });

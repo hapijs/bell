@@ -177,7 +177,7 @@ describe('Bell', () => {
         const mock = new Mock.V1({ failToken: true });
         const provider = await mock.start();
 
-        const server = Server({ host: 'localhost', port: 80 });
+        const server = Server({ host: 'localhost', port: 80, debug: { log: ['error'], request: ['error', 'implementation'] } });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -201,7 +201,7 @@ describe('Bell', () => {
         });
 
         const res = await server.inject('/login');
-
+        console.log(res.payload, res.headers);
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
         const mockRes = await mock.server.inject(res.headers.location);
 
@@ -365,9 +365,7 @@ describe('Bell', () => {
 
         Mock.override('https://api.twitter.com/1.1/users/show.json', (uri) => {
 
-            Mock.clear();
             expect(uri).to.equal('https://api.twitter.com/1.1/users/show.json?user_id=1234567890&fields=id%2Cemail');
-            await mock.stop();
         });
 
         server.auth.strategy('custom', 'bell', {
@@ -397,6 +395,8 @@ describe('Bell', () => {
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
         const mockRes = await mock.server.inject(res.headers.location);
         const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        Mock.clear();
+        await mock.stop();
     });
 
     it('authenticates with mock Twitter', { parallel: false }, async () => {
@@ -742,7 +742,7 @@ describe('Bell', () => {
             path: '/login',
             config: {
                 auth: 'custom',
-                handler: function (request, h) {
+                handler: async function (request, h) {
 
                     const client = new Bell.oauth.Client({
                         name: 'twitter',
@@ -791,7 +791,7 @@ describe('Bell', () => {
             path: '/login',
             config: {
                 auth: 'custom',
-                handler: function (request, h) {
+                handler: async function (request, h) {
 
                     const client = new Bell.oauth.Client({
                         name: 'twitter',
@@ -840,7 +840,7 @@ describe('Bell', () => {
             path: '/login',
             config: {
                 auth: 'custom',
-                handler: function (request, h) {
+                handler: async function (request, h) {
 
                     const client = new Bell.oauth.Client({
                         name: 'twitter',
@@ -879,8 +879,6 @@ describe('v2()', () => {
         const server = Server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        expect(err).to.not.exist();
-
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
             isSecure: false,
@@ -907,1539 +905,1381 @@ describe('v2()', () => {
         expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
         await mock.stop();
     });
-});
-    });
 
-it('forces https in redirect_uri when set in options', async () => {
+    it('forces https in redirect_uri when set in options', async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        forceHttps: true
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            forceHttps: true
         });
-    });
 
-it('uses location setting in redirect_uri when set in options', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        location: 'https://differenthost:8888'
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        expect(response.statusCode).to.equal(200);
+        await mock.stop();
     });
 
-it('ignores empty string returned by location setting (function)', async () => {
+    it('uses location setting in redirect_uri when set in options', async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        location: () => ''
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    await mock.stop();
-});
-    });
-
-it('uses location setting (function) in redirect_uri when set in options', async () => {
-
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        location: (request) => 'https://differenthost:8888' + request.path.replace(/(\/again)?$/, '/again')
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login/again',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin%2Fagain&state=');
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('https://differenthost:8888/login/again?code=1&state=');
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            location: 'https://differenthost:8888'
         });
-    });
 
-it('authenticates an endpoint with custom scope', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        scope: ['a']
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain('scope=a');
-    await mock.stop();
-});
-    });
-
-it('authenticates an endpoint with custom function scope', async () => {
-
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        scope: (request) => [request.query.scope]
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login?scope=foo');
-
-    expect(res.headers.location).to.contain('scope=foo');
-    await mock.stop();
-});
-    });
-
-it('authenticates with mock Instagram with skip profile', { parallel: false }, async () => {
-
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    const custom = Bell.providers.instagram();
-    Hoek.merge(custom, provider);
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'instagram',
-        clientSecret: 'secret',
-        provider: custom,
-        skipProfile: true
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.result).to.equal({
-        provider: 'custom',
-        token: '456',
-        refreshToken: undefined,
-        expiresIn: 3600,
-        query: {}
-    });
-
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        expect(response.statusCode).to.equal(200);
+        await mock.stop();
     });
 
-it('authenticates an endpoint with runtime query parameters', async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+    it('ignores empty string returned by location setting (function)', async () => {
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    expect(err).to.not.exist();
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        allowRuntimeProviderParams: true
-    });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            location: () => ''
+        });
 
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
+        });
+
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        await mock.stop();
     });
 
-    const res = await server.inject('/login?runtime=5');
+    it('uses location setting (function) in redirect_uri when set in options', async () => {
 
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    await mock.stop();
-});
-    });
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-it('allows runtime state', async () => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            location: (request) => 'https://differenthost:8888' + request.path.replace(/(\/again)?$/, '/again')
+        });
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        runtimeStateCallback: function (request) {
-
-            return request.query.state;
-        }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
+        });
 
-    const res = await server.inject('/login?state=something');
+        server.route({
+            method: '*',
+            path: '/login/again',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    expect(res.headers.location).to.contain('something');
-    await mock.stop();
-});
-    });
-
-it('allows empty or null runtime state', async () => {
-
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        runtimeStateCallback: function (request) {
-
-            return null;
-        }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
+        });
+
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin%2Fagain&state=');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('https://differenthost:8888/login/again?code=1&state=');
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        expect(response.statusCode).to.equal(200);
+        await mock.stop();
     });
 
-    const res = await server.inject('/login?state=something');
+    it('authenticates an endpoint with custom scope', async () => {
 
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    await mock.stop();
-});
-    });
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-it('fails on missing state', async () => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            scope: ['a']
+        });
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
+        });
+
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain('scope=a');
+        await mock.stop();
     });
 
-    const res = await server.inject('/login');
+    it('authenticates an endpoint with custom function scope', async () => {
 
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const mockRes = await mock.server.inject(res.headers.location);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            scope: (request) => [request.query.scope]
+        });
 
-    server.inject({ url: 'http://localhost:80/login?code=1', headers: { cookie } }, (response) => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?scope=foo');
+        expect(res.headers.location).to.contain('scope=foo');
+        await mock.stop();
+    });
+
+    it('authenticates with mock Instagram with skip profile', { parallel: false }, async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.instagram();
+        Hoek.merge(custom, provider);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'instagram',
+            clientSecret: 'secret',
+            provider: custom,
+            skipProfile: true
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            refreshToken: undefined,
+            expiresIn: 3600,
+            query: {}
+        });
+
+        await mock.stop();
+    });
+
+    it('authenticates an endpoint with runtime query parameters', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            allowRuntimeProviderParams: true
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?runtime=5');
+
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        await mock.stop();
+    });
+
+    it('allows runtime state', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            runtimeStateCallback: function (request) {
+
+                return request.query.state;
+            }
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?state=something');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        expect(res.headers.location).to.contain('something');
+        await mock.stop();
+    });
+
+    it('allows empty or null runtime state', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            runtimeStateCallback: function (request) {
+
+                return null;
+            }
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?state=something');
+
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        await mock.stop();
+    });
+
+    it('fails on missing state', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+        const mockRes = await mock.server.inject(res.headers.location);
+
+        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+        const response = await server.inject({ url: 'http://localhost:80/login?code=1', headers: { cookie } });
         expect(response.statusCode).to.equal(500);
         await mock.stop();
     });
-});
+
+    it('does not include runtime query parameters by default', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true }
         });
-    });
 
-it('does not include runtime query parameters by default', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
+        });
+
+        const res = await server.inject('/login?notallowed=b');
+        expect(res.headers.location).to.not.contain('notallowed');
+        await mock.stop();
     });
 
-    const res = await server.inject('/login?notallowed=b');
+    it('refreshes & errors on missing cookie in token step', async () => {
 
-    expect(res.headers.location).to.not.contain('notallowed');
-    await mock.stop();
-});
-    });
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-it('refreshes & errors on missing cookie in token step', async () => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider
+        });
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
+        });
 
-    const res = await server.inject('/login');
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        expect(cookie).to.exist();
+        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    expect(cookie).to.exist();
-    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-    server.inject(mockRes.headers.location, (response) => {
-
+        const response = await server.inject(mockRes.headers.location);
         expect(response.statusCode).to.equal(200);
         const newLocation = mockRes.headers.location + '&refresh=1';
         expect(response.payload).to.contain(newLocation);
 
-        server.inject(newLocation, (errorResponse) => {
+        const errorResponse = await server.inject(newLocation);
+        expect(errorResponse.statusCode).to.equal(500);
+        await mock.stop();
+    });
 
-            expect(errorResponse.statusCode).to.equal(500);
-            await mock.stop();
+    it('errors on mismatching state', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider
         });
-    });
-});
-        });
-    });
 
-it('errors on mismatching state', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
+        });
 
-    const res = await server.inject('/login');
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
 
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    expect(res.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
 
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('http://localhost:80/login?code=1&state=');
-
-    server.inject({ url: 'http://localhost:80/login?code=1&state=xx', headers: { cookie } }, (response) => {
-
+        const response = await server.inject({ url: 'http://localhost:80/login?code=1&state=xx', headers: { cookie } });
         expect(response.statusCode).to.equal(500);
         await mock.stop();
     });
-});
+
+    it('errors on failed token request', { parallel: false }, async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
+
+        Mock.override(provider.token, null);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
         });
-    });
 
-it('errors on failed token request', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    Mock.override(provider.token, null);
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
     });
 
-it('errors on errored token request (500)', { parallel: false }, async () => {
+    it('errors on errored token request (500)', { parallel: false }, async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
 
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
+        Mock.override(provider.token, Boom.badRequest());
 
-    Mock.override(provider.token, Boom.badRequest());
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
         });
-    });
 
-it('errors on errored token request (<200)', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    const error = Boom.badRequest();
-    error.output.statusCode = 199;
-    Mock.override(provider.token, error);
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
     });
 
-it('errors on invalid token request response', { parallel: false }, async () => {
+    it('errors on errored token request (<200)', { parallel: false }, async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
 
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
+        const error = Boom.badRequest();
+        error.output.statusCode = 199;
+        Mock.override(provider.token, error);
 
-    Mock.override(provider.token, '{x');
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
         });
-    });
 
-it('passes if the client secret is not modified in route', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: Mock.CLIENT_ID_TESTER,
-        clientSecret: Mock.CLIENT_SECRET_TESTER,
-        provider
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
     });
 
-it('errors on failed profile request', { parallel: false }, async () => {
+    it('errors on invalid token request response', { parallel: false }, async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
 
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
+        Mock.override(provider.token, '{x');
 
-    Mock.override('https://graph.facebook.com/v2.9/me', null);
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
         });
-    });
 
-it('errors on errored profile request', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    Mock.override('https://graph.facebook.com/v2.9/me', Boom.badRequest());
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
     });
 
-it('errors on invalid profile request', { parallel: false }, async () => {
+    it('passes if the client secret is not modified in route', { parallel: false }, async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
-
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    Mock.override('https://graph.facebook.com/v2.9/me', '{c');
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.statusCode).to.equal(500);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: Mock.CLIENT_ID_TESTER,
+            clientSecret: Mock.CLIENT_SECRET_TESTER,
+            provider
         });
-    });
 
-it('errors on rejected query parameter', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        expect(response.statusCode).to.equal(200);
+        await mock.stop();
     });
 
-    const res = await server.inject('/login?error=access_denied');
+    it('errors on failed profile request', { parallel: false }, async () => {
 
-    expect(res.statusCode).to.equal(500);
-    server.inject('/login?error=access_denied&error_description="rejection"', (res2) => {
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
+
+        Mock.override('https://graph.facebook.com/v2.9/me', null);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
+    });
+
+    it('errors on errored profile request', { parallel: false }, async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
+
+        Mock.override('https://graph.facebook.com/v2.9/me', Boom.badRequest());
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
+    });
+
+    it('errors on invalid profile request', { parallel: false }, async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
+
+        Mock.override('https://graph.facebook.com/v2.9/me', '{c');
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.statusCode).to.equal(500);
+        await mock.stop();
+    });
+
+    it('errors on rejected query parameter', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true }
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login?error=access_denied');
+        expect(res.statusCode).to.equal(500);
+
+        const res2 = await server.inject('/login?error=access_denied&error_description="rejection"');
         expect(res2.statusCode).to.equal(500);
-        server.inject('/login?denied="definitely"', (res3) => {
+        const res3 = await server.inject('/login?denied="definitely"');
 
-            expect(res3.statusCode).to.equal(500);
-            done();
+        expect(res3.statusCode).to.equal(500);
+    });
+
+    it('errors if isSecure is true when protocol is not https', async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: true,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true }
         });
-    });
-});
-    });
 
-it('errors if isSecure is true when protocol is not https', async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: (request, h) => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: true,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true }
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: (request, h) => {
-
-                return request.auth.credentials;
+                    return request.auth.credentials;
+                }
             }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.statusCode).to.equal(500);
-    done();
-});
-    });
-
-it('passes if isSecure is true when protocol is https (location)', async () => {
-
-    const mock = new Mock.V2();
-    const provider = await mock.start();
-
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
-
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: true,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        location: 'https://differenthost:8888'
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: (request, h) => {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
         });
+
+        const res = await server.inject('/login');
+        expect(res.statusCode).to.equal(500);
     });
 
-it('passes if isSecure is true when protocol is https (forced)', async () => {
+    it('passes if isSecure is true when protocol is https (location)', async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    expect(err).to.not.exist();
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: true,
-        clientId: 'test',
-        clientSecret: 'secret',
-        provider,
-        providerParams: { special: true },
-        forceHttps: true
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: (request, h) => {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    expect(response.statusCode).to.equal(200);
-    await mock.stop();
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: true,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            location: 'https://differenthost:8888'
         });
-    });
 
-it('passes profile get params', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: (request, h) => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Fdifferenthost%3A8888%2Flogin&state=');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-    expect(err).to.not.exist();
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('https://differenthost:8888/login?code=1&state=');
 
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
-
-        Mock.clear();
-        expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        expect(response.statusCode).to.equal(200);
         await mock.stop();
     });
 
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom,
-        profileParams: {
-            fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
-        }
-    });
+    it('passes if isSecure is true when protocol is https (forced)', async () => {
 
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-                return request.auth.credentials;
-            }
-        }
-    });
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-});
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: true,
+            clientId: 'test',
+            clientSecret: 'secret',
+            provider,
+            providerParams: { special: true },
+            forceHttps: true
         });
-    });
 
-it('passes profileParams', { parallel: false }, async () => {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: (request, h) => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const res = await server.inject('/login');
+        expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
-    expect(err).to.not.exist();
+        const mockRes = await mock.server.inject(res.headers.location);
+        expect(mockRes.headers.location).to.contain('https://localhost:80/login?code=1&state=');
 
-    const custom = Bell.providers.facebook();
-    Hoek.merge(custom, provider);
-
-    Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
-
-        Mock.clear();
-        expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        expect(response.statusCode).to.equal(200);
         await mock.stop();
     });
 
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom,
-        profileParams: {
-            fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
-        }
-    });
+    it('passes profile get params', { parallel: false }, async () => {
 
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
+        const mock = new Mock.V2();
+        const provider = await mock.start();
 
-                return request.auth.credentials;
-            }
-        }
-    });
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-    const res = await server.inject('/login');
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
 
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
 
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-});
-            });
+            expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
         });
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom,
+            profileParams: {
+                fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
+            }
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        Mock.clear();
+        await mock.stop();
+    });
+
+    it('passes profileParams', { parallel: false }, async () => {
+
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
+
+        const custom = Bell.providers.facebook();
+        Hoek.merge(custom, provider);
+
+        Mock.override('https://graph.facebook.com/v2.9/me', (uri) => {
+
+            expect(uri).to.equal('https://graph.facebook.com/v2.9/me?appsecret_proof=d32b1d35fd115c4a496e06fd8df67eed8057688b17140a2cef365cb235817102&fields=id%2Cemail%2Cpicture%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink%2Clocale%2Ctimezone%2Cupdated_time%2Cverified%2Cgender');
+        });
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom,
+            profileParams: {
+                fields: 'id,email,picture,name,first_name,middle_name,last_name,link,locale,timezone,updated_time,verified,gender'
+            }
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const mockRes = await mock.server.inject(res.headers.location);
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        Mock.clear();
+        await mock.stop();
     });
 
 
-describe('Client', () => {
+    describe('Client', () => {
 
-    it('accepts empty client secret', { parallel: false }, () => {
-
-        const client = new OAuth.Client({ provider: Bell.providers.twitter() });
-        expect(client.settings.clientSecret).to.equal('&');
-    });
-
-    describe('_request()', () => {
-
-        it('errors on failed request', async () => {
-
-            Mock.override('http://example.com/', null);
+        it('accepts empty client secret', { parallel: false }, () => {
 
             const client = new OAuth.Client({ provider: Bell.providers.twitter() });
-            client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, (err, payload) => {
+            expect(client.settings.clientSecret).to.equal('&');
+        });
 
-                Mock.clear();
-                expect(err.message).to.equal('unknown');
+        describe('_request()', () => {
+
+            it('errors on failed request', async () => {
+
+                Mock.override('http://example.com/', null);
+
+                const client = new OAuth.Client({ provider: Bell.providers.twitter() });
+                try {
+                    const payload = await client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' });
+                    expect(payload).to.not.exist();
+                }
+                catch (err) {
+                    expect(err.message).to.equal('unknown');
+                }
+                finally {
+                    Mock.clear();
+                }
+
+
+
             });
-        });
 
-        it('errors on invalid response', async () => {
+            it('errors on invalid response', async () => {
 
-            Mock.override('http://example.com/', '{x');
+                Mock.override('http://example.com/', '{x');
 
-            const client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
-            client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' }, (err, payload) => {
+                const client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
+                try {
+                    const payload = await client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type' });
+                    expect(payload).to.not.exist();
+                }
+                catch (err) {
+                    expect(err.message).to.startWith('Received invalid payload from prov type endpoint: Unexpected token x');
+                }
+                finally {
+                    Mock.clear();
+                }
 
-                Mock.clear();
-                expect(err.message).to.startWith('Received invalid payload from prov type endpoint: Unexpected token x');
             });
-        });
 
-        it('errors on invalid response (no desc)', async () => {
+            it('errors on invalid response (no desc)', async () => {
 
-            Mock.override('http://example.com/', '{x');
+                Mock.override('http://example.com/', '{x');
 
-            const client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
-            client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' }, (err, payload) => {
-
-                Mock.clear();
-                expect(err.message).to.startWith('Received invalid payload from prov resource endpoint: Unexpected token x');
-            });
-        });
-    });
-
-    describe('baseUri()', () => {
-
-        it('removes default port', () => {
-
-            expect(OAuth.Client.baseUri('http://example.com:80/x')).to.equal('http://example.com/x');
-            expect(OAuth.Client.baseUri('https://example.com:443/x')).to.equal('https://example.com/x');
-        });
-
-        it('keeps non-default port', () => {
-
-            expect(OAuth.Client.baseUri('http://example.com:8080/x')).to.equal('http://example.com:8080/x');
-            expect(OAuth.Client.baseUri('https://example.com:8080/x')).to.equal('https://example.com:8080/x');
-        });
-    });
-
-    describe('signature()', () => {
-
-        it('generates RFC 5849 example', () => {
-
-            const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
-            const tokenSecret = 'dh893hdasih9';
-
-            const params = {
-                b5: '=%3D',
-                a3: ['a', '2 q'],
-                'c@': '',
-                a2: 'r b',
-                c2: ''
-            };
-
-            const oauth = {
-                oauth_consumer_key: '9djdj82h48djs9d2',
-                oauth_token: 'kkk9d7dh3k39sjv7',
-                oauth_signature_method: 'HMAC-SHA1',
-                oauth_timestamp: '137131201',
-                oauth_nonce: '7d8f3e4a'
-            };
-
-            const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
-            expect(signature).to.equal('r6/TJjbCOr97/+UU0NsvSne7s5g=');
-        });
-
-        it('computes RSA-SHA1 signature', () => {
-
-            const client = new OAuth.Client({
-                clientId: '9djdj82h48djs9d2',
-                clientSecret: privateKey,
-                provider: {
-                    protocol: 'oauth',
-                    auth: 'https://example.com/oauth/authorize',
-                    token: 'https://example.com/oauth/access-token',
-                    temporary: 'https://example.com/oauth/request-token',
-                    signatureMethod: 'RSA-SHA1'
+                const client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
+                try {
+                    const payload = client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' });
+                    expect(payload).to.not.exist();
+                }
+                catch (err) {
+                    expect(err.message).to.startWith('Received invalid payload from prov resource endpoint: Unexpected token x');
+                }
+                finally {
+                    Mock.clear();
                 }
             });
-
-            const params = {
-                b5: '=%3D',
-                a3: ['a', '2 q'],
-                'c@': '',
-                a2: 'r b',
-                c2: ''
-            };
-
-            const oauth = {
-                oauth_consumer_key: '9djdj82h48djs9d2',
-                oauth_token: 'kkk9d7dh3k39sjv7',
-                oauth_signature_method: 'RSA-SHA1',
-                oauth_timestamp: '137131201',
-                oauth_nonce: '7d8f3e4a'
-            };
-
-            const signature = client.signature('get', 'http://example.com/request', params, oauth, privateKey);
-            expect(signature).to.equal('mUUxSJS/cfLML3eZMlLK7eYxN36hWeBf4gGkAQbEc0bjz2GTH7YVaW2bQ+wwkHuWwxOTSLD70FJxVV4fmGIyw+/l7kt1FaJepL3Uc7IcARhUzsdT9HXRcHFjRkyDvBSssZA6LksQjGyblpYv5LXtUtVTm+IFR19ZwovFjIvNBxM=');
         });
 
-        it('handles array param with reveresed order', () => {
+        describe('baseUri()', () => {
 
-            const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
-            const tokenSecret = 'dh893hdasih9';
+            it('removes default port', () => {
 
-            const params = {
-                b5: '=%3D',
-                a3: ['2 q', 'a'],
-                'c@': '',
-                a2: 'r b',
-                c2: ''
-            };
+                expect(OAuth.Client.baseUri('http://example.com:80/x')).to.equal('http://example.com/x');
+                expect(OAuth.Client.baseUri('https://example.com:443/x')).to.equal('https://example.com/x');
+            });
 
-            const oauth = {
-                oauth_consumer_key: '9djdj82h48djs9d2',
-                oauth_token: 'kkk9d7dh3k39sjv7',
-                oauth_signature_method: 'HMAC-SHA1',
-                oauth_timestamp: '137131201',
-                oauth_nonce: '7d8f3e4a'
-            };
+            it('keeps non-default port', () => {
 
-            const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
-            expect(signature).to.equal('r6/TJjbCOr97/+UU0NsvSne7s5g=');
+                expect(OAuth.Client.baseUri('http://example.com:8080/x')).to.equal('http://example.com:8080/x');
+                expect(OAuth.Client.baseUri('https://example.com:8080/x')).to.equal('https://example.com:8080/x');
+            });
         });
 
-        it('handles array param with same value', () => {
+        describe('signature()', () => {
 
-            const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
-            const tokenSecret = 'dh893hdasih9';
+            it('generates RFC 5849 example', () => {
 
-            const params = {
-                b5: '=%3D',
-                a3: ['a', 'a'],
-                'c@': '',
-                a2: 'r b',
-                c2: ''
-            };
+                const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
+                const tokenSecret = 'dh893hdasih9';
 
-            const oauth = {
-                oauth_consumer_key: '9djdj82h48djs9d2',
-                oauth_token: 'kkk9d7dh3k39sjv7',
-                oauth_signature_method: 'HMAC-SHA1',
-                oauth_timestamp: '137131201',
-                oauth_nonce: '7d8f3e4a'
-            };
+                const params = {
+                    b5: '=%3D',
+                    a3: ['a', '2 q'],
+                    'c@': '',
+                    a2: 'r b',
+                    c2: ''
+                };
 
-            const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
-            expect(signature).to.equal('dub5m7j8nN7KtHBochesFDQHea4=');
+                const oauth = {
+                    oauth_consumer_key: '9djdj82h48djs9d2',
+                    oauth_token: 'kkk9d7dh3k39sjv7',
+                    oauth_signature_method: 'HMAC-SHA1',
+                    oauth_timestamp: '137131201',
+                    oauth_nonce: '7d8f3e4a'
+                };
+
+                const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
+                expect(signature).to.equal('r6/TJjbCOr97/+UU0NsvSne7s5g=');
+            });
+
+            it('computes RSA-SHA1 signature', () => {
+
+                const client = new OAuth.Client({
+                    clientId: '9djdj82h48djs9d2',
+                    clientSecret: privateKey,
+                    provider: {
+                        protocol: 'oauth',
+                        auth: 'https://example.com/oauth/authorize',
+                        token: 'https://example.com/oauth/access-token',
+                        temporary: 'https://example.com/oauth/request-token',
+                        signatureMethod: 'RSA-SHA1'
+                    }
+                });
+
+                const params = {
+                    b5: '=%3D',
+                    a3: ['a', '2 q'],
+                    'c@': '',
+                    a2: 'r b',
+                    c2: ''
+                };
+
+                const oauth = {
+                    oauth_consumer_key: '9djdj82h48djs9d2',
+                    oauth_token: 'kkk9d7dh3k39sjv7',
+                    oauth_signature_method: 'RSA-SHA1',
+                    oauth_timestamp: '137131201',
+                    oauth_nonce: '7d8f3e4a'
+                };
+
+                const signature = client.signature('get', 'http://example.com/request', params, oauth, privateKey);
+                expect(signature).to.equal('mUUxSJS/cfLML3eZMlLK7eYxN36hWeBf4gGkAQbEc0bjz2GTH7YVaW2bQ+wwkHuWwxOTSLD70FJxVV4fmGIyw+/l7kt1FaJepL3Uc7IcARhUzsdT9HXRcHFjRkyDvBSssZA6LksQjGyblpYv5LXtUtVTm+IFR19ZwovFjIvNBxM=');
+            });
+
+            it('handles array param with reveresed order', () => {
+
+                const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
+                const tokenSecret = 'dh893hdasih9';
+
+                const params = {
+                    b5: '=%3D',
+                    a3: ['2 q', 'a'],
+                    'c@': '',
+                    a2: 'r b',
+                    c2: ''
+                };
+
+                const oauth = {
+                    oauth_consumer_key: '9djdj82h48djs9d2',
+                    oauth_token: 'kkk9d7dh3k39sjv7',
+                    oauth_signature_method: 'HMAC-SHA1',
+                    oauth_timestamp: '137131201',
+                    oauth_nonce: '7d8f3e4a'
+                };
+
+                const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
+                expect(signature).to.equal('r6/TJjbCOr97/+UU0NsvSne7s5g=');
+            });
+
+            it('handles array param with same value', () => {
+
+                const client = new OAuth.Client({ clientId: '9djdj82h48djs9d2', clientSecret: 'j49sk3j29djd', provider: Bell.providers.twitter() });
+                const tokenSecret = 'dh893hdasih9';
+
+                const params = {
+                    b5: '=%3D',
+                    a3: ['a', 'a'],
+                    'c@': '',
+                    a2: 'r b',
+                    c2: ''
+                };
+
+                const oauth = {
+                    oauth_consumer_key: '9djdj82h48djs9d2',
+                    oauth_token: 'kkk9d7dh3k39sjv7',
+                    oauth_signature_method: 'HMAC-SHA1',
+                    oauth_timestamp: '137131201',
+                    oauth_nonce: '7d8f3e4a'
+                };
+
+                const signature = client.signature('post', 'http://example.com/request', params, oauth, tokenSecret);
+                expect(signature).to.equal('dub5m7j8nN7KtHBochesFDQHea4=');
+            });
+        });
+
+        describe('queryString()', () => {
+
+            it('handles params with non-string values', () => {
+
+                const params = {
+                    a: [1, 2],
+                    b: null,
+                    c: [true, false],
+                    d: Infinity
+                };
+
+                expect(OAuth.Client.queryString(params)).to.equal('a=1&a=2&b=&c=true&c=false&d=');
+            });
         });
     });
-
-    describe('queryString()', () => {
-
-        it('handles params with non-string values', () => {
-
-            const params = {
-                a: [1, 2],
-                b: null,
-                c: [true, false],
-                d: Infinity
-            };
-
-            expect(OAuth.Client.queryString(params)).to.equal('a=1&a=2&b=&c=true&c=false&d=');
-        });
-    });
-});
 });

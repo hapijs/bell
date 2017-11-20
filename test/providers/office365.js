@@ -20,73 +20,73 @@ describe('office365', () => {
     it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.office365();
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    Id: '1234567890',
-                    DisplayName: 'steve smith',
-                    EmailAddress: 'steve_smith@domain.onmicrosoft.com'
-                };
+        const custom = Bell.providers.office365();
+        Hoek.merge(custom, provider);
 
-                Mock.override('https://outlook.office.com/api/v2.0/me', profile);
+        const profile = {
+            Id: '1234567890',
+            DisplayName: 'steve smith',
+            EmailAddress: 'steve_smith@domain.onmicrosoft.com'
+        };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'office365',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        Mock.override('https://outlook.office.com/api/v2.0/me', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: {
-                            strategy: 'custom'
-                        },
-                        handler: function (request, h) {
-                            /*if (!request.auth.isAuthenticated) {
-                                return reply('Authentication failed due to: '+request.auth.error.message);
-                            }*/
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'office365',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                const res = await server.inject('/login');
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: {
+                    strategy: 'custom'
+                },
+                handler: function (request, h) {
+                    /*if (!request.auth.isAuthenticated) {
+                        return reply('Authentication failed due to: '+request.auth.error.message);
+                    }*/
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+        const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: '456',
-                            refreshToken: undefined,
-                            expiresIn: 3600,
-                            query: {},
-                            profile: {
-                                id: '1234567890',
-                                displayName: 'steve smith',
-                                email: 'steve_smith@domain.onmicrosoft.com',
-                                raw: profile
-                            }
-                        });
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        mock.stop(done);
-                    });
-                });
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            refreshToken: undefined,
+            expiresIn: 3600,
+            query: {},
+            profile: {
+                id: '1234567890',
+                displayName: 'steve smith',
+                email: 'steve_smith@domain.onmicrosoft.com',
+                raw: profile
+            }
+        });
+
+        await mock.stop();
+    });
+});
             });
         });
     });

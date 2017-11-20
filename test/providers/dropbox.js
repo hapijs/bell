@@ -20,67 +20,67 @@ describe('dropbox', () => {
     it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.dropbox();
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    display_name: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    first_name: 'steve',
-                    last_name: 'smith',
-                    email: 'steve@example.com'
-                };
+        const custom = Bell.providers.dropbox();
+        Hoek.merge(custom, provider);
 
-                Mock.override('https://api.dropbox.com/1/account/info', profile);
+        const profile = {
+            display_name: '1234567890',
+            username: 'steve',
+            name: 'steve',
+            first_name: 'steve',
+            last_name: 'smith',
+            email: 'steve@example.com'
+        };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'dropbox',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        Mock.override('https://api.dropbox.com/1/account/info', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, h) {
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'dropbox',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                const res = await server.inject('/login');
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+        const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: '456',
-                            expiresIn: 3600,
-                            refreshToken: undefined,
-                            query: {},
-                            profile
-                        });
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        mock.stop(done);
-                    });
-                });
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile
+        });
+
+        await mock.stop();
+    });
+});
             });
         });
     });

@@ -9,33 +9,33 @@ const Bell = require('../');
 
 const server = Server({ port: 8000 });
 
-server.register(Bell, (err) => {
+await server.register(Bell);
+
+Hoek.assert(!err, err);
+server.auth.strategy('slack', 'bell', {
+    provider: 'slack',
+    password: 'cookie_encryption_password_secure',
+    isSecure: false,
+    clientId: '',
+    clientSecret: ''
+});
+
+server.route({
+    method: '*',
+    path: '/bell/door',
+    config: {
+        auth: 'slack',
+        handler: function (request, h) {
+
+            reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
+        }
+    }
+});
+
+server.start((err) => {
 
     Hoek.assert(!err, err);
-    server.auth.strategy('slack', 'bell', {
-        provider: 'slack',
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: '',
-        clientSecret: ''
-    });
+    console.log('Server started at:', server.info.uri);
 
-    server.route({
-        method: '*',
-        path: '/bell/door',
-        config: {
-            auth: 'slack',
-            handler: function (request, h) {
-
-                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
-            }
-        }
-    });
-
-    server.start((err) => {
-
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-
-    });
+});
 });

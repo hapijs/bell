@@ -22,74 +22,74 @@ describe('twitch', () => {
     }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({
-                host: 'localhost',
-                port: 80
+        const server = Server({
+            host: 'localhost',
+            port: 80
+        });
+        await server.register(Bell);
+
+
+
+        const custom = Bell.providers.twitch();
+        Hoek.merge(custom, provider);
+
+        const profile = {
+            display_name: 'Kappa',
+            username: 'kappa',
+            name: 'Kappa',
+            email: 'kappa@example.com'
+        };
+
+        Mock.override('https://api.twitch.tv/kraken/user', profile);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'twitch',
+            clientSecret: 'secret',
+            provider: custom
+        });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
+
+        server.inject({
+            url: mockRes.headers.location,
+            headers: {
+                cookie
+            }
+        }, (response) => {
+
+            Mock.clear();
+            expect(response.result).to.equal({
+                provider: 'custom',
+                token: '456',
+                expiresIn: 3600,
+                refreshToken: undefined,
+                query: {},
+                profile
             });
-            server.register(Bell, (err) => {
 
-                expect(err).to.not.exist();
-
-                const custom = Bell.providers.twitch();
-                Hoek.merge(custom, provider);
-
-                const profile = {
-                    display_name: 'Kappa',
-                    username: 'kappa',
-                    name: 'Kappa',
-                    email: 'kappa@example.com'
-                };
-
-                Mock.override('https://api.twitch.tv/kraken/user', profile);
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'twitch',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, h) {
-
-                            return request.auth.credentials;
-                        }
-                    }
-                });
-
-                const res = await server.inject('/login');
-
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
-
-                    server.inject({
-                        url: mockRes.headers.location,
-                        headers: {
-                            cookie
-                        }
-                    }, (response) => {
-
-                        Mock.clear();
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: '456',
-                            expiresIn: 3600,
-                            refreshToken: undefined,
-                            query: {},
-                            profile
-                        });
-
-                        mock.stop(done);
-                    });
-                });
-            });
+            await mock.stop();
+        });
+    });
+});
         });
     });
 });

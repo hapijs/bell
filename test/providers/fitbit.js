@@ -20,67 +20,67 @@ describe('fitbit', () => {
     it('authenticates with mock', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = Server({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.fitbit();
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    user: {
-                        encodedId: '1234',
-                        displayName: 'Steve',
-                        fullName: 'Steve Smith'
-                    }
-                };
+        const custom = Bell.providers.fitbit();
+        Hoek.merge(custom, provider);
 
-                Mock.override('https://api.fitbit.com/1/user/-/profile.json', profile);
+        const profile = {
+            user: {
+                encodedId: '1234',
+                displayName: 'Steve',
+                fullName: 'Steve Smith'
+            }
+        };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'fitbit',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        Mock.override('https://api.fitbit.com/1/user/-/profile.json', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, h) {
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'fitbit',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                            return request.auth.credentials;
-                        }
-                    }
-                });
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                const res = await server.inject('/login');
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                mock.server.inject(res.headers.location, (mockRes) => {
+        const res = await server.inject('/login');
 
-                    server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
 
-                        Mock.clear();
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-                        expect(response.result).to.equal({
-                            provider: 'custom',
-                            token: '456',
-                            expiresIn: 3600,
-                            refreshToken: undefined,
-                            query: {},
-                            profile: { id: '1234', displayName: 'Steve', name: 'Steve Smith' }
-                        });
+        Mock.clear();
 
-                        mock.stop(done);
-                    });
-                });
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: { id: '1234', displayName: 'Steve', name: 'Steve Smith' }
+        });
+
+        await mock.stop();
+    });
+});
             });
         });
     });
