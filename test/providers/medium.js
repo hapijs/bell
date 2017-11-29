@@ -93,8 +93,3 @@ describe('medium', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

@@ -84,8 +84,3 @@ describe('meetup', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

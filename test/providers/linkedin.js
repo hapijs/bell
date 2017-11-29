@@ -88,38 +88,33 @@ describe('linkedin', () => {
 
         await mock.stop();
     });
-});
-            });
+
+    it('adds profile fields', { parallel: false }, async () => {
+
+        const custom = Bell.providers.linkedin();
+
+        const strategyOptions = {
+            clientSecret: 'secret',
+            providerParams: {
+                fields: '(id,firstName)'
+            }
+        };
+        Hoek.merge(custom, strategyOptions);
+
+        const profile = {
+            id: '1234567890',
+            firstName: 'steve',
+            lastName: 'smith',
+            headline: 'Master of the universe'
+        };
+
+        custom.profile({ token: '456' }, null, (url, query, callback) => {
+
+            expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
+            callback(profile);
+        }, () => {
+
+            done();
         });
     });
-});
-
-it('adds profile fields', { parallel: false }, async () => {
-
-    const custom = Bell.providers.linkedin();
-
-    const strategyOptions = {
-        clientSecret: 'secret',
-        providerParams: {
-            fields: '(id,firstName)'
-        }
-    };
-    Hoek.merge(custom, strategyOptions);
-
-    const profile = {
-        id: '1234567890',
-        firstName: 'steve',
-        lastName: 'smith',
-        headline: 'Master of the universe'
-    };
-
-    custom.profile({ token: '456' }, null, (url, query, callback) => {
-
-        expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
-        callback(profile);
-    }, () => {
-
-        done();
-    });
-});
 });

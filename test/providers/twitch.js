@@ -69,28 +69,22 @@ describe('twitch', () => {
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
         const mockRes = await mock.server.inject(res.headers.location);
 
-        server.inject({
+        const response = await server.inject({
             url: mockRes.headers.location,
             headers: {
                 cookie
             }
-        }, (response) => {
-
-            Mock.clear();
-            expect(response.result).to.equal({
-                provider: 'custom',
-                token: '456',
-                expiresIn: 3600,
-                refreshToken: undefined,
-                query: {},
-                profile
-            });
-
-            await mock.stop();
         });
-    });
-});
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile
         });
+
+        await mock.stop();
     });
-});
 });

@@ -17,7 +17,7 @@ const { describe, it } = exports.lab = Lab.script();
 
 // Test helpers
 
-const testProfile = function (opts) {
+const testProfile = async function (opts) {
 
     const profile = opts.profile;
     const expectedResult = opts.expectedResult;
@@ -66,11 +66,6 @@ const testProfile = function (opts) {
     expect(response.result).to.equal(expectedResult);
 
     await mock.stop();
-});
-            });
-        });
-    });
-});
 };
 
 describe('azuread', () => {
@@ -82,7 +77,7 @@ describe('azuread', () => {
             name: 'Sample AD User',
             upn: 'sample@microsoft.com'
         };
-        testProfile({
+        await testProfile({
             profile,
             expectedResult: {
                 provider: 'custom',
@@ -108,7 +103,7 @@ describe('azuread', () => {
             name: 'Sample AD User',
             email: 'sample@microsoft.com'
         };
-        testProfile({
+        await testProfile({
             profile,
             expectedResult: {
                 provider: 'custom',
@@ -192,10 +187,4 @@ describe('azuread', () => {
 
         await mock.stop();
     });
-});
-            });
-        });
-
-    });
-});
 });

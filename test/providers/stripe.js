@@ -85,8 +85,3 @@ describe('stripe', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

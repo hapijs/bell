@@ -101,8 +101,3 @@ describe('googleplus', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

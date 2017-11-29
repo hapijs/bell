@@ -87,8 +87,3 @@ describe('yahoo', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

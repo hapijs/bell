@@ -87,8 +87,3 @@ describe('bitbucket', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});
