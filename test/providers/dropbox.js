@@ -81,8 +81,3 @@ describe('dropbox', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

@@ -94,8 +94,3 @@ describe('arcgisonline', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

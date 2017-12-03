@@ -88,8 +88,3 @@ describe('pinterest', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

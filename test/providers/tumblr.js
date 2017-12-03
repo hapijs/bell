@@ -82,8 +82,3 @@ describe('tumblr', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

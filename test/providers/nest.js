@@ -69,8 +69,3 @@ describe('nest', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

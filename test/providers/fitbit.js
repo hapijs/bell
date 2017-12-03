@@ -81,8 +81,3 @@ describe('fitbit', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

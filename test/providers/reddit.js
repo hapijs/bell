@@ -89,8 +89,3 @@ describe('reddit', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

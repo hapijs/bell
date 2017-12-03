@@ -90,95 +90,86 @@ describe('facebook', () => {
 
         await mock.stop();
     });
-});
-            });
-        });
-    });
-});
 
-it('authenticates with mock (with custom fields)', { parallel: false }, async () => {
 
-    const mock = new Mock.V2();
-    const provider = await mock.start();
+    it('authenticates with mock (with custom fields)', { parallel: false }, async () => {
 
-    const server = Server({ host: 'localhost', port: 80 });
-    await server.register(Bell);
+        const mock = new Mock.V2();
+        const provider = await mock.start();
+
+        const server = Server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
 
 
-    const custom = Bell.providers.facebook({ fields: 'id,name,email,first_name,last_name,middle_name,picture' });
-    Hoek.merge(custom, provider);
+        const custom = Bell.providers.facebook({ fields: 'id,name,email,first_name,last_name,middle_name,picture' });
+        Hoek.merge(custom, provider);
 
-    const profile = {
-        id: '1234567890',
-        username: 'steve',
-        name: 'steve',
-        first_name: 'steve',
-        last_name: 'smith',
-        email: 'steve@example.com',
-        picture: {
-            data: {
-                is_silhouette: false,
-                url: 'https://example.com/profile.png'
-            }
-        }
-    };
-
-    Mock.override('https://graph.facebook.com/v2.9/me', profile);
-
-    server.auth.strategy('custom', 'bell', {
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        clientId: 'facebook',
-        clientSecret: 'secret',
-        provider: custom
-    });
-
-    server.route({
-        method: '*',
-        path: '/login',
-        config: {
-            auth: 'custom',
-            handler: function (request, h) {
-
-                return request.auth.credentials;
-            }
-        }
-    });
-
-    const res = await server.inject('/login');
-
-    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-    const mockRes = await mock.server.inject(res.headers.location);
-
-    const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
-
-    Mock.clear();
-    expect(response.result).to.equal({
-        provider: 'custom',
-        token: '456',
-        expiresIn: 3600,
-        refreshToken: undefined,
-        query: {},
-        profile: {
+        const profile = {
             id: '1234567890',
             username: 'steve',
-            displayName: 'steve',
-            name: {
-                first: 'steve',
-                last: 'smith',
-                middle: undefined
-            },
+            name: 'steve',
+            first_name: 'steve',
+            last_name: 'smith',
             email: 'steve@example.com',
-            raw: profile
-        }
-    });
+            picture: {
+                data: {
+                    is_silhouette: false,
+                    url: 'https://example.com/profile.png'
+                }
+            }
+        };
 
-    await mock.stop();
-});
-            });
+        Mock.override('https://graph.facebook.com/v2.9/me', profile);
+
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'facebook',
+            clientSecret: 'secret',
+            provider: custom
         });
-    });
-});
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: '1234567890',
+                username: 'steve',
+                displayName: 'steve',
+                name: {
+                    first: 'steve',
+                    last: 'smith',
+                    middle: undefined
+                },
+                email: 'steve@example.com',
+                raw: profile
+            }
+        });
+
+        await mock.stop();
     });
 });

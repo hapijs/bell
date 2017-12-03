@@ -90,8 +90,3 @@ describe('wordpress', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});

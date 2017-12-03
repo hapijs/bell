@@ -100,8 +100,3 @@ describe('discord', () => {
         await mock.stop();
     });
 });
-            });
-        });
-    });
-});
-});
