@@ -75,8 +75,8 @@ describe('facebook', () => {
                             expect(response.result).to.equal({
                                 provider: 'custom',
                                 token: '456',
-                                expiresIn: 3600,
                                 refreshToken: undefined,
+                                expiresIn: 3600,
                                 query: {},
                                 profile: {
                                     id: '1234567890',
@@ -88,10 +88,10 @@ describe('facebook', () => {
                                         middle: undefined
                                     },
                                     email: 'steve@example.com',
+                                    photo: 'https://example.com/profile.png',
                                     raw: profile
                                 }
                             });
-
                             mock.stop(done);
                         });
                     });
@@ -175,6 +175,7 @@ describe('facebook', () => {
                                         middle: undefined
                                     },
                                     email: 'steve@example.com',
+                                    photo: 'https://example.com/profile.png',
                                     raw: profile
                                 }
                             });
