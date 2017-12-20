@@ -8,6 +8,8 @@ Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 
 **bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`, `Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`, `VK`, `ArcGIS Online`, `Windows Live`, `Nest`, `Phabricator`, `BitBucket`, `Dropbox`, `Reddit`, `Tumblr`, `Twitch`, `Mixer`, `Salesforce`, `Pinterest`, `Discord`, `DigitalOcean`, `AzureAD`, `trakt.tv` and `Okta`. It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple configuration object.
 
+**NOTE**: Bell 8.x.y uses the Hapi v16 APIs and **will not work** with Hapi v17. As of writing, Bell 8.x.y is the latest version, and [an effort to make Bell support Hapi v17 is underway](https://github.com/hapijs/bell/issues/330).
+
 ## Documentation
 
 [**API Documentation**](API.md)
