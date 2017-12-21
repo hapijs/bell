@@ -2,45 +2,44 @@
 
 // Load modules
 
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Bell = require('../');
 
 
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const server = Server({ port: 8000 });
 
-server.register(Bell, (err) => {
+await server.register(Bell);
+
+Hoek.assert(!err, err);
+server.auth.strategy('linkedin', 'bell', {
+    provider: 'linkedin',
+    password: 'cookie_encryption_password_secure',
+    isSecure: false,
+    // You'll need to go to https://www.linkedin.com/secure/developer?newapp= and set up an application to get started
+    // Follow the instructions on https://developer.linkedin.com/docs/oauth2 to setup redirect_uri and default scopes
+    clientId: '',
+    clientSecret: '',
+    providerParams: {
+        redirect_uri: server.info.uri + '/bell/door'
+    }
+});
+
+server.route({
+    method: '*',
+    path: '/bell/door',
+    config: {
+        auth: 'linkedin',
+        handler: function (request, h) {
+
+            reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
+        }
+    }
+});
+
+server.start((err) => {
 
     Hoek.assert(!err, err);
-    server.auth.strategy('linkedin', 'bell', {
-        provider: 'linkedin',
-        password: 'cookie_encryption_password_secure',
-        isSecure: false,
-        // You'll need to go to https://www.linkedin.com/secure/developer?newapp= and set up an application to get started
-        // Follow the instructions on https://developer.linkedin.com/docs/oauth2 to setup redirect_uri and default scopes
-        clientId: '',
-        clientSecret: '',
-        providerParams: {
-            redirect_uri: server.info.uri + '/bell/door'
-        }
-    });
-
-    server.route({
-        method: '*',
-        path: '/bell/door',
-        config: {
-            auth: 'linkedin',
-            handler: function (request, reply) {
-
-                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
-            }
-        }
-    });
-
-    server.start((err) => {
-
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-    });
+    console.log('Server started at:', server.info.uri);
+});
 });

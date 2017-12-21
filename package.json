@@ -38,28 +38,28 @@
     "yahoo"
   ],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.9.0"
   },
   "dependencies": {
-    "boom": "4.2.x",
-    "cryptiles": "3.x.x",
-    "hoek": "4.x.x",
-    "joi": "10.x.x",
-    "wreck": "10.x.x"
+    "boom": "7.x.x",
+    "cryptiles": "4.x.x",
+    "hoek": "5.x.x",
+    "joi": "13.x.x",
+    "wreck": "14.x.x"
   },
   "peerDependencies": {
-    "hapi": ">=13.5.0"
+    "hapi": ">=17.0.0"
   },
   "devDependencies": {
-    "hapi": "16.x.x",
-    "hawk": "6.x.x",
-    "lab": "13.x.x",
-    "code": "4.x.x",
-    "sinon": "1.x.x"
+    "hapi": "17.x.x",
+    "hawk": "7.x.x",
+    "lab": "15.x.x",
+    "code": "5.x.x",
+    "sinon": "4.x.x"
   },
   "scripts": {
-    "test": "node node_modules/lab/bin/lab -t 100 -L -v",
-    "test-cov-html": "node node_modules/lab/bin/lab -r html -o coverage.html -L"
+    "test": "lab -a code -t 100 -L -v",
+    "test-cov-html": "lab -a code -r html -o coverage.html -L"
   },
   "license": "BSD-3-Clause"
 }

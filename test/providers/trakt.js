@@ -20,88 +20,81 @@ const expect = Code.expect;
 
 describe('trakt', () => {
 
-    it('fails with no API key', { parallel: false }, (done) => {
+    it('fails with no API key', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start(() => {
+        await mock.start();
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = new Hapi.Server();
+        server.connection({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
-                expect(Bell.providers.trakt).to.throw(Error);
-                mock.stop(done);
-            });
-        });
+
+        expect(Bell.providers.trakt).to.throw(Error);
+        await mock.stop();
     });
 
-    it('authenticates with mock and API key', { parallel: false }, (done) => {
+    it('authenticates with mock and API key', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        mock.start((provider) => {
+        const provider = await mock.start();
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const server = new Hapi.Server();
+        server.connection({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
 
-                const custom = Bell.providers.trakt({ apiKey: 'trakt-api-key' });
-                Hoek.merge(custom, provider);
 
-                const profile = {
-                    id: '1234567890',
-                    username: 'steve',
-                    name: 'steve',
-                    email: 'steve@example.com',
-                    state: 'active'
-                };
+        const custom = Bell.providers.trakt({ apiKey: 'trakt-api-key' });
+        Hoek.merge(custom, provider);
 
-                Mock.override('https://api.trakt.tv/users/me', profile);
+        const profile = {
+            id: '1234567890',
+            username: 'steve',
+            name: 'steve',
+            email: 'steve@example.com',
+            state: 'active'
+        };
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'trakt',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        Mock.override('https://api.trakt.tv/users/me', profile);
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'trakt',
+            clientSecret: 'secret',
+            provider: custom
         });
+
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res = await server.inject('/login');
+
+        const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
+        const mockRes = await mock.server.inject(res.headers.location);
+
+        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        Mock.clear();
+        expect(response.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile
+        });
+
+        await mock.stop();
     });
 });

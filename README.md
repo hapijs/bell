@@ -27,10 +27,8 @@ Lead Maintainer: [Lois Desplat](https://github.com/ldesplat)
 Twitter:
 
 ```javascript
-var Hapi = require('hapi');
-var server = new Hapi.Server();
-
-server.connection({ port: 8000 });
+const { Server } = require('hapi');
+const server = Server({ port: 8000 });
 
 // Register bell with the server
 server.register(require('bell'), function (err) {
@@ -56,7 +54,7 @@ server.register(require('bell'), function (err) {
         path: '/login',          // The callback endpoint registered with the provider
         config: {
             auth: 'twitter',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply('Authentication failed due to: ' + request.auth.error.message);

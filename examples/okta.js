@@ -2,12 +2,11 @@
 
 // Load modules
 
-const Hapi = require('hapi');
+const { Server } = require('hapi');
 const Hoek = require('hoek');
 const Boom = require('boom');
 
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+const server = Server({ port: 8000 });
 
 server.register([require('hapi-auth-cookie'), require('../')], (err) => {
 
@@ -33,7 +32,7 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
         path: '/auth/okta',
         config: {
             auth: 'okta',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
                     return reply(Boom.unauthorized('Authentication failed: ' + request.auth.error.message));
@@ -53,7 +52,7 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
         path: '/',
         config: {
             auth: 'session',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 //Return a message using the information from the session
                 return reply('Hello, ' + request.auth.credentials.profile.email + '!');

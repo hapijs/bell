@@ -4,8 +4,8 @@
 
 const Querystring = require('querystring');
 const Boom = require('boom');
-const Code = require('code');
-const Hapi = require('hapi');
+const { expect } = require('code');
+const { Server } = require('hapi');
 const Hawk = require('hawk');
 const Hoek = require('hoek');
 const Wreck = require('wreck');
@@ -14,11 +14,6 @@ const Wreck = require('wreck');
 // Declare internals
 
 const internals = {};
-
-
-// Test shortcuts
-
-const expect = Code.expect;
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
@@ -30,15 +25,14 @@ exports.V1 = internals.V1 = function (options) {
 
     this.tokens = {};
 
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'POST',
             path: '/temporary',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     if (this.options.failTemporary) {
                         return reply(Boom.badRequest());
@@ -60,7 +54,7 @@ exports.V1 = internals.V1 = function (options) {
                         oauth_callback_confirmed: true
                     };
 
-                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return h.response(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
             }
         },
@@ -69,7 +63,7 @@ exports.V1 = internals.V1 = function (options) {
             path: '/auth',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     const token = this.tokens[request.query.oauth_token];
                     expect(token).to.exist();
@@ -78,7 +72,7 @@ exports.V1 = internals.V1 = function (options) {
                     token.verifier = '123';
 
                     const extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
-                    return reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
+                    return h.redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
                 }
             }
         },
@@ -87,10 +81,10 @@ exports.V1 = internals.V1 = function (options) {
             path: '/token',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     if (this.options.failToken) {
-                        return reply(Boom.badRequest());
+                        return Boom.badRequest();
                     }
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
@@ -109,7 +103,7 @@ exports.V1 = internals.V1 = function (options) {
                         payload.screen_name = 'Steve Stevens';
                     }
 
-                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return h.response(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
             }
         },
@@ -118,12 +112,12 @@ exports.V1 = internals.V1 = function (options) {
             path: '/resource',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_token).to.equal('final');
 
-                    return reply(request.payload ? request.payload : 'some text reply');
+                    return request.payload ? request.payload : 'some text reply';
                 }
             }
         }
@@ -131,28 +125,24 @@ exports.V1 = internals.V1 = function (options) {
 };
 
 
-internals.V1.prototype.start = function (callback) {
+internals.V1.prototype.start = async function () {
 
-    this.server.start((err) => {
+    await this.server.start();
+    this.uri = this.server.info.uri;
 
-        expect(err).to.not.exist();
-
-        this.uri = this.server.info.uri;
-
-        return callback({
-            protocol: 'oauth',
-            temporary: this.server.info.uri + '/temporary',
-            auth: this.server.info.uri + '/auth',
-            token: this.server.info.uri + '/token',
-            signatureMethod: this.options.signatureMethod
-        });
-    });
+    return {
+        protocol: 'oauth',
+        temporary: this.server.info.uri + '/temporary',
+        auth: this.server.info.uri + '/auth',
+        token: this.server.info.uri + '/token',
+        signatureMethod: this.options.signatureMethod
+    };
 };
 
 
-internals.V1.prototype.stop = function (callback) {
+internals.V1.prototype.stop = async function (callback) {
 
-    this.server.stop(callback);
+    await this.server.stop();
 };
 
 
@@ -163,15 +153,14 @@ exports.V2 = internals.V2 = function (options) {
     this.codes = {};
 
     this.useParamsAuth = (options.useParamsAuth === false ? false : true);
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
+    this.server = Server({ host: 'localhost' });
     this.server.route([
         {
             method: 'GET',
             path: '/auth',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     const code = String(Object.keys(this.codes).length + 1);
                     this.codes[code] = {
@@ -179,7 +168,7 @@ exports.V2 = internals.V2 = function (options) {
                         client_id: request.query.client_id
                     };
 
-                    return reply().redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
+                    return h.redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
                 }
             }
         },
@@ -188,7 +177,7 @@ exports.V2 = internals.V2 = function (options) {
             path: '/token',
             config: {
                 bind: this,
-                handler: function (request, reply) {
+                handler: function (request, h) {
 
                     const code = this.codes[request.payload.code];
                     expect(code).to.exist();
@@ -234,7 +223,7 @@ exports.V2 = internals.V2 = function (options) {
                         payload.id = 'https://login.salesforce.com/id/foo/bar';
                     }
 
-                    return reply(payload).code(options.code || 200);
+                    return h.response(payload).code(options.code || 200);
                 }
             }
         }
@@ -242,27 +231,23 @@ exports.V2 = internals.V2 = function (options) {
 };
 
 
-internals.V2.prototype.start = function (callback) {
+internals.V2.prototype.start = async function () {
 
-    this.server.start((err) => {
+    await this.server.start();
+    this.uri = this.server.info.uri;
 
-        expect(err).to.not.exist();
-
-        this.uri = this.server.info.uri;
-
-        return callback({
-            protocol: 'oauth2',
-            useParamsAuth: this.useParamsAuth,
-            auth: this.server.info.uri + '/auth',
-            token: this.server.info.uri + '/token'
-        });
-    });
+    return {
+        protocol: 'oauth2',
+        useParamsAuth: this.useParamsAuth,
+        auth: this.server.info.uri + '/auth',
+        token: this.server.info.uri + '/token'
+    };
 };
 
 
-internals.V2.prototype.stop = function (callback) {
+internals.V2.prototype.stop = async function () {
 
-    this.server.stop(callback);
+    await this.server.stop();
 };
 
 
