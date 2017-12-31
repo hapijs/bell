@@ -1,5 +1,3 @@
-'use strict';
-
 // Load modules
 
 const Bell = require('../');
@@ -168,7 +166,7 @@ describe('Bell', () => {
         });
 
         const res = await server.inject('/login');
-        expect(res.statusCode).to.equal(500);
+        expect(res.statusCode).to.equal(400);
         await mock.stop();
     });
 
@@ -207,7 +205,7 @@ describe('Bell', () => {
 
         const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
-        expect(response.statusCode).to.equal(500);
+        expect(response.statusCode).to.equal(400);
         await mock.stop();
     });
 
@@ -394,7 +392,9 @@ describe('Bell', () => {
         const res = await server.inject('/login');
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
         const mockRes = await mock.server.inject(res.headers.location);
-        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
         Mock.clear();
         await mock.stop();
     });
@@ -801,8 +801,8 @@ describe('Bell', () => {
                     });
 
                     const credentials = request.auth.credentials;
-                    const res = await client.resource('POST', mock.uri + '/resource', { a: 5 }, { token: credentials.token, secret: credentials.secret, raw: true });
-                    return h.response(res);
+                    const { payload, statusCode } = await client.resource('POST', mock.uri + '/resource', { a: 5 }, { token: credentials.token, secret: credentials.secret, raw: true });
+                    return h.response(payload).code(statusCode);
                 }
             }
         });
@@ -851,7 +851,7 @@ describe('Bell', () => {
 
                     const credentials = request.auth.credentials;
                     const res = await client.resource('POST', mock.uri + '/resource', { a: 5 }, { token: credentials.token, secret: credentials.secret, stream: true });
-                    return reply(res);
+                    return res;
                 }
             }
         });
@@ -2020,7 +2020,9 @@ describe('v2()', () => {
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
         const mockRes = await mock.server.inject(res.headers.location);
-        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
+        await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+
         Mock.clear();
         await mock.stop();
     });
@@ -2068,7 +2070,7 @@ describe('v2()', () => {
         const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
 
         const mockRes = await mock.server.inject(res.headers.location);
-        const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
+        await server.inject({ url: mockRes.headers.location, headers: { cookie } });
         Mock.clear();
         await mock.stop();
     });
@@ -2128,7 +2130,7 @@ describe('v2()', () => {
 
                 const client = new OAuth.Client({ name: 'prov', provider: Bell.providers.twitter() });
                 try {
-                    const payload = client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' });
+                    const payload = await client._request('get', 'http://example.com/', null, { oauth_token: 'xcv' }, { secret: 'secret' });
                     expect(payload).to.not.exist();
                 }
                 catch (err) {

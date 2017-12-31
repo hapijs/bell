@@ -1,5 +1,3 @@
-'use strict';
-
 // Load modules
 
 const Querystring = require('querystring');
@@ -7,7 +5,6 @@ const Boom = require('boom');
 const { expect } = require('code');
 const { Server } = require('hapi');
 const Hawk = require('hawk');
-const Hoek = require('hoek');
 const Wreck = require('wreck');
 
 
@@ -35,7 +32,7 @@ exports.V1 = internals.V1 = function (options) {
                 handler: function (request, h) {
 
                     if (this.options.failTemporary) {
-                        return reply(Boom.badRequest());
+                        return Promise.reject(Boom.badRequest());
                     }
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
@@ -140,7 +137,7 @@ internals.V1.prototype.start = async function () {
 };
 
 
-internals.V1.prototype.stop = async function (callback) {
+internals.V1.prototype.stop = async function () {
 
     await this.server.stop();
 };
@@ -257,8 +254,6 @@ exports.override = function (uri, payload) {
 
         return function (dest) {
 
-            const callback = arguments.length === 3 ? arguments[2] : arguments[1];
-
             if (dest.indexOf(uri) === 0) {
                 if (typeof payload === 'function') {
                     return payload(dest);
@@ -266,14 +261,14 @@ exports.override = function (uri, payload) {
 
                 if (payload instanceof Error) {
                     const statusCode = (payload && payload.output ? payload.output.statusCode : 400);
-                    return Hoek.nextTick(callback)(null, { statusCode }, JSON.stringify({ message: payload.message }));
+                    return { res: { statusCode }, payload: JSON.stringify({ message: payload.message }) };
                 }
 
                 if (payload === null) {
-                    return Hoek.nextTick(callback)(Boom.internal('unknown'));
+                    return Promise.reject(Boom.internal('unknown'));
                 }
 
-                return Hoek.nextTick(callback)(null, { statusCode: 200 }, typeof payload === 'string' ? payload : JSON.stringify(payload));
+                return { res: { statusCode: 200 }, payload: typeof payload === 'string' ? payload : JSON.stringify(payload) };
             }
 
             return internals.wreck[method].apply(null, arguments);

@@ -1,5 +1,3 @@
-'use strict';
-
 // Load modules
 
 const Bell = require('../');
@@ -58,7 +56,7 @@ describe('Bell', () => {
 
         spy.restore();
 
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth', async () => {
@@ -104,7 +102,7 @@ describe('Bell', () => {
 
         expect(response.result.provider).to.equal('custom');
         expect(response.result.query.next).to.equal('/home');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth using RSA-SHA1 signing', async () => {
@@ -150,7 +148,7 @@ describe('Bell', () => {
 
         expect(response.result.provider).to.equal('custom');
         expect(response.result.query.next).to.equal('/home');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth2', async () => {
@@ -195,7 +193,7 @@ describe('Bell', () => {
         const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
         expect(response.result.provider).to.equal('custom');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth2 and basic authentication', async () => {
@@ -240,7 +238,7 @@ describe('Bell', () => {
         const response = await server.inject({ url: mockRes.headers.location, headers: { cookie } });
 
         expect(response.result.provider).to.equal('custom');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth2 with custom client secret options', async () => {
@@ -286,7 +284,7 @@ describe('Bell', () => {
 
         expect(response.result.provider).to.equal('custom');
         expect(response.result.token).to.equal('mycustomtoken');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('authenticates an endpoint via oauth2 with custom client secret options and params auth', async () => {
@@ -332,7 +330,7 @@ describe('Bell', () => {
 
         expect(response.result.provider).to.equal('custom');
         expect(response.result.token).to.equal('mycustomtoken');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('overrides cookie name', async () => {
@@ -369,7 +367,7 @@ describe('Bell', () => {
         const res = await server.inject('/login');
 
         expect(res.headers['set-cookie'][0]).to.contain('ring=');
-        mock.stopasync();
+        await mock.stop();
     });
 
     it('allows multiple custom provider names', async () => {
@@ -427,10 +425,10 @@ describe('Bell', () => {
         const res = await server.inject('/login_1');
 
         expect(res.headers['set-cookie'][0]).to.contain('ring_1=');
-        server.inject('/login_2', (response) => {
+        server.inject('/login_2', async (response) => {
 
             expect(response.headers['set-cookie'][0]).to.contain('ring_2=');
-            mock.stopasync();
+            await mock.stop();
         });
     });
 
@@ -478,16 +476,16 @@ describe('Bell', () => {
 
         spy.restore();
 
-        mock.stopasync();
+        await mock.stop();
     });
 
     describe('simulate()', () => {
 
         it('authenticates an endpoint via oauth', { parallel: false }, async () => {
 
-            Bell.simulate((request, next) => {
+            Bell.simulate((request, h) => {
 
-                return next(null, { some: 'value' });
+                return { some: 'value' };
             });
 
             const server = Server();
@@ -528,15 +526,14 @@ describe('Bell', () => {
             });
 
             Bell.simulate(false);
-            done();
         });
 
 
         it('authenticates an endpoint via oauth2', { parallel: false }, async () => {
 
-            Bell.simulate((request, next) => {
+            Bell.simulate((request, h) => {
 
-                return next(null, { some: 'value' });
+                return { some: 'value' };
             });
 
             const server = Server();
@@ -578,14 +575,13 @@ describe('Bell', () => {
             });
 
             Bell.simulate(false);
-            done();
         });
 
         it('simulates error', { parallel: false }, async () => {
 
-            Bell.simulate((request, next) => {
+            Bell.simulate((request, h) => {
 
-                return next(Boom.badRequest());
+                return Promise.reject(Boom.badRequest());
             });
 
             const server = Server();
@@ -615,10 +611,9 @@ describe('Bell', () => {
 
             const res = await server.inject('/login?next=%2Fhome');
 
-            expect(res.statusCode).to.equal(400);
+            expect(res.statusCode).to.equal(500);
 
             Bell.simulate(false);
-            done();
         });
     });
 });

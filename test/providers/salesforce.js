@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -20,7 +20,7 @@ describe('salesforce', () => {
     it('fails with extendedProfile false and identityServiceProfile true', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        const provider = await mock.start();
+        await mock.start();
 
         const server = Server({ host: 'localhost', port: 80 });
         await server.register(Bell);

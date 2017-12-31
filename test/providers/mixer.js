@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -73,7 +73,7 @@ describe('mixer', () => {
             headers: {
                 cookie
             }
-        })
+        });
 
         Mock.clear();
         expect(response.result).to.equal({

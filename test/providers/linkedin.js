@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -108,13 +108,10 @@ describe('linkedin', () => {
             headline: 'Master of the universe'
         };
 
-        custom.profile({ token: '456' }, null, (url, query, callback) => {
+        await custom.profile({ token: '456' }, null, (url, query) => {
 
             expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
-            callback(profile);
-        }, () => {
-
-            done();
+            return profile;
         });
     });
 });

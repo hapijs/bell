@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -20,7 +20,7 @@ describe('auth0', () => {
     it('fails with no domain', { parallel: false }, async () => {
 
         const mock = new Mock.V2();
-        const provider = await mock.start();
+        await mock.start();
 
         const server = Server({ host: 'localhost', port: 80 });
         await server.register(Bell);
@@ -73,7 +73,7 @@ describe('auth0', () => {
                 auth: 'custom',
                 handler: function (request, h) {
 
-                    reply(request.auth);
+                    return request.auth;
                 }
             }
         });
