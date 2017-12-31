@@ -1,0 +1,4 @@
+{
+  "extends": "hapi",
+  "parser": "babel-eslint"
+}

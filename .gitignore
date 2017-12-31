@@ -17,3 +17,4 @@ coverage.*
 lib-cov
 complexity.md
 package-lock.json
+yarn.lock

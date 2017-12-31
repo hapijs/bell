@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -57,7 +57,7 @@ describe('arcgisonline', () => {
                 auth: 'custom',
                 handler: function (request, h) {
 
-                    return request.auth.credentials;
+                    return Promise.resolve(request.auth.credentials);
                 }
             }
         });

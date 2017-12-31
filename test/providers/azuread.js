@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -21,7 +21,6 @@ const testProfile = async function (opts) {
 
     const profile = opts.profile;
     const expectedResult = opts.expectedResult;
-    const done = opts.done;
     const mock = new Mock.V2();
     const provider = await mock.start();
 
@@ -91,8 +90,7 @@ describe('azuread', () => {
                     email: 'sample@microsoft.com',
                     raw: profile
                 }
-            },
-            done
+            }
         });
     });
 
@@ -117,8 +115,7 @@ describe('azuread', () => {
                     email: 'sample@microsoft.com',
                     raw: profile
                 }
-            },
-            done
+            }
         });
     });
 

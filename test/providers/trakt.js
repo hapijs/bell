@@ -1,4 +1,4 @@
-'use strict';
+
 
 // Load modules
 
@@ -25,8 +25,7 @@ describe('trakt', () => {
         const mock = new Mock.V2();
         await mock.start();
 
-        const server = new Hapi.Server();
-        server.connection({ host: 'localhost', port: 80 });
+        const server = new Hapi.Server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
 
@@ -39,8 +38,7 @@ describe('trakt', () => {
         const mock = new Mock.V2();
         const provider = await mock.start();
 
-        const server = new Hapi.Server();
-        server.connection({ host: 'localhost', port: 80 });
+        const server = new Hapi.Server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
 

@@ -1,16 +1,14 @@
-'use strict';
-
 // Load modules
 
 const { Server } = require('hapi');
-const Hoek = require('hoek');
 const Boom = require('boom');
 
-const server = Server({ port: 8000 });
+(async () => {
 
-server.register([require('hapi-auth-cookie'), require('../')], (err) => {
+    const server = Server({ port: 8000 });
 
-    Hoek.assert(!err, err);
+    await server.register([require('hapi-auth-cookie'), require('../')]);
+
     server.auth.strategy('session', 'cookie', {
         password: 'secret_cookie_encryption_password', //Use something more secure in production
         redirectTo: '/auth/okta', //If there is no session, redirect here
@@ -35,14 +33,14 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
-                    return reply(Boom.unauthorized('Authentication failed: ' + request.auth.error.message));
+                    return Boom.unauthorized('Authentication failed: ' + request.auth.error.message);
                 }
 
                 //Just store the third party credentials in the session as an example. You could do something
                 //more useful here - like loading or setting up an account (social signup).
                 request.auth.session.set(request.auth.credentials);
 
-                return reply.redirect('/');
+                return h.redirect('/');
             }
         }
     });
@@ -55,14 +53,11 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
             handler: function (request, h) {
 
                 //Return a message using the information from the session
-                return reply('Hello, ' + request.auth.credentials.profile.email + '!');
+                return 'Hello, ' + request.auth.credentials.profile.email + '!';
             }
         }
     });
 
-    server.start((err) => {
-
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-    });
-});
+    await server.start();
+    console.log('Server started at:', server.info.uri);
+})();
