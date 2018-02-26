@@ -7,98 +7,88 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('linkedin', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.linkedin();
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
+        const profile = {
+            id: '1234567890',
+            firstName: 'steve',
+            lastName: 'smith',
+            emailAddress: 'steve.smith@domain.com',
+            headline: 'Master of the universe'
+        };
 
-                const custom = Bell.providers.linkedin();
-                Hoek.merge(custom, provider);
+        Mock.override('https://api.linkedin.com/v1/people/~', profile);
 
-                const profile = {
-                    id: '1234567890',
-                    firstName: 'steve',
-                    lastName: 'smith',
-                    emailAddress: 'steve.smith@domain.com',
-                    headline: 'Master of the universe'
-                };
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'linkedin',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                Mock.override('https://api.linkedin.com/v1/people/~', profile);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'linkedin',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
-                                    email: 'steve.smith@domain.com',
-                                    headline: 'Master of the universe',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: '1234567890',
+                name: {
+                    first: 'steve',
+                    last: 'smith'
+                },
+                email: 'steve.smith@domain.com',
+                headline: 'Master of the universe',
+                raw: profile
+            }
         });
     });
 
-    it('adds profile fields', { parallel: false }, (done) => {
+    it('adds profile fields', async () => {
 
         const custom = Bell.providers.linkedin();
 
@@ -108,6 +98,7 @@ describe('linkedin', () => {
                 fields: '(id,firstName)'
             }
         };
+
         Hoek.merge(custom, strategyOptions);
 
         const profile = {
@@ -117,13 +108,12 @@ describe('linkedin', () => {
             headline: 'Master of the universe'
         };
 
-        custom.profile({ token: '456' }, null, (url, query, callback) => {
+        const get = (url, query) => {
 
             expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
-            callback(profile);
-        }, () => {
+            return profile;
+        };
 
-            done();
-        });
+        await custom.profile({ token: '456' }, null, get);
     });
 });

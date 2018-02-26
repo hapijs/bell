@@ -3,52 +3,57 @@
 // Load modules
 
 const Querystring = require('querystring');
+
 const Boom = require('boom');
 const Code = require('code');
 const Hapi = require('hapi');
 const Hawk = require('hawk');
-const Hoek = require('hoek');
+const Teamwork = require('teamwork');
 const Wreck = require('wreck');
 
 
 // Declare internals
 
-const internals = {};
+const internals = {
+    wreck: null
+};
 
 
 // Test shortcuts
 
 const expect = Code.expect;
 
+
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
 exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
 
-exports.V1 = internals.V1 = function (options) {
 
-    this.options = options || {};
-    this.options.signatureMethod = this.options.signatureMethod || 'HMAC-SHA1';
+exports.v1 = async function (flags, options = {}) {
 
-    this.tokens = {};
+    const mock = {
+        options,
+        tokens: {},
+        server: Hapi.server({ host: 'localhost' })
+    };
 
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
-    this.server.route([
+    mock.options.signatureMethod = mock.options.signatureMethod || 'HMAC-SHA1';
+
+    mock.server.route([
         {
             method: 'POST',
             path: '/temporary',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
-                    if (this.options.failTemporary) {
-                        return reply(Boom.badRequest());
+                    if (mock.options.failTemporary) {
+                        throw Boom.badRequest();
                     }
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_signature_method', 'oauth_callback', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_callback).to.exist();
 
-                    const token = String(Object.keys(this.tokens).length + 1);
-                    this.tokens[token] = {
+                    const token = String(Object.keys(mock.tokens).length + 1);
+                    mock.tokens[token] = {
                         authorized: false,
                         secret: 'secret',
                         callback: header.oauth_callback
@@ -60,41 +65,39 @@ exports.V1 = internals.V1 = function (options) {
                         oauth_callback_confirmed: true
                     };
 
-                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return h.response(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
             }
         },
         {
             method: 'GET',
             path: '/auth',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
-                    const token = this.tokens[request.query.oauth_token];
+                    const token = mock.tokens[request.query.oauth_token];
                     expect(token).to.exist();
 
                     token.authorized = true;
                     token.verifier = '123';
 
                     const extra = Object.keys(request.query).length > 1 ? '&extra=true' : '';
-                    return reply().redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
+                    return h.redirect(unescape(token.callback) + '?oauth_token=' + request.query.oauth_token + '&oauth_verifier=' + token.verifier + extra);
                 }
             }
         },
         {
             method: 'POST',
             path: '/token',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
-                    if (this.options.failToken) {
-                        return reply(Boom.badRequest());
+                    if (mock.options.failToken) {
+                        throw Boom.badRequest();
                     }
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
-                    const token = this.tokens[header.oauth_token];
+                    const token = mock.tokens[header.oauth_token];
                     expect(token).to.exist();
                     expect(token.verifier).to.equal(header.oauth_verifier);
                     expect(token.authorized).to.equal(true);
@@ -109,91 +112,81 @@ exports.V1 = internals.V1 = function (options) {
                         payload.screen_name = 'Steve Stevens';
                     }
 
-                    return reply(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
+                    return h.response(Querystring.encode(payload)).type('application/x-www-form-urlencoded');
                 }
             }
         },
         {
             method: '*',
             path: '/resource',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
                     const header = Hawk.utils.parseAuthorizationHeader(request.headers.authorization.replace(/OAuth/i, 'Hawk'), ['realm', 'oauth_consumer_key', 'oauth_token', 'oauth_signature_method', 'oauth_verifier', 'oauth_signature', 'oauth_version', 'oauth_timestamp', 'oauth_nonce']);
                     expect(header.oauth_token).to.equal('final');
 
-                    return reply(request.payload ? request.payload : 'some text reply');
+                    return request.payload ? request.payload : 'some text reply';
                 }
             }
         }
     ]);
+
+    await mock.server.start();
+    mock.uri = mock.server.info.uri;
+
+    mock.provider = {
+        protocol: 'oauth',
+        temporary: mock.server.info.uri + '/temporary',
+        auth: mock.server.info.uri + '/auth',
+        token: mock.server.info.uri + '/token',
+        signatureMethod: mock.options.signatureMethod
+    };
+
+    flags.onCleanup = () => {
+
+        exports.clear();
+        return mock.server.stop();
+    };
+
+    return mock;
 };
 
 
-internals.V1.prototype.start = function (callback) {
+exports.v2 = async function (flags, options = {}) {
 
-    this.server.start((err) => {
+    const mock = {
+        codes: {},
+        useParamsAuth: (options.useParamsAuth === false ? false : true),
+        server: Hapi.server({ host: 'localhost' })
+    };
 
-        expect(err).to.not.exist();
-
-        this.uri = this.server.info.uri;
-
-        return callback({
-            protocol: 'oauth',
-            temporary: this.server.info.uri + '/temporary',
-            auth: this.server.info.uri + '/auth',
-            token: this.server.info.uri + '/token',
-            signatureMethod: this.options.signatureMethod
-        });
-    });
-};
-
-
-internals.V1.prototype.stop = function (callback) {
-
-    this.server.stop(callback);
-};
-
-
-exports.V2 = internals.V2 = function (options) {
-
-    options = options || {};
-
-    this.codes = {};
-
-    this.useParamsAuth = (options.useParamsAuth === false ? false : true);
-    this.server = new Hapi.Server();
-    this.server.connection({ host: 'localhost' });
-    this.server.route([
+    mock.server.route([
         {
             method: 'GET',
             path: '/auth',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
-                    const code = String(Object.keys(this.codes).length + 1);
-                    this.codes[code] = {
+                    const code = String(Object.keys(mock.codes).length + 1);
+                    mock.codes[code] = {
                         redirect_uri: request.query.redirect_uri,
                         client_id: request.query.client_id
                     };
 
-                    return reply().redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
+                    return h.redirect(request.query.redirect_uri + '?code=' + code + '&state=' + request.query.state);
                 }
             }
         },
         {
             method: 'POST',
             path: '/token',
-            config: {
-                bind: this,
-                handler: function (request, reply) {
+            options: {
+                handler: function (request, h) {
 
-                    const code = this.codes[request.payload.code];
+                    const code = mock.codes[request.payload.code];
                     expect(code).to.exist();
                     expect(code.redirect_uri).to.equal(request.payload.redirect_uri);
-                    if (this.useParamsAuth) {
+                    if (mock.useParamsAuth) {
                         expect(code.client_id).to.equal(request.payload.client_id);
                         expect(request.headers.authorization).to.be.undefined();
                     }
@@ -234,61 +227,57 @@ exports.V2 = internals.V2 = function (options) {
                         payload.id = 'https://login.salesforce.com/id/foo/bar';
                     }
 
-                    return reply(payload).code(options.code || 200);
+                    return h.response(payload).code(options.code || 200);
                 }
             }
         }
     ]);
-};
 
+    await mock.server.start();
+    mock.uri = mock.server.info.uri;
 
-internals.V2.prototype.start = function (callback) {
+    mock.provider = {
+        protocol: 'oauth2',
+        useParamsAuth: mock.useParamsAuth,
+        auth: mock.server.info.uri + '/auth',
+        token: mock.server.info.uri + '/token'
+    };
 
-    this.server.start((err) => {
+    flags.onCleanup = () => {
 
-        expect(err).to.not.exist();
+        exports.clear();
+        return mock.server.stop();
+    };
 
-        this.uri = this.server.info.uri;
-
-        return callback({
-            protocol: 'oauth2',
-            useParamsAuth: this.useParamsAuth,
-            auth: this.server.info.uri + '/auth',
-            token: this.server.info.uri + '/token'
-        });
-    });
-};
-
-
-internals.V2.prototype.stop = function (callback) {
-
-    this.server.stop(callback);
+    return mock;
 };
 
 
 exports.override = function (uri, payload) {
 
+    const team = new Teamwork();
+
     const override = function (method) {
 
-        return function (dest) {
-
-            const callback = arguments.length === 3 ? arguments[2] : arguments[1];
+        return async function (dest) {
 
             if (dest.indexOf(uri) === 0) {
                 if (typeof payload === 'function') {
-                    return payload(dest);
+                    await payload(dest);
+                    team.attend();
+                    return { res: { statusCode: 200 }, payload: '{"x":1}' };
                 }
 
                 if (payload instanceof Error) {
                     const statusCode = (payload && payload.output ? payload.output.statusCode : 400);
-                    return Hoek.nextTick(callback)(null, { statusCode }, JSON.stringify({ message: payload.message }));
+                    return { res: { statusCode }, payload: JSON.stringify({ message: payload.message }) };
                 }
 
                 if (payload === null) {
-                    return Hoek.nextTick(callback)(Boom.internal('unknown'));
+                    throw Boom.internal('unknown');
                 }
 
-                return Hoek.nextTick(callback)(null, { statusCode: 200 }, typeof payload === 'string' ? payload : JSON.stringify(payload));
+                return { res: { statusCode: 200 }, payload: typeof payload === 'string' ? payload : JSON.stringify(payload) };
             }
 
             return internals.wreck[method].apply(null, arguments);
@@ -302,11 +291,16 @@ exports.override = function (uri, payload) {
 
     Wreck.get = override('get');
     Wreck.post = override('post');
+
+    return team.work;
 };
 
 
-exports.clear = (uri) => {
+exports.clear = function () {
 
-    Wreck.get = internals.wreck.get;
-    Wreck.post = internals.wreck.post;
+    if (internals.wreck) {
+        Wreck.get = internals.wreck.get;
+        Wreck.post = internals.wreck.post;
+        internals.wreck = null;
+    }
 };

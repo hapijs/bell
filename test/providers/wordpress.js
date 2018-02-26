@@ -7,95 +7,85 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('wordpress', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.wordpress();
 
-                expect(err).to.not.exist();
+        Hoek.merge(custom, mock.provider);
 
-                const custom = Bell.providers.wordpress();
+        Mock.override('https://public-api.wordpress.com/rest/v1.1/me', {
+            ID: 12345678,
+            language: 'en',
+            token_scope: ['global'],
+            username: 'steve',
+            display_name: 'steve'
+        });
 
-                Hoek.merge(custom, provider);
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'wordpress',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                Mock.override('https://public-api.wordpress.com/rest/v1.1/me', {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
+
+                    return request.auth.credentials;
+                }
+            }
+        });
+
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+        const res2 = await mock.server.inject(res1.headers.location);
+
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            refreshToken: undefined,
+            expiresIn: 3600,
+            query: {},
+            profile: {
+                id: 12345678,
+                username: 'steve',
+                displayName: 'steve',
+                raw: {
                     ID: 12345678,
                     language: 'en',
                     token_scope: ['global'],
                     username: 'steve',
                     display_name: 'steve'
-                });
-
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'wordpress',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
-
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
-
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
-
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                refreshToken: undefined,
-                                expiresIn: 3600,
-                                query: {},
-                                profile: {
-                                    id: 12345678,
-                                    username: 'steve',
-                                    displayName: 'steve',
-                                    raw: {
-                                        ID: 12345678,
-                                        language: 'en',
-                                        token_scope: ['global'],
-                                        username: 'steve',
-                                        display_name: 'steve'
-                                    }
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+                }
+            }
         });
     });
 });

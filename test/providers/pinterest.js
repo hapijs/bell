@@ -7,93 +7,84 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
+
 
 describe('pinterest', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const pinterest = Bell.providers.pinterest();
+        Hoek.merge(pinterest, mock.provider);
 
-                expect(err).to.not.exist();
+        const profile = {
+            data: {
+                id: '1234567890',
+                username: 'steve',
+                first_name: 'steve',
+                last_name: 'smith'
+            }
+        };
 
-                const pinterest = Bell.providers.pinterest();
-                Hoek.merge(pinterest, provider);
+        Mock.override('https://api.pinterest.com/v1/me/', profile);
 
-                const profile = {
-                    data: {
-                        id: '1234567890',
-                        username: 'steve',
-                        first_name: 'steve',
-                        last_name: 'smith'
-                    }
-                };
+        server.auth.strategy('pinterest', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'pinterest',
+            clientSecret: 'secret',
+            provider: pinterest
+        });
 
-                Mock.override('https://api.pinterest.com/v1/me/', profile);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'pinterest',
+                handler: function (request, h) {
 
-                server.auth.strategy('pinterest', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'pinterest',
-                    clientSecret: 'secret',
-                    provider: pinterest
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'pinterest',
-                        handler: function (request, reply) {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'pinterest',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: '1234567890',
-                                    username: 'steve',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'pinterest',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: '1234567890',
+                username: 'steve',
+                name: {
+                    first: 'steve',
+                    last: 'smith'
+                },
+                raw: profile
+            }
         });
     });
 });

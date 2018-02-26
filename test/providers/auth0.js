@@ -7,118 +7,97 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('auth0', () => {
 
-    it('fails with no domain', { parallel: false }, (done) => {
+    it('fails with no domain', () => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
-
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
-
-                expect(err).to.not.exist();
-
-                expect(Bell.providers.auth0).to.throw(Error);
-
-                mock.stop(done);
-            });
-        });
+        expect(Bell.providers.auth0).to.throw(Error);
     });
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.auth0({ domain: 'example.auth0.com' });
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
+        const profile = {
+            user_id: 'auth0|1234567890',
+            name: 'steve smith',
+            given_name: 'steve',
+            family_name: 'smith',
+            email: 'steve@example.com'
+        };
 
-                const custom = Bell.providers.auth0({ domain: 'example.auth0.com' });
-                Hoek.merge(custom, provider);
+        Mock.override('https://example.auth0.com/userinfo', profile);
 
-                const profile = {
-                    user_id: 'auth0|1234567890',
-                    name: 'steve smith',
-                    given_name: 'steve',
-                    family_name: 'smith',
-                    email: 'steve@example.com'
-                };
+        server.auth.strategy('custom', 'bell', {
+            config: {
+                domain: 'example.auth0.com'
+            },
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: '123',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                Mock.override('https://example.auth0.com/userinfo', profile);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                server.auth.strategy('custom', 'bell', {
-                    config: {
-                        domain: 'example.auth0.com'
-                    },
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: '123',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+                    return request.auth;
+                }
+            }
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                            reply(request.auth);
-                        }
-                    }
-                });
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                server.inject('/login', (res) => {
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result.credentials).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: 'auth0|1234567890',
+                displayName: 'steve smith',
+                name: {
+                    first: 'steve',
+                    last: 'smith'
+                },
+                email: 'steve@example.com',
+                raw: profile
+            }
+        });
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result.credentials).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: 'auth0|1234567890',
-                                    displayName: 'steve smith',
-                                    name: {
-                                        first: 'steve',
-                                        last: 'smith'
-                                    },
-                                    email: 'steve@example.com',
-                                    raw: profile
-                                }
-                            });
-                            expect(response.result.artifacts).to.equal({
-                                'access_token': '456',
-                                'expires_in': 3600
-                            });
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        expect(res3.result.artifacts).to.equal({
+            'access_token': '456',
+            'expires_in': 3600
         });
     });
 });
