@@ -2,7 +2,9 @@ If you want to write your own provider please see the section at the bottom of t
 
 ## Existing Providers
 
-Each provider may specify configuration options that are unique. Any of these unique options are documented here and must be provided during strategy creation. See the [API Documentation](API.md) for all other options.
+Each provider may specify configuration options that are unique. Any of these unique options are
+documented here and must be provided during strategy creation. See the [API Documentation](API.md)
+for all other options.
 
 ### ArcGIS Online
 
@@ -64,7 +66,8 @@ credentials.profile = {
 };
 ```
 
-Specific fields may vary depending on the identity provider used. For more information, [refer to the documentation on user profiles](https://auth0.com/docs/user-profile/normalized).
+Specific fields may vary depending on the identity provider used. For more information,
+[refer to the documentation on user profiles](https://auth0.com/docs/user-profile/normalized).
 
 ### Azure Active Directory
 
@@ -72,7 +75,8 @@ Specific fields may vary depending on the identity provider used. For more infor
 
 - `scope`: defaults to `['openid','offline_access', 'profile']`
 - `config`:
-  - `tenantId`: The tenant ID from the Azure AD application instance which is present in the authorization URL
+  - `tenantId`: The tenant ID from the Azure AD application instance which is present in the
+    authorization URL
 - `auth`: `'https://login.microsoftonline.com/'+ tenantId +'/oauth2/authorize'`
 - `token`: `'https://login.microsoftonline.com/'+ tenantId +'/oauth2/token'`
 
@@ -86,7 +90,6 @@ credentials.profile = {
     raw: profile
 };
 ```
-
 
 ### Bitbucket
 
