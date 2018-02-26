@@ -102,7 +102,6 @@ The `server.auth.strategy()` method requires the following strategy options:
       as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to `false`.
     - `auth` - the authorization endpoint URI.
     - `token` - the access token endpoint URI.
-    - `version` - the OAuth version.
     - `scope` - an array of scope strings (OAuth 2.0 only).
     - `scopeSeparator` - the scope separator character (OAuth 2.0 only). Only required when a
       provider has a broken OAuth 2.0 implementation. Defaults to space (Facebook and GitHub
