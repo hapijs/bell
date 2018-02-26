@@ -214,6 +214,77 @@ describe('Bell', () => {
             expect(res3.statusCode).to.equal(500);
         });
 
+        it('passes credentials on error (temporary error)', async (flags) => {
+
+            const mock = await Mock.v1(flags, { failTemporary: true });
+            const server = Hapi.server({ host: 'localhost', port: 80 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: mock.provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: {
+                        strategy: 'custom',
+                        mode: 'try'
+                    },
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res = await server.inject('/login?some=thing');
+            expect(res.result).to.equal({ provider: 'custom', query: { some: 'thing' } });
+        });
+
+        it('passes credentials on error (token error)', async (flags) => {
+
+            const mock = await Mock.v1(flags, { failToken: true });
+            const server = Hapi.server({ host: 'localhost', port: 80 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: mock.provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: {
+                        strategy: 'custom',
+                        mode: 'try'
+                    },
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?some=thing');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.result).to.equal({ provider: 'custom', query: { some: 'thing' } });
+        });
+
         it('does not pass on runtime query params by default', async (flags) => {
 
             const mock = await Mock.v1(flags);
