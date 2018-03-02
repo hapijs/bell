@@ -7,151 +7,131 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
+
 
 describe('slack', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.slack();
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
+        const profile = {
+            ok: true,
+            url: 'https:\/\/example.slack.com\/',
+            team: 'Example',
+            user: 'cal',
+            team_id: 'T12345',
+            user_id: 'U12345'
+        };
 
-                const custom = Bell.providers.slack();
-                Hoek.merge(custom, provider);
+        Mock.override('https://slack.com/api/auth.test', profile);
 
-                const profile = {
-                    ok: true,
-                    url: 'https:\/\/example.slack.com\/',
-                    team: 'Example',
-                    user: 'cal',
-                    team_id: 'T12345',
-                    user_id: 'U12345'
-                };
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'slack',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                Mock.override('https://slack.com/api/auth.test', profile);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'slack',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                server.inject('/login', (res) => {
-
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                refreshToken: undefined,
-                                expiresIn: 3600,
-                                query: {},
-                                profile: {
-                                    access_token: '456',
-                                    scope: undefined,
-                                    user: 'cal',
-                                    user_id: 'U12345',
-                                    raw: profile
-                                }
-                            });
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            refreshToken: undefined,
+            expiresIn: 3600,
+            query: {},
+            profile: {
+                access_token: '456',
+                scope: undefined,
+                user: 'cal',
+                user_id: 'U12345',
+                raw: profile
+            }
         });
     });
 
-    it('authenticates with mock (without extended profile)', { parallel: false }, (done) => {
+    it('authenticates with mock (without extended profile)', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.slack({ extendedProfile: false });
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'slack',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                const custom = Bell.providers.slack({ extendedProfile: false });
-                Hoek.merge(custom, provider);
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'slack',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                server.inject('/login', (res) => {
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
-
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                refreshToken: undefined,
-                                expiresIn: 3600,
-                                query: {},
-                                profile: {
-                                    scope: undefined,
-                                    access_token: '456'
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            refreshToken: undefined,
+            expiresIn: 3600,
+            query: {},
+            profile: {
+                scope: undefined,
+                access_token: '456'
+            }
         });
     });
 });

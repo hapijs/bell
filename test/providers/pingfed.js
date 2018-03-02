@@ -7,185 +7,142 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('pingfed', () => {
 
-    it('authenticates with mock', {
-        parallel: false
-    }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({
-                host: 'localhost',
-                port: 80
-            });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.pingfed();
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
+        const profile = {
+            id: 'steve.smith@example.com',
+            displayName: 'steve.smith@example.com',
+            username: 'steve.smith@example.com',
+            email: 'steve.smith@example.com',
+            sub: 'steve.smith@example.com'
+        };
 
-                const custom = Bell.providers.pingfed();
-                Hoek.merge(custom, provider);
+        Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
 
-                const profile = {
-                    id: 'steve.smith@example.com',
-                    displayName: 'steve.smith@example.com',
-                    username: 'steve.smith@example.com',
-                    email: 'steve.smith@example.com',
-                    sub: 'steve.smith@example.com'
-                };
-                // need to fix this
-                Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'pingfed',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'pingfed',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply){
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                server.inject('/login', (res) => {
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
-
-                        server.inject({
-                            url: mockRes.headers.location,
-                            headers: {
-                                cookie
-                            }
-                        }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: 'steve.smith@example.com',
-                                    displayName: 'steve.smith@example.com',
-                                    username: 'steve.smith@example.com',
-                                    email: 'steve.smith@example.com',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: 'steve.smith@example.com',
+                displayName: 'steve.smith@example.com',
+                username: 'steve.smith@example.com',
+                email: 'steve.smith@example.com',
+                raw: profile
+            }
         });
     });
-    it('authenticates with mock and custom uri ', {
-        parallel: false
-    }, (done) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+    it('authenticates with mock and custom uri ', async (flags) => {
 
-            const server = new Hapi.Server();
-            server.connection({
-                host: 'localhost',
-                port: 80
-            });
-            server.register(Bell, (err) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-                expect(err).to.not.exist();
+        const custom = Bell.providers.pingfed({ uri: 'https://login-dev.ext.hpe.com' });
+        Hoek.merge(custom, mock.provider);
 
-                const custom = Bell.providers.pingfed({ uri: 'https://login-dev.ext.hpe.com' });
-                Hoek.merge(custom, provider);
+        const profile = {
+            id: 'steve.smith@example.com',
+            displayName: 'steve.smith@example.com',
+            username: 'steve.smith@example.com',
+            email: 'steve.smith@example.com',
+            sub: 'steve.smith@example.com'
+        };
 
-                const profile = {
-                    id: 'steve.smith@example.com',
-                    displayName: 'steve.smith@example.com',
-                    username: 'steve.smith@example.com',
-                    email: 'steve.smith@example.com',
-                    sub: 'steve.smith@example.com'
-                };
-                // need to fix this
-                Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
+        Mock.override('https://login-dev.ext.hpe.com/idp/userinfo.openid', profile);
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'pingfed',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'pingfed',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply){
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.inject('/login', (res) => {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                        server.inject({
-                            url: mockRes.headers.location,
-                            headers: {
-                                cookie
-                            }
-                        }, (response) => {
-
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                refreshToken: undefined,
-                                query: {},
-                                profile: {
-                                    id: 'steve.smith@example.com',
-                                    displayName: 'steve.smith@example.com',
-                                    username: 'steve.smith@example.com',
-                                    email: 'steve.smith@example.com',
-                                    raw: profile
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            refreshToken: undefined,
+            query: {},
+            profile: {
+                id: 'steve.smith@example.com',
+                displayName: 'steve.smith@example.com',
+                username: 'steve.smith@example.com',
+                email: 'steve.smith@example.com',
+                raw: profile
+            }
         });
     });
 });

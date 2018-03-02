@@ -7,197 +7,173 @@ const Code = require('code');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Lab = require('lab');
+
 const Mock = require('../mock');
+
+
+// Declare internals
+
+const internals = {};
 
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.describe;
-const it = lab.it;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('foursquare', () => {
 
-    it('authenticates with mock', { parallel: false }, (done) => {
+    it('authenticates with mock', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.foursquare();
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
-
-                const custom = Bell.providers.foursquare();
-                Hoek.merge(custom, provider);
-
-                const data = {
-                    response: {
-                        user: {
-                            id: '1234',
-                            firstName: 'Steve',
-                            lastName: 'Smith',
-                            gender: 'male',
-                            relationship: 'self',
-                            photo: {
-                                prefix: 'https://irs0.4sqi.net/img/user/',
-                                suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
-                            },
-                            contact: {
-                                email: 'stevesmith@test.com'
-                            }
-                        }
+        const data = {
+            response: {
+                user: {
+                    id: '1234',
+                    firstName: 'Steve',
+                    lastName: 'Smith',
+                    gender: 'male',
+                    relationship: 'self',
+                    photo: {
+                        prefix: 'https://irs0.4sqi.net/img/user/',
+                        suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
+                    },
+                    contact: {
+                        email: 'stevesmith@test.com'
                     }
-                };
+                }
+            }
+        };
 
-                Mock.override('https://api.foursquare.com/v2/users/self', data);
+        Mock.override('https://api.foursquare.com/v2/users/self', data);
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'foursquare',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'foursquare',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                            reply(request.auth.credentials);
-                        }
-                    }
-                });
+                    return request.auth.credentials;
+                }
+            }
+        });
 
-                server.inject('/login', (res) => {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            secret: 'secret',
+            query: {},
+            profile: {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-
-                                    id: '1234',
-                                    displayName: 'Steve Smith',
-                                    name: {
-                                        first: 'Steve',
-                                        last: 'Smith'
-                                    },
-                                    email: data.response.user.contact.email,
-                                    raw: data.response.user
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+                id: '1234',
+                displayName: 'Steve Smith',
+                name: {
+                    first: 'Steve',
+                    last: 'Smith'
+                },
+                email: data.response.user.contact.email,
+                raw: data.response.user
+            }
         });
     });
 
-    it('authenticates with mock when user has no email set', { parallel: false }, (done) => {
+    it('authenticates with mock when user has no email set', async (flags) => {
 
-        const mock = new Mock.V2();
-        mock.start((provider) => {
+        const mock = await Mock.v2(flags);
+        const server = Hapi.server({ host: 'localhost', port: 80 });
+        await server.register(Bell);
 
-            const server = new Hapi.Server();
-            server.connection({ host: 'localhost', port: 80 });
-            server.register(Bell, (err) => {
+        const custom = Bell.providers.foursquare();
+        Hoek.merge(custom, mock.provider);
 
-                expect(err).to.not.exist();
-
-                const custom = Bell.providers.foursquare();
-                Hoek.merge(custom, provider);
-
-                const data = {
-                    response: {
-                        user: {
-                            id: '1234',
-                            firstName: 'Steve',
-                            lastName: 'Smith',
-                            gender: 'male',
-                            relationship: 'self',
-                            photo: {
-                                prefix: 'https://irs0.4sqi.net/img/user/',
-                                suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
-                            },
-                            contact: {
-                                facebook: 'http://facebook.com/stevesmith.test'
-                            }
-                        }
+        const data = {
+            response: {
+                user: {
+                    id: '1234',
+                    firstName: 'Steve',
+                    lastName: 'Smith',
+                    gender: 'male',
+                    relationship: 'self',
+                    photo: {
+                        prefix: 'https://irs0.4sqi.net/img/user/',
+                        suffix: '/1234-K0KG0PLWAG1WTOXM.jpg'
+                    },
+                    contact: {
+                        facebook: 'http://facebook.com/stevesmith.test'
                     }
-                };
+                }
+            }
+        };
 
-                Mock.override('https://api.foursquare.com/v2/users/self', data);
+        Mock.override('https://api.foursquare.com/v2/users/self', data);
 
-                server.auth.strategy('custom', 'bell', {
-                    password: 'cookie_encryption_password_secure',
-                    isSecure: false,
-                    clientId: 'foursquare',
-                    clientSecret: 'secret',
-                    provider: custom
-                });
+        server.auth.strategy('custom', 'bell', {
+            password: 'cookie_encryption_password_secure',
+            isSecure: false,
+            clientId: 'foursquare',
+            clientSecret: 'secret',
+            provider: custom
+        });
 
-                server.route({
-                    method: '*',
-                    path: '/login',
-                    config: {
-                        auth: 'custom',
-                        handler: function (request, reply) {
+        server.route({
+            method: '*',
+            path: '/login',
+            config: {
+                auth: 'custom',
+                handler: function (request, h) {
 
-                            reply(request.auth.credentials);
+                    return request.auth.credentials;
 
-                        }
-                    }
-                });
+                }
+            }
+        });
 
-                server.inject('/login', (res) => {
+        const res1 = await server.inject('/login');
+        const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
-                    const cookie = res.headers['set-cookie'][0].split(';')[0] + ';';
-                    mock.server.inject(res.headers.location, (mockRes) => {
+        const res2 = await mock.server.inject(res1.headers.location);
 
-                        server.inject({ url: mockRes.headers.location, headers: { cookie } }, (response) => {
+        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+        expect(res3.result).to.equal({
+            provider: 'custom',
+            token: '456',
+            expiresIn: 3600,
+            secret: 'secret',
+            query: {},
+            profile: {
 
-                            Mock.clear();
-                            expect(response.result).to.equal({
-                                provider: 'custom',
-                                token: '456',
-                                expiresIn: 3600,
-                                secret: 'secret',
-                                query: {},
-                                profile: {
-
-                                    id: '1234',
-                                    displayName: 'Steve Smith',
-                                    name: {
-                                        first: 'Steve',
-                                        last: 'Smith'
-                                    },
-                                    email: undefined,
-                                    raw: data.response.user
-                                }
-                            });
-
-                            mock.stop(done);
-                        });
-                    });
-                });
-            });
+                id: '1234',
+                displayName: 'Steve Smith',
+                name: {
+                    first: 'Steve',
+                    last: 'Smith'
+                },
+                email: undefined,
+                raw: data.response.user
+            }
         });
     });
 });

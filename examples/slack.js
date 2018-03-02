@@ -2,17 +2,19 @@
 
 // Load modules
 
-const Hapi = require('hapi');
-const Hoek = require('hoek');
 const Bell = require('../');
+const Hapi = require('hapi');
 
 
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+// Declare internals
 
-server.register(Bell, (err) => {
+const internals = {};
 
-    Hoek.assert(!err, err);
+
+internals.start = async function () {
+
+    const server = Hapi.server({ port: 8000 });
+    await server.register(Bell);
     server.auth.strategy('slack', 'bell', {
         provider: 'slack',
         password: 'cookie_encryption_password_secure',
@@ -24,19 +26,16 @@ server.register(Bell, (err) => {
     server.route({
         method: '*',
         path: '/bell/door',
-        config: {
+        options: {
             auth: 'slack',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
-                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
+                return '<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>';
             }
         }
     });
 
-    server.start((err) => {
+    await server.start();
+};
 
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-
-    });
-});
+internals.start();

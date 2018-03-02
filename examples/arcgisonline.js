@@ -2,24 +2,28 @@
 
 // Load modules
 
-const Hapi = require('hapi');
-const Hoek = require('hoek');
 const Bell = require('../');
+const Hapi = require('hapi');
 
 
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
+// Declare internals
 
-server.register(Bell, (err) => {
+const internals = {};
 
-    Hoek.assert(!err, err);
+
+internals.start = async function () {
+
+    const server = Hapi.server({ port: 8000 });
+    await server.register(Bell);
+
+    // You'll need to go to https://developers.arcgis.com/en/applications and set up an application to get started
+    // Once you create your app you will get your ClientID and Client Secret.
+    // Also be sure to set redirect URL as well at the bottom of the screen in Redirect URIs section.
+
     server.auth.strategy('arcgisonline', 'bell', {
         provider: 'arcgisonline',
         password: 'cookie_encryption_password_secure',
         isSecure: false,
-        // You'll need to go to https://developers.arcgis.com/en/applications and set up an application to get started
-        // Once you create your app you will get your ClientID and Client Secret.
-        // Also be sure to set redirect URL as well at the bottom of the screen in Redirect URIs section.
         clientId: '',
         clientSecret: '',
         providerParams: {
@@ -30,18 +34,17 @@ server.register(Bell, (err) => {
     server.route({
         method: '*',
         path: '/bell/door',
-        config: {
+        options: {
             auth: 'arcgisonline',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
-                reply('<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>');
+                return '<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>';
             }
         }
     });
 
-    server.start((err) => {
+    await server.start();
+    console.log('Server started at:', server.info.uri);
+};
 
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-    });
-});
+internals.start();

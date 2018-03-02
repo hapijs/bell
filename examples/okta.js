@@ -2,20 +2,25 @@
 
 // Load modules
 
-const Hapi = require('hapi');
-const Hoek = require('hoek');
+const Bell = require('../');
 const Boom = require('boom');
+const Hapi = require('hapi');
 
-const server = new Hapi.Server();
-server.connection({ port: 8000 });
 
-server.register([require('hapi-auth-cookie'), require('../')], (err) => {
+// Declare internals
 
-    Hoek.assert(!err, err);
+const internals = {};
+
+
+internals.start = async function () {
+
+    const server = Hapi.server({ port: 8000 });
+    await server.register([require('hapi-auth-cookie'), Bell]);
+
     server.auth.strategy('session', 'cookie', {
-        password: 'secret_cookie_encryption_password', //Use something more secure in production
-        redirectTo: '/auth/okta', //If there is no session, redirect here
-        isSecure: false //Should be set to true (which is the default) in production
+        password: 'secret_cookie_encryption_password',      // Use something more secure in production
+        redirectTo: '/auth/okta',                           // If there is no session, redirect here
+        isSecure: false                                     // Should be set to true (which is the default) in production
     });
 
     server.auth.strategy('okta', 'bell', {
@@ -31,19 +36,19 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
     server.route({
         method: 'GET',
         path: '/auth/okta',
-        config: {
+        options: {
             auth: 'okta',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
-                    return reply(Boom.unauthorized('Authentication failed: ' + request.auth.error.message));
+                    throw Boom.unauthorized('Authentication failed: ' + request.auth.error.message);
                 }
 
-                //Just store the third party credentials in the session as an example. You could do something
-                //more useful here - like loading or setting up an account (social signup).
-                request.auth.session.set(request.auth.credentials);
+                // Just store the third party credentials in the session as an example. You could do something
+                // more useful here - like loading or setting up an account (social signup).
 
-                return reply.redirect('/');
+                request.auth.session.set(request.auth.credentials);
+                return h.redirect('/');
             }
         }
     });
@@ -51,19 +56,19 @@ server.register([require('hapi-auth-cookie'), require('../')], (err) => {
     server.route({
         method: 'GET',
         path: '/',
-        config: {
+        options: {
             auth: 'session',
-            handler: function (request, reply) {
+            handler: function (request, h) {
 
                 //Return a message using the information from the session
-                return reply('Hello, ' + request.auth.credentials.profile.email + '!');
+
+                return 'Hello, ' + request.auth.credentials.profile.email + '!';
             }
         }
     });
 
-    server.start((err) => {
+    await server.start();
+    console.log('Server started at:', server.info.uri);
+};
 
-        Hoek.assert(!err, err);
-        console.log('Server started at:', server.info.uri);
-    });
-});
+internals.start();
