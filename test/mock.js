@@ -191,7 +191,7 @@ exports.v2 = async function (flags, options = {}) {
                         expect(request.headers.authorization).to.be.undefined();
                     }
                     else {
-                        const basic = new Buffer(request.headers.authorization.slice(6), 'base64').toString();
+                        const basic = Buffer.from(request.headers.authorization.slice(6), 'base64').toString();
                         expect(basic).to.startWith(code.client_id);
                         expect(request.payload.client_id).to.be.undefined();
                     }
