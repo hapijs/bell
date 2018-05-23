@@ -32,6 +32,106 @@ describe('Bell', () => {
 
     describe('v1()', () => {
 
+        it('authenticates without using a strategy', async (flags) => {
+
+            const mock = await Mock.v1(flags);
+            const server = Hapi.server({ host: 'localhost', port: 80 });
+            await server.register(Bell);
+            server.state('test', {
+                ttl        : 60000,
+                isSecure   : false,
+                isHttpOnly : true,
+                isSameSite : false,
+                encoding   : 'iron',
+                password   : 'cookie_encryption_password_secure'
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    handler: function (request, h) {
+
+                        const bell = request.server.plugins.bell.oauth.v1({
+                            password: 'cookie_encryption_password_secure',
+                            isSecure: false,
+                            clientId: 'test',
+                            clientSecret: 'secret',
+                            provider: mock.provider,
+                            cookie: 'test'
+                        });
+
+                        return bell(request, h);
+                    }
+                }
+            });
+
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+            expect(res2.headers.location).to.contain('http://localhost:80/login?oauth_token=1&oauth_verifier=');
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+        });
+
+
+
+        it('rejects without using a strategy', async (flags) => {
+
+            const mock = await Mock.v1(flags, { failToken: true });
+            const server = Hapi.server({ host: 'localhost', port: 80 });
+            await server.register(Bell);
+
+            server.state('test', {
+                ttl        : 60000,
+                isSecure   : false,
+                isHttpOnly : true,
+                isSameSite : false,
+                encoding   : 'iron',
+                password   : 'cookie_encryption_password_secure'
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    handler: async function (request, h) {
+
+                        const bell = request.server.plugins.bell.oauth.v1({
+                            password: 'cookie_encryption_password_secure',
+                            isSecure: false,
+                            clientId: 'test',
+                            clientSecret: 'secret',
+                            provider: mock.provider,
+                            cookie: 'test'
+                        });
+
+                        try {
+                            return await bell(request, h);
+                        }
+                        catch (error){
+
+                            expect(error.output.credentials).to.exist();
+                            return error;
+                        }
+                    }
+                }
+            });
+
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(500);
+        });
+
+
         it('errors on missing oauth_verifier', async () => {
 
             const server = Hapi.server({ host: 'localhost', port: 80 });
@@ -898,6 +998,110 @@ describe('Bell', () => {
     });
 
     describe('v2()', () => {
+
+        it('authenticates without using a strategy', async (flags) => {
+
+            const mock   = await Mock.v2(flags);
+            const server = Hapi.server({ host : 'localhost', port : 80 });
+            await server.register(Bell);
+
+            server.state('test', {
+                ttl        : 60000,
+                isSecure   : false,
+                isHttpOnly : true,
+                isSameSite : false,
+                encoding   : 'iron',
+                password   : 'cookie_encryption_password_secure'
+            });
+
+            server.route({
+                method  : '*',
+                path    : '/login',
+                options : {
+                    handler : function (request, h) {
+
+                        const bell = request.server.plugins.bell.oauth.v2({
+                            provider     : mock.provider,
+                            password       : 'cookie_encryption_password_secure',
+                            isSecure     : false,
+                            clientId       : 'test',
+                            clientSecret   : 'secret',
+                            providerParams : { special : true },
+                            cookie: 'test'
+                        });
+
+                        return bell(request, h);
+                    }
+                }
+            });
+
+            const res1 =  await server.inject('/login');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+            expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+        });
+
+        it('authenticates without using a strategy', async (flags) => {
+
+            const mock   = await Mock.v2(flags);
+            const server = Hapi.server({ host : 'localhost', port : 80 });
+            await server.register(Bell);
+
+            const error = Boom.badRequest();
+            error.output.statusCode = 199;
+            Mock.override(mock.provider.token, error);
+
+            server.state('test', {
+                ttl        : 60000,
+                isSecure   : false,
+                isHttpOnly : true,
+                isSameSite : false,
+                encoding   : 'iron',
+                password   : 'cookie_encryption_password_secure'
+            });
+
+            server.route({
+                method  : '*',
+                path    : '/login',
+                options : {
+                    handler : async function (request, h) {
+
+                        const bell = request.server.plugins.bell.oauth.v2({
+                            provider     : mock.provider,
+                            password       : 'cookie_encryption_password_secure',
+                            isSecure     : false,
+                            clientId       : 'test',
+                            clientSecret   : 'secret',
+                            providerParams : { special : true },
+                            cookie: 'test'
+                        });
+
+                        try {
+                            return await bell(request, h);
+                        }
+                        catch (err){
+
+                            expect(err.output.credentials).to.exist();
+                            return err;
+                        }
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(500);
+        });
 
         it('authenticates an endpoint with provider parameters', async (flags) => {
 
