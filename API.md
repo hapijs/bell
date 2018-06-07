@@ -225,14 +225,13 @@ override method `Bell.simulate()` which puts the module into simulation mode and
 created while it is in this mode will return the simulated credentials.
 
 The `Bell.simulate(credentialsFunc)` takes a single argument:
-- `credentialsFunc` - a function called for each incoming request to the protected resource with
-  the signature `function(request, next)` where:
+
+- `credentialsFunc` - a function called for each incoming request to the protected resource that
+  should return the credentials object to be set in `request.auth.credentials`. Note that **bell**
+  will set the default keys automatically if not present except for the provider-specific values.
+  
+  has the signature `function(request)` where:
     - `request` - the **hapi** request object.
-    - `next` - the callback method using the signature `function(err, credentials)` where:
-        - `err` - the error object to return an error response.
-        - `credentials` - the credentials object set in `request.auth.credentials`. Note that
-          **bell** will set the default keys automatically if not present except for the
-          provider-specific values.
 
 Note that you must call `Bell.simulate()` before the module is registered by your application and
 need to call `Bell.simulate(false)` to stop it from simulating authentication.
