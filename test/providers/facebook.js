@@ -39,7 +39,13 @@ describe('facebook', () => {
             name: 'steve',
             first_name: 'steve',
             last_name: 'smith',
-            email: 'steve@example.com'
+            email: 'steve@example.com',
+            picture: {
+                data: {
+                    is_silhouette: false,
+                    url: 'https://example.com/profile.png'
+                }
+            }
         };
 
         Mock.override('https://graph.facebook.com/v2.9/me', profile);
@@ -86,6 +92,12 @@ describe('facebook', () => {
                     middle: undefined
                 },
                 email: 'steve@example.com',
+                picture: {
+                    data: {
+                        is_silhouette: false,
+                        url: 'https://example.com/profile.png'
+                    }
+                },
                 raw: profile
             }
         });
@@ -159,6 +171,12 @@ describe('facebook', () => {
                     middle: undefined
                 },
                 email: 'steve@example.com',
+                picture: {
+                    data: {
+                        is_silhouette: false,
+                        url: 'https://example.com/profile.png'
+                    }
+                },
                 raw: profile
             }
         });

@@ -2,7 +2,7 @@
 
 Third-party authentication plugin for [hapi](https://github.com/hapijs/hapi).
 
-Lead Maintainer: [Eran Hammer](https://github.com/hueniverse)
+Lead Maintainer: [Adri Van Houdt](https://github.com/adrivanhoudt)
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
 

@@ -39,7 +39,7 @@ describe('auth0', () => {
         Hoek.merge(custom, mock.provider);
 
         const profile = {
-            user_id: 'auth0|1234567890',
+            sub: 'auth0|1234567890',
             name: 'steve smith',
             given_name: 'steve',
             family_name: 'smith',
