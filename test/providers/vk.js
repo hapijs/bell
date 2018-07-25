@@ -93,7 +93,7 @@ describe('vk', () => {
         const server = Hapi.server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        const custom = Bell.providers.vk({ version: '5.6' });
+        const custom = Bell.providers.vk({ version: '4.104' });
         Hoek.merge(custom, mock.provider);
 
         const data = {
