@@ -98,7 +98,7 @@ describe('vk', () => {
 
         const data = {
             response: [{
-                id: '1234567890',
+                uid: '1234567890',
                 first_name: 'steve',
                 last_name: 'smith'
             }]
