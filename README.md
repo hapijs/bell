@@ -71,7 +71,7 @@ internals.start = async function () {
 
     // Use the 'twitter' authentication strategy to protect the
     // endpoint handling the incoming authentication credentials.
-    // This endpoints usually looks up the third party account in
+    // This endpoint usually looks up the third party account in
     // the database and sets some application state (cookie) with
     // the local application account information.
 
