@@ -35,6 +35,7 @@ internals.start = async function () {
                 if (!request.auth.isAuthenticated) {
                     return `Authentication failed due to: ${request.auth.error.message}`;
                 }
+
                 return '<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>';
             }
         }

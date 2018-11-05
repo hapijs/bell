@@ -25,8 +25,8 @@ const expect = Code.expect;
 
 
 exports.CLIENT_ID_TESTER = internals.CLIENT_ID_TESTER = 'clientIdTester';
-exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
 
+exports.CLIENT_SECRET_TESTER = internals.CLIENT_SECRET_TESTER = 'clientSecretTester';
 
 exports.v1 = async function (flags, options = {}) {
 
@@ -259,7 +259,7 @@ exports.override = function (uri, payload) {
 
     const override = function (method) {
 
-        return async function (dest) {
+        return async function (dest, ...args) {
 
             if (dest.indexOf(uri) === 0) {
                 if (typeof payload === 'function') {
@@ -280,7 +280,7 @@ exports.override = function (uri, payload) {
                 return { res: { statusCode: 200 }, payload: typeof payload === 'string' ? payload : JSON.stringify(payload) };
             }
 
-            return internals.wreck[method].apply(null, arguments);
+            return internals.wreck[method](dest, ...args);
         };
     };
 

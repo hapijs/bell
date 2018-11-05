@@ -84,8 +84,8 @@ describe('foursquare', () => {
             provider: 'custom',
             token: '456',
             expiresIn: 3600,
-            secret: 'secret',
             query: {},
+            refreshToken: undefined,
             profile: {
 
                 id: '1234',
@@ -161,8 +161,8 @@ describe('foursquare', () => {
             provider: 'custom',
             token: '456',
             expiresIn: 3600,
-            secret: 'secret',
             query: {},
+            refreshToken: undefined,
             profile: {
 
                 id: '1234',

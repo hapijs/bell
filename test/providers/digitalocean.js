@@ -74,8 +74,8 @@ describe('digitalocean', () => {
             provider: 'custom',
             token: '456',
             expiresIn: 3600,
-            secret: 'secret',
             query: {},
+            refreshToken: undefined,
             profile: {
 
                 id: data.account.uuid,
@@ -136,8 +136,8 @@ describe('digitalocean', () => {
             provider: 'custom',
             token: '456',
             expiresIn: 3600,
-            secret: 'secret',
             query: {},
+            refreshToken: undefined,
             profile: {
 
                 id: data.account.uuid,
