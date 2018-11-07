@@ -44,8 +44,8 @@
     "boom": "7.x.x",
     "bounce": "1.x.x",
     "cryptiles": "4.x.x",
-    "hoek": "^6.0.1",
-    "joi": "^14.0.4",
+    "hoek": "6.x.x",
+    "joi": "14.x.x",
     "wreck": "14.x.x"
   },
   "peerDependencies": {
@@ -55,7 +55,7 @@
     "code": "5.x.x",
     "hapi": "17.x.x",
     "hawk": "7.x.x",
-    "lab": "^17.3.0",
+    "lab": "17.x.x",
     "teamwork": "3.x.x"
   },
   "scripts": {
