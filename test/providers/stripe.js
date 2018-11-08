@@ -30,7 +30,7 @@ describe('stripe', () => {
         const server = Hapi.server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        const custom = Bell.providers.stripe({});
+        const custom = Bell.providers.stripe();
         Hoek.merge(custom, mock.provider);
 
         const profile = {
