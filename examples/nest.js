@@ -1,12 +1,8 @@
 'use strict';
 
-// Load modules
-
 const Bell = require('../');
 const Hapi = require('hapi');
 
-
-// Declare internals
 
 const internals = {};
 

@@ -1,7 +1,5 @@
 'use strict';
 
-// Load modules
-
 const Bell = require('../../');
 const Code = require('code');
 const Hapi = require('hapi');
@@ -11,12 +9,8 @@ const Lab = require('lab');
 const Mock = require('../mock');
 
 
-// Declare internals
-
 const internals = {};
 
-
-// Test shortcuts
 
 const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;

@@ -1,12 +1,8 @@
 'use strict';
 
-// Load modules
-
 const Hapi = require('hapi');
 const Bell = require('../');
 
-
-// Declare internals
 
 const internals = {};
 
@@ -35,6 +31,7 @@ internals.start = async function () {
                 if (!request.auth.isAuthenticated) {
                     return `Authentication failed due to: ${request.auth.error.message}`;
                 }
+
                 return '<pre>' + JSON.stringify(request.auth.credentials, null, 4) + '</pre>';
             }
         }
