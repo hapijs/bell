@@ -147,6 +147,7 @@ Each strategy accepts the following optional settings:
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to
   `'bell-provider'` where 'provider' is the provider name (or `'custom'` for custom providers). For
   example, the Twitter cookie name defaults to `'bell-twitter'`.
+- `isSameSite` - sets the cookie same site option. Defaults to `Strict`.
 - `isSecure` - sets the cookie secure flag. Defaults to `true`.
 - `isHttpOnly` - sets the cookie HTTP only flag. Defaults to `true`.
 - `ttl` - cookie time-to-live in milliseconds. Defaults to `null` (session time-life - cookies are
