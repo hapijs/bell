@@ -7,3 +7,5 @@ coverage.*
 **/._*
 
 **/*.pem
+
+.vscode
