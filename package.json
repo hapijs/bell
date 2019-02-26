@@ -49,7 +49,7 @@
     "code": "5.x.x",
     "hapi": "17.x.x",
     "hawk": "7.x.x",
-    "lab": "17.x.x",
+    "lab": "18.x.x",
     "teamwork": "3.x.x"
   },
   "scripts": {

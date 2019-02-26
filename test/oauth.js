@@ -114,7 +114,7 @@ describe('Bell', () => {
             expect(res.statusCode).to.equal(500);
         });
 
-        it('errors on rejected query parameter', async () => {
+        it('errors on rejected/denied query parameter', async () => {
 
             const server = Hapi.server({ host: 'localhost', port: 80 });
             await server.register(Bell);
@@ -141,6 +141,8 @@ describe('Bell', () => {
 
             const res = await server.inject('/login?error=access_denied');
             expect(res.statusCode).to.equal(500);
+            const res2 = await server.inject('/login?denied=true');
+            expect(res2.statusCode).to.equal(500);
         });
 
         it('fails getting temporary credentials', async (flags) => {
