@@ -50,10 +50,12 @@ describe('linkedin', () => {
         };
 
         const email = {
-            handle: 'urn:li:emailAddress:3775708763',
-            'handle~': {
-                emailAddress: 'steve.smith@domain.com'
-            }
+            elements: [{
+                handle: 'urn:li:emailAddress:3775708763',
+                'handle~': {
+                    emailAddress: 'steve.smith@domain.com'
+                }
+            }]
         };
 
         Mock.override('https://api.linkedin.com/v2', (dest) => {
@@ -148,10 +150,12 @@ describe('linkedin', () => {
         };
 
         const email = {
-            handle: 'urn:li:emailAddress:3775708763',
-            'handle~': {
-                emailAddress: 'steve.smith@domain.com'
-            }
+            elements: [{
+                handle: 'urn:li:emailAddress:3775708763',
+                'handle~': {
+                    emailAddress: 'steve.smith@domain.com'
+                }
+            }]
         };
 
         let profileChecked = false;
