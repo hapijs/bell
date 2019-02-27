@@ -28,7 +28,7 @@ describe('Bell', () => {
 
         it('errors on missing oauth_verifier', async () => {
 
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -57,7 +57,7 @@ describe('Bell', () => {
 
         it('attempts to perform html redirection on missing cookie on token step', async () => {
 
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -82,12 +82,12 @@ describe('Bell', () => {
 
             const res = await server.inject('/login?oauth_token=123&oauth_verifier=123');
             expect(res.statusCode).to.equal(200);
-            expect(res.result).to.equal('<html><head><meta http-equiv=\"refresh\" content=\"0;URL=\'http://localhost:80/login?oauth_token=123&oauth_verifier=123&refresh=1\'\"></head><body></body></html>');
+            expect(res.result).to.equal('<html><head><meta http-equiv=\"refresh\" content=\"0;URL=\'http://localhost:8080/login?oauth_token=123&oauth_verifier=123&refresh=1\'\"></head><body></body></html>');
         });
 
         it('errors on missing cookie on token step (with refresh)', async () => {
 
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -116,7 +116,7 @@ describe('Bell', () => {
 
         it('errors on rejected/denied query parameter', async () => {
 
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -148,7 +148,7 @@ describe('Bell', () => {
         it('fails getting temporary credentials', async (flags) => {
 
             const mock = await Mock.v1(flags, { failTemporary: true });
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -178,7 +178,7 @@ describe('Bell', () => {
         it('fails getting token credentials', async (flags) => {
 
             const mock = await Mock.v1(flags, { failToken: true });
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -213,7 +213,7 @@ describe('Bell', () => {
         it('passes credentials on error (temporary error)', async (flags) => {
 
             const mock = await Mock.v1(flags, { failTemporary: true });
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -246,7 +246,7 @@ describe('Bell', () => {
         it('passes credentials on error (token error)', async (flags) => {
 
             const mock = await Mock.v1(flags, { failToken: true });
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -284,7 +284,7 @@ describe('Bell', () => {
         it('does not pass on runtime query params by default', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -314,7 +314,7 @@ describe('Bell', () => {
         it('passes on runtime query params with allowRuntimeProviderParams', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -345,7 +345,7 @@ describe('Bell', () => {
         it('authenticates an endpoint via oauth with auth provider parameters', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -373,13 +373,13 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?special=true&oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123&extra=true');
         });
 
         it('authenticates an endpoint via oauth with a function as provider parameters', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -407,13 +407,13 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?value=bar&oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123&extra=true');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123&extra=true');
         });
 
         it('passes profileParams', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.twitter();
@@ -459,7 +459,7 @@ describe('Bell', () => {
         it('errors on invalid resource request (mock Twitter)', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.twitter();
@@ -492,7 +492,7 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.statusCode).to.equal(500);
@@ -501,7 +501,7 @@ describe('Bell', () => {
         it('authenticates with mock Twitter with skip profile', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.twitter();
@@ -546,7 +546,7 @@ describe('Bell', () => {
         it('errors on mismatching token', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -575,14 +575,14 @@ describe('Bell', () => {
 
             await mock.server.inject(res1.headers.location);
 
-            const res2 = await server.inject({ url: 'http://localhost:80/login?oauth_token=2&oauth_verifier=123', headers: { cookie } });
+            const res2 = await server.inject({ url: 'http://localhost:8080/login?oauth_token=2&oauth_verifier=123', headers: { cookie } });
             expect(res2.statusCode).to.equal(500);
         });
 
         it('errors if isSecure is true when protocol is not https', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -612,7 +612,7 @@ describe('Bell', () => {
         it('passes if isSecure is true when protocol is https (forced)', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -640,7 +640,7 @@ describe('Bell', () => {
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
+            expect(res2.headers.location).to.contain('https://localhost:8080/login?oauth_token=1&oauth_verifier=');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.statusCode).to.equal(200);
@@ -649,7 +649,7 @@ describe('Bell', () => {
         it('passes if isSecure is true when protocol is https (location)', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -686,7 +686,7 @@ describe('Bell', () => {
         it('forces https in callback_url when set in options', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -713,7 +713,7 @@ describe('Bell', () => {
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('https://localhost:80/login?oauth_token=1&oauth_verifier=');
+            expect(res2.headers.location).to.contain('https://localhost:8080/login?oauth_token=1&oauth_verifier=');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.statusCode).to.equal(200);
@@ -722,7 +722,7 @@ describe('Bell', () => {
         it('uses location setting in callback_url when set in options', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -759,7 +759,7 @@ describe('Bell', () => {
         it('returns resource response stream', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -795,7 +795,7 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.result).to.equal('some text reply');
@@ -804,7 +804,7 @@ describe('Bell', () => {
         it('returns raw resource response', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -841,7 +841,7 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.result).to.equal('{"a":"5"}');
@@ -850,7 +850,7 @@ describe('Bell', () => {
         it('returns resource POST response', async (flags) => {
 
             const mock = await Mock.v1(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -886,7 +886,7 @@ describe('Bell', () => {
             expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+            expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.result).to.equal('{"a":"5"}');
@@ -898,7 +898,7 @@ describe('Bell', () => {
         it('authenticates an endpoint with provider parameters', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -923,13 +923,13 @@ describe('Bell', () => {
             });
 
             const res = await server.inject('/login');
-            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
         });
 
         it('forces https in redirect_uri when set in options', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -955,11 +955,11 @@ describe('Bell', () => {
             });
 
             const res1 = await server.inject('/login');
-            expect(res1.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+            expect(res2.headers.location).to.contain('https://localhost:8080/login?code=1&state=');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.statusCode).to.equal(200);
@@ -968,7 +968,7 @@ describe('Bell', () => {
         it('uses location setting in redirect_uri when set in options', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1007,7 +1007,7 @@ describe('Bell', () => {
         it('ignores empty string returned by location setting (function)', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1033,13 +1033,13 @@ describe('Bell', () => {
             });
 
             const res = await server.inject('/login');
-            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
         });
 
         it('uses location setting (function) in redirect_uri when set in options', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1090,7 +1090,7 @@ describe('Bell', () => {
         it('authenticates an endpoint with custom scope', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1121,7 +1121,7 @@ describe('Bell', () => {
         it('authenticates an endpoint with custom function scope', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1152,7 +1152,7 @@ describe('Bell', () => {
         it('authenticates with mock Instagram with skip profile', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.instagram();
@@ -1197,7 +1197,7 @@ describe('Bell', () => {
         it('authenticates an endpoint with runtime query parameters', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1223,13 +1223,13 @@ describe('Bell', () => {
             });
 
             const res = await server.inject('/login?runtime=5');
-            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
         });
 
         it('allows runtime state', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1258,14 +1258,14 @@ describe('Bell', () => {
             });
 
             const res = await server.inject('/login?state=something');
-            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
             expect(res.headers.location).to.contain('something');
         });
 
         it('allows empty or null runtime state', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1294,13 +1294,13 @@ describe('Bell', () => {
             });
 
             const res = await server.inject('/login?state=something');
-            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
         });
 
         it('fails on missing state', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1325,19 +1325,19 @@ describe('Bell', () => {
 
             const res1 = await server.inject('/login');
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
-            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+            expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
-            const res3 = await server.inject({ url: 'http://localhost:80/login?code=1', headers: { cookie } });
+            const res3 = await server.inject({ url: 'http://localhost:8080/login?code=1', headers: { cookie } });
             expect(res3.statusCode).to.equal(500);
         });
 
         it('does not include runtime query parameters by default', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1368,7 +1368,7 @@ describe('Bell', () => {
         it('refreshes & errors on missing cookie in token step', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1394,10 +1394,10 @@ describe('Bell', () => {
             const res1 = await server.inject('/login');
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
             expect(cookie).to.exist();
-            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+            expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
             const res3 = await server.inject(res2.headers.location);
             expect(res3.statusCode).to.equal(200);
@@ -1411,7 +1411,7 @@ describe('Bell', () => {
         it('errors on mismatching state', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1436,19 +1436,19 @@ describe('Bell', () => {
 
             const res1 = await server.inject('/login');
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
-            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+            expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
-            const res3 = await server.inject({ url: 'http://localhost:80/login?code=1&state=xx', headers: { cookie } });
+            const res3 = await server.inject({ url: 'http://localhost:8080/login?code=1&state=xx', headers: { cookie } });
             expect(res3.statusCode).to.equal(500);
         });
 
         it('errors on failed token request', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1488,7 +1488,7 @@ describe('Bell', () => {
         it('errors on errored token request (500)', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1528,7 +1528,7 @@ describe('Bell', () => {
         it('errors on errored token request (<200)', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1570,7 +1570,7 @@ describe('Bell', () => {
         it('errors on invalid token request response', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1610,7 +1610,7 @@ describe('Bell', () => {
         it('passes if the client secret is not modified in route', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1645,7 +1645,7 @@ describe('Bell', () => {
         it('errors on failed profile request', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1685,7 +1685,7 @@ describe('Bell', () => {
         it('errors on errored profile request', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1725,7 +1725,7 @@ describe('Bell', () => {
         it('errors on invalid profile request', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1765,7 +1765,7 @@ describe('Bell', () => {
         it('errors on rejected query parameter', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1802,7 +1802,7 @@ describe('Bell', () => {
         it('errors if isSecure is true when protocol is not https', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1833,7 +1833,7 @@ describe('Bell', () => {
         it('passes if isSecure is true when protocol is https (location)', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1872,7 +1872,7 @@ describe('Bell', () => {
         it('passes if isSecure is true when protocol is https (forced)', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             server.auth.strategy('custom', 'bell', {
@@ -1898,11 +1898,11 @@ describe('Bell', () => {
             });
 
             const res1 = await server.inject('/login');
-            expect(res1.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?special=true&client_id=test&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
             const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
             const res2 = await mock.server.inject(res1.headers.location);
-            expect(res2.headers.location).to.contain('https://localhost:80/login?code=1&state=');
+            expect(res2.headers.location).to.contain('https://localhost:8080/login?code=1&state=');
 
             const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
             expect(res3.statusCode).to.equal(200);
@@ -1911,7 +1911,7 @@ describe('Bell', () => {
         it('passes profile get params', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
@@ -1958,7 +1958,7 @@ describe('Bell', () => {
         it('passes profileParams', async (flags) => {
 
             const mock = await Mock.v2(flags);
-            const server = Hapi.server({ host: 'localhost', port: 80 });
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
             await server.register(Bell);
 
             const custom = Bell.providers.facebook();
