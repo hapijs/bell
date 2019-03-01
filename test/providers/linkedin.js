@@ -168,17 +168,25 @@ describe('linkedin', () => {
                 return profile;
             }
 
+            expect(url).to.equal('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))');
+
             return email;
         };
 
         await custom.profile({ token: '456' }, null, get);
 
         delete custom.providerParams.fields;
+        profileChecked = false;
 
         const get2 = (url, query) => {
 
-            expect(url).to.equal('https://api.linkedin.com/v1/people/~');
-            return profile;
+            if (!profileChecked) {
+                expect(url).to.equal('https://api.linkedin.com/v2/me');
+                profileChecked = true;
+                return profile;
+            }
+
+            return email;
         };
 
         await custom.profile({ token: '456' }, null, get2);
