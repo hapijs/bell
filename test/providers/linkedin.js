@@ -172,5 +172,15 @@ describe('linkedin', () => {
         };
 
         await custom.profile({ token: '456' }, null, get);
+
+        delete custom.providerParams.fields;
+
+        const get2 = (url, query) => {
+
+            expect(url).to.equal('https://api.linkedin.com/v1/people/~');
+            return profile;
+        };
+
+        await custom.profile({ token: '456' }, null, get2);
     });
 });

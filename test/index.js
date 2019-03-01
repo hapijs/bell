@@ -25,7 +25,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth', async (flags) => {
 
         const mock = await Mock.v1(flags);
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -53,7 +53,7 @@ describe('Bell', () => {
         expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+        expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -63,7 +63,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth using RSA-SHA1 signing', async (flags) => {
 
         const mock = await Mock.v1(flags, { signatureMethod: 'RSA-SHA1' });
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -91,7 +91,7 @@ describe('Bell', () => {
         expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.equal('http://localhost:80/login?oauth_token=1&oauth_verifier=123');
+        expect(res2.headers.location).to.equal('http://localhost:8080/login?oauth_token=1&oauth_verifier=123');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -101,7 +101,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth2', async (flags) => {
 
         const mock = await Mock.v2(flags);
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -125,11 +125,11 @@ describe('Bell', () => {
         });
 
         const res1 = await server.inject('/login');
-        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
         const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+        expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -138,7 +138,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth2 and basic authentication', async (flags) => {
 
         const mock = await Mock.v2(flags, { useParamsAuth: false });
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -163,10 +163,10 @@ describe('Bell', () => {
 
         const res1 = await server.inject('/login');
         const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
-        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+        expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -175,7 +175,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth2 with custom client secret options', async (flags) => {
 
         const mock = await Mock.v2(flags, false);
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -200,10 +200,10 @@ describe('Bell', () => {
 
         const res1 = await server.inject('/login');
         const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
-        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+        expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -213,7 +213,7 @@ describe('Bell', () => {
     it('authenticates an endpoint via oauth2 with custom client secret options and params auth', async (flags) => {
 
         const mock = await Mock.v2(flags, true);                        // Sets useParamsAuth = true
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -238,10 +238,10 @@ describe('Bell', () => {
 
         const res1 = await server.inject('/login');
         const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
-        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A80%2Flogin&state=');
+        expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=customSecret&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
 
         const res2 = await mock.server.inject(res1.headers.location);
-        expect(res2.headers.location).to.contain('http://localhost:80/login?code=1&state=');
+        expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
 
         const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
         expect(res3.result.provider).to.equal('custom');
@@ -251,7 +251,7 @@ describe('Bell', () => {
     it('overrides cookie name', async (flags) => {
 
         const mock = await Mock.v1(flags);
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom', 'bell', {
@@ -282,7 +282,7 @@ describe('Bell', () => {
     it('allows multiple custom provider names', async (flags) => {
 
         const mock = await Mock.v1(flags);
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         server.auth.strategy('custom_1', 'bell', {
@@ -341,7 +341,7 @@ describe('Bell', () => {
 
     it('exposes OAuth via plugin', async () => {
 
-        const server = Hapi.server({ host: 'localhost', port: 80 });
+        const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
         expect(server.plugins.bell.oauth.Client).to.be.function();
