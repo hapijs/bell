@@ -29,13 +29,43 @@ describe('linkedin', () => {
 
         const profile = {
             id: '1234567890',
-            firstName: 'steve',
-            lastName: 'smith',
-            emailAddress: 'steve.smith@domain.com',
-            headline: 'Master of the universe'
+            firstName: {
+                localized: {
+                    en_US: 'steve'
+                },
+                preferredLocal: {
+                    country: 'US',
+                    language: 'en'
+                }
+            },
+            lastName: {
+                localized: {
+                    en_US: 'smith'
+                },
+                preferredLocal: {
+                    country: 'US',
+                    language: 'en'
+                }
+            }
         };
 
-        Mock.override('https://api.linkedin.com/v1/people/~', profile);
+        const email = {
+            elements: [{
+                handle: 'urn:li:emailAddress:3775708763',
+                'handle~': {
+                    emailAddress: 'steve.smith@domain.com'
+                }
+            }]
+        };
+
+        Mock.override('https://api.linkedin.com/v2', (dest) => {
+
+            if (dest.startsWith('https://api.linkedin.com/v2/me')) {
+                return profile;
+            }
+
+            return email;
+        });
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
@@ -76,8 +106,10 @@ describe('linkedin', () => {
                     last: 'smith'
                 },
                 email: 'steve.smith@domain.com',
-                headline: 'Master of the universe',
-                raw: profile
+                raw: {
+                    profile,
+                    email
+                }
             }
         });
     });
@@ -97,25 +129,64 @@ describe('linkedin', () => {
 
         const profile = {
             id: '1234567890',
-            firstName: 'steve',
-            lastName: 'smith',
-            headline: 'Master of the universe'
+            firstName: {
+                localized: {
+                    en_US: 'steve'
+                },
+                preferredLocal: {
+                    country: 'US',
+                    language: 'en'
+                }
+            },
+            lastName: {
+                localized: {
+                    en_US: 'smith'
+                },
+                preferredLocal: {
+                    country: 'US',
+                    language: 'en'
+                }
+            }
         };
+
+        const email = {
+            elements: [{
+                handle: 'urn:li:emailAddress:3775708763',
+                'handle~': {
+                    emailAddress: 'steve.smith@domain.com'
+                }
+            }]
+        };
+
+        let profileChecked = false;
 
         const get = (url, query) => {
 
-            expect(url).to.equal('https://api.linkedin.com/v1/people/~(id,firstName)');
-            return profile;
+            if (!profileChecked) {
+                expect(url).to.equal('https://api.linkedin.com/v2/me?projection=(id,firstName)');
+                profileChecked = true;
+                return profile;
+            }
+
+            expect(url).to.equal('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))');
+
+            return email;
         };
 
         await custom.profile({ token: '456' }, null, get);
 
         delete custom.providerParams.fields;
+        profileChecked = false;
 
         const get2 = (url, query) => {
 
-            expect(url).to.equal('https://api.linkedin.com/v1/people/~');
-            return profile;
+            if (!profileChecked) {
+                expect(url).to.equal('https://api.linkedin.com/v2/me');
+                profileChecked = true;
+                return profile;
+            }
+
+            return email;
         };
 
         await custom.profile({ token: '456' }, null, get2);

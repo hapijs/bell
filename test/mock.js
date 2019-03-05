@@ -258,7 +258,12 @@ exports.override = function (uri, payload) {
 
             if (dest.indexOf(uri) === 0) {
                 if (typeof payload === 'function') {
-                    await payload(dest);
+                    const res = await payload(dest);
+
+                    if (res) {
+                        return { res: { statusCode: 200 }, payload: JSON.stringify(res) };
+                    }
+
                     team.attend();
                     return { res: { statusCode: 200 }, payload: '{"x":1}' };
                 }
