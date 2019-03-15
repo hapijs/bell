@@ -19,15 +19,15 @@ internals.start = async function () {
         clientSecret: '',
         isSameSite: 'Lax', // fixes issue with Auth Redirect Loop
         scope: [
-          'identify',
-          'groups:read',
-          'channels:read',
-          'im:read',
-          'mpim:read',
-          'users:read',
-          'users:read.email',
-          'users.profile:read',
-        ], // fixes non admin users don't get the proper scope.
+            'identify',
+            'groups:read',
+            'channels:read',
+            'im:read',
+            'mpim:read',
+            'users:read',
+            'users:read.email',
+            'users.profile:read'
+        ] // fixes non admin users don't get the proper scope.
     });
 
     server.route({
