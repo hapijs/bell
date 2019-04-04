@@ -23,7 +23,7 @@ internals.start = async function () {
         password: 'cookie_encryption_password_secure',
         isSecure: false,
         clientId: '',
-        clientSecret: '',
+        clientSecret: ''
         /*
         * isSameSite property
         * Fixes: https://stackoverflow.com/questions/39748688/hapi-js-bell-auth-cookie-redirect-loop
