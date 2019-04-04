@@ -11,13 +11,25 @@ internals.start = async function () {
 
     const server = Hapi.server({ port: 8000 });
     await server.register(Bell);
+
+    /*
+    * You can pass in your own scope rules which admins rules
+    * get defaulted to identify.
+    *
+    */
+
     server.auth.strategy('slack', 'bell', {
         provider: 'slack',
         password: 'cookie_encryption_password_secure',
         isSecure: false,
         clientId: '',
         clientSecret: '',
-        isSameSite: 'Lax', // fixes issue with Auth Redirect Loop
+        /*
+        * isSameSite property
+        * Fixes: https://stackoverflow.com/questions/39748688/hapi-js-bell-auth-cookie-redirect-loop
+        isSameSite: 'Lax',
+        * You can pass in your own scope rules. You may find it's needed for admin
+        * rules which get defaulted to identify.
         scope: [
             'identify',
             'groups:read',
@@ -27,7 +39,8 @@ internals.start = async function () {
             'users:read',
             'users:read.email',
             'users.profile:read'
-        ] // fixes non admin users don't get the proper scope.
+        ]
+        */
     });
 
     server.route({
