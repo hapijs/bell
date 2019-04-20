@@ -1,8 +1,8 @@
 'use strict';
 
-const Bell = require('../');
-const Boom = require('boom');
-const Hapi = require('hapi');
+const Bell = require('..');
+const Boom = require('@hapi/boom');
+const Hapi = require('@hapi/hapi');
 
 
 const internals = {};
