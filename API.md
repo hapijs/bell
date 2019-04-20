@@ -1,5 +1,11 @@
 ## API
 
+### Notes
+
+Testing third-party authorization is often a painful process. They are hard to test, tidious to configure, and tend to break when running on local servers. If you are having issues running **bell** locally, you might want to look at the `isSecure` and `isSameSite` options. Since most people don't run TLS on their local test server, `isSecure` must be set to `false` to remove the TLS requirement. `isSameSite` might need to be set to `'Lax'` in some cases.
+
+You should also review the default scope set for each provider early in your implementation. The default scope is meant to get the minimal permissions needed to perform simple user login. In most cases, you would want to ask for more permissions as the default often does not provide access to most API calls provided by the third-party services.
+
 ### Usage
 
 **bell** works by adding a login endpoint and setting it to use a **bell**-based authentication
