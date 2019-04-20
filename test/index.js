@@ -1,11 +1,11 @@
 'use strict';
 
-const Bell = require('../');
-const Boom = require('boom');
-const Code = require('code');
-const Hapi = require('hapi');
-const Hoek = require('hoek');
-const Lab = require('lab');
+const Bell = require('..');
+const Boom = require('@hapi/boom');
+const Code = require('@hapi/code');
+const Hapi = require('@hapi/hapi');
+const Hoek = require('@hapi/hoek');
+const Lab = require('@hapi/lab');
 
 const Mock = require('./mock');
 

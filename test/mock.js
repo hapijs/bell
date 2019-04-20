@@ -2,12 +2,12 @@
 
 const Querystring = require('querystring');
 
-const Boom = require('boom');
-const Code = require('code');
-const Hapi = require('hapi');
-const Hawk = require('hawk');
-const Teamwork = require('teamwork');
-const Wreck = require('wreck');
+const Boom = require('@hapi/boom');
+const Code = require('@hapi/code');
+const Hapi = require('@hapi/hapi');
+const Hawk = require('@hapi/hawk');
+const Teamwork = require('@hapi/teamwork');
+const Wreck = require('@hapi/wreck');
 
 
 const internals = {

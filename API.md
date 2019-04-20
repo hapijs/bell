@@ -18,8 +18,8 @@ session management. A common solution is to combine **bell** with the
 ```js
 // Load modules
 
-const Bell = require('bell');
-const Hapi = require('hapi');
+const Bell = require('@hapi/bell');
+const Hapi = require('@hapi/hapi');
 
 
 // Declare internals

@@ -1,10 +1,10 @@
-# **bell**
+<a href="http://hapijs.com"><img src="https://github.com/hapijs/assets/blob/master/images/family.svg" width="180px" align="right" /></a>
+
+# bell
 
 Third-party authentication plugin for [hapi](https://github.com/hapijs/hapi).
 
-Lead Maintainer: [Adri Van Houdt](https://github.com/adrivanhoudt)
-
-[![Build Status](https://secure.travis-ci.org/hapijs/bell.png)](http://travis-ci.org/hapijs/bell)
+[![Build Status](https://secure.travis-ci.org/hapijs/bell.svg?branch=v9)](http://travis-ci.org/hapijs/bell)
 
 **bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`,
 `Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`,
@@ -34,8 +34,8 @@ Twitter:
 ```js
 // Load modules
 
-const Bell = require('bell');
-const Hapi = require('hapi');
+const Bell = require('@hapi/bell');
+const Hapi = require('@hapi/hapi');
 
 
 // Declare internals

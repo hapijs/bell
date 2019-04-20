@@ -1,5 +1,5 @@
 {
-  "name": "bell",
+  "name": "@hapi/bell",
   "description": "Third-party login plugin for hapi",
   "version": "9.5.0",
   "repository": "git://github.com/hapijs/bell",
@@ -38,23 +38,23 @@
     "yahoo"
   ],
   "dependencies": {
-    "boom": "7.x.x",
-    "bounce": "1.x.x",
-    "cryptiles": "4.x.x",
-    "hoek": "6.x.x",
-    "joi": "14.x.x",
-    "wreck": "14.x.x"
+    "@hapi/boom": "7.x.x",
+    "@hapi/bounce": "1.x.x",
+    "@hapi/cryptiles": "4.x.x",
+    "@hapi/hoek": "6.x.x",
+    "@hapi/joi": "15.x.x",
+    "@hapi/wreck": "15.x.x"
   },
   "devDependencies": {
-    "code": "5.x.x",
-    "hapi": "17.x.x",
-    "hawk": "7.x.x",
-    "lab": "18.x.x",
-    "teamwork": "3.x.x"
+    "@hapi/code": "5.x.x",
+    "@hapi/hapi": "17.x.x",
+    "@hapi/hawk": "7.x.x",
+    "@hapi/lab": "18.x.x",
+    "@hapi/teamwork": "3.x.x"
   },
   "scripts": {
-    "test": "lab -a code -t 100 -L -m 3000",
-    "test-cov-html": "lab -a code -r html -o coverage.html -m 3000"
+    "test": "lab -a @hapi/code -t 100 -L -m 3000",
+    "test-cov-html": "lab -a @hapi/code -r html -o coverage.html -m 3000"
   },
   "license": "BSD-3-Clause"
 }
