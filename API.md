@@ -1,5 +1,15 @@
 ## API
 
+- [Usage](#usage)
+- [Options](#options)
+- [Advanced usage](#advanced-usage)
+  - [Configuration via Environment Variables](#configuration-via-environment-variables)
+  - [Handling Errors](#handling-errors)
+  - [Token Refresh](#token-refresh)
+  - [Simulated authentication](#simulated-authentication)
+- [Usage without a strategy](#usage-without-a-strategy)
+- [Customized scope and params](#customized-scope-and-params)
+
 ### Usage
 
 **bell** works by adding a login endpoint and setting it to use a **bell**-based authentication
