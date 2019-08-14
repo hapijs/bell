@@ -4,7 +4,7 @@
 
 Third-party authentication plugin for [hapi](https://github.com/hapijs/hapi).
 
-[![Build Status](https://secure.travis-ci.org/hapijs/bell.svg?branch=master)](http://travis-ci.org/hapijs/bell)
+[![Build Status](https://secure.travis-ci.org/hapijs/bell.svg?branch=master)](http://travis-ci.org/hapijs/bell) [![Greenkeeper badge](https://badges.greenkeeper.io/hapijs/bell.svg)](https://greenkeeper.io/)
 
 **bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`,
 `Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`,
