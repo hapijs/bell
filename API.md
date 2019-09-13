@@ -17,18 +17,10 @@ You should also review the default scope set for each provider early in your imp
 
 ### Usage
 
-**bell** works by adding a login endpoint and setting it to use a **bell**-based authentication
-strategy. **bell** will manage the third-party authentication flow and will only call the handler
-if the user successfully authenticated. The handler function is then used to examine the
-third-party credentials (e.g. lookup an existing account or offer a registration page), setup an
-active session, and redirect to the actual application.
+**bell** works by adding a login endpoint and setting it to use a **bell**-based authentication strategy. **bell** will manage the third-party authentication flow and will only call the handler if the user successfully authenticated. The handler function is then used to examine the third-party credentials (e.g. lookup an existing account or offer a registration page), setup an active session, and redirect to the actual application.
 
-**bell** does not maintain a session beyond a temporary state between the authorization flow. If a
-user authenticated once when accessing the endpoint, they will have to authenticate again. This
-means **bell** cannot be used alone as a login system except for single-page applications that
-require loading a single resource. Once the handler is called, the application must set its own
-session management. A common solution is to combine **bell** with the
-[**hapi-auth-cookie**](https://github.com/hapijs/hapi-auth-cookie) authentication scheme plugin.
+**bell** does not maintain a session beyond a temporary state between the authorization flow. If a user authenticated once when accessing the endpoint, they will have to authenticate again. This means **bell** cannot be used alone as a login system except for single-page applications that require loading a single resource. Once the handler is called, the application must set its own
+session management. A common solution is to combine **bell** with the [**hapi-auth-cookie**](https://github.com/hapijs/hapi-auth-cookie) authentication scheme plugin.
 
 ```js
 // Load modules
@@ -100,10 +92,10 @@ internals.start();
 
 The `server.auth.strategy()` method requires the following strategy options:
 
-- `provider` - the name of the third-party provider (`'auth0'`, `'azuread'`, `'bitbucket'`,
+- `provider` - the name of the third-party provider (`'auth0'`, `'azure'`, `'bitbucket'`,
   `'dropbox'`, `'facebook'`, `'fitbit'`, `'foursquare'`, `'github'`, `'google'`, `'googleplus'`,
   `'instagram'`, `'linkedin'`, `'live'`, `'twitter'`, `'vk'`, `'arcgisonline'`, `'yahoo'`,
-  `'nest'`, `'phabricator'`, `'office365'`, `'pinterest'`) or an object containing a custom
+  `'nest'`, `'phabricator'`, `'pinterest'`) or an object containing a custom
   provider with the following:
 
     - `protocol` - the authorization protocol used. Must be one of:
