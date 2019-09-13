@@ -11,7 +11,7 @@ internals.start = async function () {
 
     const server = Hapi.server({ port: 8000 });
     await server.register(Bell);
-    
+
     // You will need github account for setting up an application and get a clientID and ClientSecret
     // This is a helpful tutorial for the whole process: https://developer.github.com/apps/building-github-apps/creating-a-github-app/
     // This guide will help you set up your app and generate ID and secret.
