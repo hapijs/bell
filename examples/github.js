@@ -19,7 +19,7 @@ internals.start = async function () {
     server.auth.strategy('github', 'bell', {
         provider: 'github',
         password: 'cookie_encryption_password_secure',
-        isSecure: false,
+        isSecure: false,                                    // For testing or in environments secured via other means
         clientId: '',
         clientSecret: '',
         location: 'https://example.com',
