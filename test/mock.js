@@ -196,6 +196,10 @@ exports.v2 = async function (flags, options = {}) {
                         expires_in: 3600
                     };
 
+                    if (request.payload.code_verifier) {
+                        payload.code_verifier = request.payload.code_verifier;
+                    }
+
                     if (code.client_id === 'instagram') {
                         payload.user = {
                             id: '123456789',

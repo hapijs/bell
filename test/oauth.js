@@ -1,5 +1,7 @@
 'use strict';
 
+const Crypto = require('crypto');
+
 const Bell = require('..');
 const Boom = require('@hapi/boom');
 const Code = require('@hapi/code');
@@ -1224,6 +1226,101 @@ describe('Bell', () => {
 
             const res = await server.inject('/login?runtime=5');
             expect(res.headers.location).to.contain(mock.uri + '/auth?special=true&runtime=5&client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
+        });
+
+        it('authenticates an endpoint via oauth with plain PKCE', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const provider = Hoek.merge({ pkce: 'plain' }, mock.provider);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.artifacts;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
+            expect(res1.headers.location).to.contain('code_challenge=');
+            expect(res1.headers.location).to.contain('code_challenge_method=plain');
+
+            const res2 = await mock.server.inject(res1.headers.location);
+            expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result.code_verifier).to.be.a.string();
+            expect(res1.headers.location).to.contain(res3.result.code_verifier);
+        });
+
+        it('authenticates an endpoint via oauth with S256 PKCE', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const provider = Hoek.merge({ pkce: 'S256' }, mock.provider);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.artifacts;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?state=something');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
+            expect(res1.headers.location).to.contain('code_challenge=');
+            expect(res1.headers.location).to.contain('code_challenge_method=S256');
+
+            const res2 = await mock.server.inject(res1.headers.location);
+            expect(res2.headers.location).to.contain('http://localhost:8080/login?code=1&state=');
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result.code_verifier).to.be.a.string();
+
+            const hash = Crypto.createHash('sha256')
+                .update(res3.result.code_verifier, 'ascii')
+                .digest('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+
+            expect(res1.headers.location).to.contain(hash);
+
         });
 
         it('allows runtime state', async (flags) => {
