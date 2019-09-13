@@ -42,7 +42,7 @@
     "@hapi/bounce": "1.x.x",
     "@hapi/cryptiles": "4.x.x",
     "@hapi/hoek": "8.x.x",
-    "@hapi/joi": "15.x.x",
+    "@hapi/joi": "16.x.x",
     "@hapi/wreck": "15.x.x"
   },
   "devDependencies": {
