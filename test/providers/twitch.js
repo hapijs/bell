@@ -34,7 +34,7 @@ describe('twitch', () => {
             email: 'kappa@example.com'
         };
 
-        Mock.override('https://api.twitch.tv/kraken/user', profile);
+        Mock.override('https://api.twitch.tv/helix/users', { data: [profile] });
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
