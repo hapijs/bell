@@ -36,7 +36,7 @@ describe('dropbox', () => {
             email: 'steve@example.com'
         };
 
-        Mock.override('https://api.dropbox.com/1/account/info', profile);
+        Mock.override('https://api.dropboxapi.com/2/users/get_current_account', profile);
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',

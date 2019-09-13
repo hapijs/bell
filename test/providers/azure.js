@@ -16,29 +16,29 @@ const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
-describe('azuread', () => {
+describe('azure', () => {
 
     it('authenticates with mock Azure AD', async (flags) => {
 
         const profile = {
-            oid: '1234567890',
-            name: 'Sample AD User',
-            upn: 'sample@microsoft.com'
+            id: '1234567890',
+            displayName: 'Sample AD User',
+            userPrincipalName: 'sample@microsoft.com'
         };
 
         const mock = await Mock.v2(flags);
         const server = Hapi.server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        const custom = Bell.providers.azuread();
+        const custom = Bell.providers.azure();
         Hoek.merge(custom, mock.provider);
 
-        Mock.override('https://login.microsoftonline.com/common/openid/userinfo', profile);
+        Mock.override('https://graph.microsoft.com/v1.0/me', profile);
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
             isSecure: false,
-            clientId: 'azuread',
+            clientId: 'azure',
             clientSecret: 'secret',
             provider: custom
         });
@@ -79,24 +79,24 @@ describe('azuread', () => {
     it('authenticates with mock Azure AD email', async (flags) => {
 
         const profile = {
-            oid: '1234567890',
-            name: 'Sample AD User',
-            email: 'sample@microsoft.com'
+            id: '1234567890',
+            displayName: 'Sample AD User',
+            mail: 'sample@microsoft.com'
         };
 
         const mock = await Mock.v2(flags);
         const server = Hapi.server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        const custom = Bell.providers.azuread();
+        const custom = Bell.providers.azure();
         Hoek.merge(custom, mock.provider);
 
-        Mock.override('https://login.microsoftonline.com/common/openid/userinfo', profile);
+        Mock.override('https://graph.microsoft.com/v1.0/me', profile);
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
             isSecure: false,
-            clientId: 'azuread',
+            clientId: 'azure',
             clientSecret: 'secret',
             provider: custom
         });
@@ -140,21 +140,21 @@ describe('azuread', () => {
         const server = Hapi.server({ host: 'localhost', port: 80 });
         await server.register(Bell);
 
-        const custom = Bell.providers.azuread({ tenant: 'abc-def-ghi' });
+        const custom = Bell.providers.azure({ tenant: 'abc-def-ghi' });
         Hoek.merge(custom, mock.provider);
 
         const profile = {
-            oid: '1234567890',
-            name: 'Sample AD User',
-            upn: 'sample@microsoft.com'
+            id: '1234567890',
+            displayName: 'Sample AD User',
+            mail: 'sample@microsoft.com'
         };
 
-        Mock.override('https://login.microsoftonline.com/abc-def-ghi/openid/userinfo', profile);
+        Mock.override('https://graph.microsoft.com/v1.0/me', profile);
 
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
             isSecure: false,
-            clientId: 'azuread',
+            clientId: 'azure',
             clientSecret: 'secret',
             provider: custom
         });

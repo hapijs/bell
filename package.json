@@ -1,7 +1,7 @@
 {
   "name": "@hapi/bell",
   "description": "Third-party login plugin for hapi",
-  "version": "10.1.0",
+  "version": "10.1.1",
   "repository": "git://github.com/hapijs/bell",
   "main": "lib/index.js",
   "keywords": [
@@ -41,15 +41,15 @@
     "@hapi/boom": "7.x.x",
     "@hapi/bounce": "1.x.x",
     "@hapi/cryptiles": "4.x.x",
-    "@hapi/hoek": "6.x.x",
-    "@hapi/joi": "15.x.x",
+    "@hapi/hoek": "8.x.x",
+    "@hapi/joi": "16.x.x",
     "@hapi/wreck": "15.x.x"
   },
   "devDependencies": {
-    "@hapi/code": "5.x.x",
+    "@hapi/code": "6.x.x",
     "@hapi/hapi": "18.x.x",
     "@hapi/hawk": "7.x.x",
-    "@hapi/lab": "18.x.x",
+    "@hapi/lab": "20.x.x",
     "@hapi/teamwork": "3.x.x"
   },
   "scripts": {
