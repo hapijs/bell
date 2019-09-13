@@ -111,6 +111,30 @@ credentials.profile = {
 };
 ```
 
+### Cognito
+
+[Provider Documentation](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html)
+
+- `scope`: Defaults to `['openid', 'email', 'profile']`
+- `config`:
+  - `uri`: Point to your Cognito user pool uri.  Intentionally no default as Cognito is organization specific.
+- `auth`: https://your-cognito-user-pool.amazoncognito.com/oauth2/authorize
+- `token`: https://your-cognito-user-pool.amazoncognito.com/oauth2/token
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.sub,
+    username: profile.preferred_username,
+    displayName: profile.name,
+    firstName: profile.given_name,
+    lastName: profile.family_name,
+    email: profile.email,
+    raw: profile
+};
+```
+
 ### DigitalOcean
 
 [Provider Documentation](https://developers.digitalocean.com/documentation/oauth)
@@ -499,6 +523,28 @@ credentials.profile = {
 };
 ```
 
+### Pingfed
+
+[Provider Documentation](https://www.pingidentity.com/content/developer/en/resources/openid-connect-developers-guide.html)
+
+- `scope`: Defaults to `['openid', 'email']`
+- `config`:
+  - `uri`: Point to your Pingfederate enterprise uri.  Intentionally no default as Ping is organization specific.
+- `auth`: https://www.example.com:9031/as/authorization.oauth2
+- `token`: https://www.example.com:9031/as/token.oauth2
+
+The default profile response will look like this:
+
+```javascript
+credentials.profile = {
+    id: profile.sub,
+    username: profile.email,
+    displayName: profile.email,
+    email: profile.email,
+    raw: profile
+};
+```
+
 ### Pinterest
 
 [Provider Documentation](https://developers.pinterest.com/docs/api/overview/)
@@ -817,7 +863,7 @@ credentials.profile = {
 
 - `scope`: Defaults to `['openid', 'email', 'offline_access']`
 - `config`:
-  - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific..
+  - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific.
 - `auth`: https://your-organization.okta.com/oauth2/v1/authorize
 - `token`: https://your-organization.okta.com/oauth2/v1/token
 

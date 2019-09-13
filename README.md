@@ -6,11 +6,12 @@ Third-party authentication plugin for [hapi](https://github.com/hapijs/hapi).
 
 [![Build Status](https://secure.travis-ci.org/hapijs/bell.svg?branch=master)](http://travis-ci.org/hapijs/bell)
 
-**bell** ships with built-in support for authentication using `Facebook`, `GitHub`, `Google`,
-`Google Plus`, `Instagram`, `LinkedIn`, `Slack`, `Stripe`, `Twitter`, `Yahoo`, `Foursquare`,
-`VK`, `ArcGIS Online`, `Windows Live`, `Nest`, `Phabricator`, `BitBucket`, `Dropbox`, `Reddit`,
-`Tumblr`, `Twitch`, `Mixer`, `Salesforce`, `Pinterest`, `Discord`, `DigitalOcean`, `AzureAD`,
-`trakt.tv` and `Okta`.
+**bell** ships with built-in support for authentication using `ArcGIS Online`, `Auth0`, `AzureAD`,
+`BitBucket`, `Cognito`, `DigitalOcean`, `Discord`, `Dropbox`, `Facebook`, `Fitbit`, `Foursquare`,
+`GitHub`, `GitLab`, `Google Plus`, `Google`, `Instagram`, `LinkedIn`, `Medium`, `Meetup`, `Mixer`,
+`Nest`, `Office365`, `Okta`, `Phabricator`, `Pingfed`, `Pinterest`, `Reddit`, `Salesforce`, `Slack`,
+`Spotify`, `Stripe`, `trakt.tv`, `Tumblr`, `Twitch`, `Twitter`, `VK`, `Wordpress`, `Windows Live`,
+and `Yahoo`.
 
 It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple
 configuration object.
