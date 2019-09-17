@@ -1,4 +1,3 @@
-# API
 
 - [Notes](#notes)
 - [Usage](#usage)
@@ -7,7 +6,7 @@
 - [Usage without a strategy](#usage-without-a-strategy)
 - [Customized scope and params](#customized-scope-and-params)
 
-## Bell
+## bell
 
 ### Notes
 
