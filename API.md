@@ -1,13 +1,4 @@
 
-- [Notes](#notes)
-- [Usage](#usage)
-- [Options](#options)
-- [Advanced usage](#advanced-usage)
-- [Usage without a strategy](#usage-without-a-strategy)
-- [Customized scope and params](#customized-scope-and-params)
-
-## bell
-
 ### Notes
 
 Testing third-party authorization is often a painful process. They are hard to test, tidious to configure, and tend to break when running on local servers. If you are having issues running **bell** locally, you might want to look at the `isSecure` and `isSameSite` options. Since most people don't run TLS on their local test server, `isSecure` must be set to `false` to remove the TLS requirement. `isSameSite` might need to be set to `'Lax'` in some cases.
