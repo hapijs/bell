@@ -878,6 +878,22 @@ credentials.profile = {
 };
 ```
 
+### Weixin
+
+[Provider Documentation](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html)
+
+
+- `scope`: Defaults to `'snsapi_login'`
+- `config`: not applicable
+- `auth`: https://open.weixin.qq.com/connect/qrconnect
+- `token`: https://api.weixin.qq.com/sns/oauth2/access_token
+
+The default profile response will look like this:
+
+```javascript
+// default profile response from Twitch
+```
+
 ## Writing a new provider
 
 When writing a new provider see existing implementations (in `lib/providers`) for reference as well as any documentation provided by your provider. You may want to support `uri` or `extendedProfile` options depending on your needs.
