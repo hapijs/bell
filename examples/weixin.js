@@ -21,7 +21,7 @@ internals.start = async function () {
         isSecure: false,
         // isHttpOnly: false,
         clientId: '',
-        clientSecret: '',
+        clientSecret: ''
         // location: 'http://localhost:8000/bell/door'
     });
 
@@ -38,7 +38,8 @@ internals.start = async function () {
                 mode: 'try'
             },
             handler: function (request, h) {
-                console.log(request)
+
+                console.log(request);
                 if (!request.auth.isAuthenticated) {
                     return 'Authentication failed due to: ' + request.auth.error.message;
                 }
