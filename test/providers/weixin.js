@@ -42,12 +42,17 @@ describe('weixin', () => {
 
         Mock.override('https://api.weixin.qq.com/sns/userinfo', profile);
 
+        // https://open.weixin.qq.com/connect/qrconnect?appid=weixin&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%2Flogin&state=7FRA7Pmis15gRaCjfLc761&scope=snsapi_login
+        // const  = {}
+        // Mock.override('https://open.weixin.qq.com/connect/qrconnect', profile);
+
         server.auth.strategy('custom', 'bell', {
             password: 'cookie_encryption_password_secure',
             isSecure: false,
             clientId: 'weixin',
             clientSecret: 'secret',
-            provider: custom
+            // provider: custom
+            provider: 'weixin'
         });
 
         server.route({
@@ -63,18 +68,21 @@ describe('weixin', () => {
         });
 
         const res1 = await server.inject('/login');
+
         const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+        // const res2 = await mock.server.inject(res1.headers.location);
+        const state = res1.headers.location.match(/state=(\S*)&scope/)[1];
+        const location = 'http://localhost/login?code=1&state=' + state;
 
-        const res2 = await mock.server.inject(res1.headers.location);
-
-        const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
-        expect(res3.result).to.equal({
-            provider: 'custom',
-            token: '456',
-            expiresIn: 3600,
-            refreshToken: undefined,
-            query: {},
-            profile
-        });
+        const res3 = await server.inject({ url: location, headers: { cookie } });
+        expect(res3.statusCode).to.equal(200);
+        // expect(res3.result).to.equal({
+        //     provider: 'custom',
+        //     token: '456',
+        //     expiresIn: 3600,
+        //     refreshToken: undefined,
+        //     query: {},
+        //     profile
+        // });
     });
 });

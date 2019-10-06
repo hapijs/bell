@@ -35,7 +35,8 @@
     "twitter",
     "vk",
     "wordpress",
-    "yahoo"
+    "yahoo",
+    "weixin"
   ],
   "dependencies": {
     "@hapi/boom": "7.x.x",
