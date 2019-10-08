@@ -1,4 +1,93 @@
 
+### Introduction
+
+**bell** ships with built-in support for authentication using `ArcGIS Online`, `Auth0`, `AzureAD`,
+`BitBucket`, `Cognito`, `DigitalOcean`, `Discord`, `Dropbox`, `Facebook`, `Fitbit`, `Foursquare`,
+`GitHub`, `GitLab`, `Google Plus`, `Google`, `Instagram`, `LinkedIn`, `Medium`, `Meetup`, `Mixer`,
+`Nest`, `Office365`, `Okta`, `Phabricator`, `Pingfed`, `Pinterest`, `Reddit`, `Salesforce`, `Slack`,
+`Spotify`, `Stripe`, `trakt.tv`, `Tumblr`, `Twitch`, `Twitter`, `VK`, `Wordpress`, `Windows Live`,
+and `Yahoo`.
+
+It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple
+configuration object.
+
+[**Providers Documentation**](Providers.md)
+
+### Tutorials
+
+[**Social Login with Twitter using hapi.js**](http://mph-web.de/social-signup-with-twitter-using-hapi-js/)
+
+### Examples
+
+[**All Examples**](/examples)
+
+Twitter:
+
+```js
+// Load modules
+
+const Bell = require('@hapi/bell');
+const Hapi = require('@hapi/hapi');
+
+
+// Declare internals
+
+const internals = {};
+
+
+internals.start = async function () {
+
+    const server = Hapi.server({ port: 8000 });
+
+    // Register bell with the server
+
+    await server.register(Bell);
+
+    // Declare an authentication strategy using the bell scheme
+    // with the name of the provider, cookie encryption password,
+    // and the OAuth client credentials.
+
+    server.auth.strategy('twitter', 'bell', {
+        provider: 'twitter',
+        password: 'cookie_encryption_password_secure',
+        clientId: 'my_twitter_client_id',
+        clientSecret: 'my_twitter_client_secret',
+        isSecure: false     // Terrible idea but required if not using HTTPS especially if developing locally
+    });
+
+    // Use the 'twitter' authentication strategy to protect the
+    // endpoint handling the incoming authentication credentials.
+    // This endpoint usually looks up the third party account in
+    // the database and sets some application state (cookie) with
+    // the local application account information.
+
+    server.route({
+        method: ['GET', 'POST'],    // Must handle both GET and POST
+        path: '/login',             // The callback endpoint registered with the provider
+        options: {
+            auth: 'twitter',
+            handler: function (request, h) {
+
+                if (!request.auth.isAuthenticated) {
+                    return `Authentication failed due to: ${request.auth.error.message}`;
+                }
+
+                // Perform any account lookup or registration, setup local session,
+                // and redirect to the application. The third-party credentials are
+                // stored in request.auth.credentials. Any query parameters from
+                // the initial request are passed back via request.auth.credentials.query.
+
+                return h.redirect('/home');
+            }
+        }
+    });
+
+    await server.start();
+};
+
+internals.start();
+```
+
 ### Notes
 
 Testing third-party authorization is often a painful process. They are hard to test, tidious to configure, and tend to break when running on local servers. If you are having issues running **bell** locally, you might want to look at the `isSecure` and `isSameSite` options. Since most people don't run TLS on their local test server, `isSecure` must be set to `false` to remove the TLS requirement. `isSameSite` might need to be set to `'Lax'` in some cases.
@@ -10,7 +99,7 @@ You should also review the default scope set for each provider early in your imp
 **bell** works by adding a login endpoint and setting it to use a **bell**-based authentication strategy. **bell** will manage the third-party authentication flow and will only call the handler if the user successfully authenticated. The handler function is then used to examine the third-party credentials (e.g. lookup an existing account or offer a registration page), setup an active session, and redirect to the actual application.
 
 **bell** does not maintain a session beyond a temporary state between the authorization flow. If a user authenticated once when accessing the endpoint, they will have to authenticate again. This means **bell** cannot be used alone as a login system except for single-page applications that require loading a single resource. Once the handler is called, the application must set its own
-session management. A common solution is to combine **bell** with the [**hapi-auth-cookie**](https://github.com/hapijs/hapi-auth-cookie) authentication scheme plugin.
+session management. A common solution is to combine **bell** with the [**@hapi/cookie**](https://hapi.dev/family/cookie) authentication scheme plugin.
 
 ```js
 // Load modules
