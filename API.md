@@ -11,7 +11,7 @@ and `Yahoo`.
 It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple
 configuration object.
 
-[**Providers Documentation**](Providers.md)
+[**Providers Documentation**](https://github.com/hapijs/bell/blob/master/Providers.md)
 
 ### Tutorials
 
@@ -19,7 +19,7 @@ configuration object.
 
 ### Examples
 
-[**All Examples**](/examples)
+[**All Examples**](https://github.com/hapijs/bell/tree/master/examples)
 
 Twitter:
 
@@ -263,7 +263,7 @@ Each strategy accepts the following optional settings:
         - `getMethod`
     - GitHub and Phabricator:
         - `uri` - allows pointing to a private enterprise installation (e.g.
-          `'https://vpn.example.com'`). See [Providers documentation](Providers.md) for more
+          `'https://vpn.example.com'`). See [Providers documentation](https://github.com/hapijs/bell/blob/master/Providers.md) for more
           information.
 - `profileParams` - an object of key-value pairs that specify additional URL query parameters to
   send with the profile request to the provider. The built-in `facebook` provider, for example,
@@ -288,7 +288,7 @@ to the nature of the OAuth protocol. There is little that can be done to recover
 almost all of them are caused by implementation or deployment issues.
 
 If you would like to display a useful error page instead of the default JSON response, use the
-**hapi** [`onPreResponse`](http://hapijs.com/api#error-transformation) extension point to transform
+**hapi** [`onPreResponse`](https://hapi.dev/api#error-transformation) extension point to transform
 the error into a useful page or to redirect the user to another destination.
 
 Another way to handle authentication errors is within the route handler. By default, an
