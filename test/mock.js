@@ -254,7 +254,7 @@ exports.v2 = async function (flags, options = {}) {
 
 exports.override = function (uri, payload) {
 
-    const team = new Teamwork();
+    const team = new Teamwork.Team();
 
     const override = function (method) {
 

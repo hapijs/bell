@@ -1,8 +1,6 @@
 language: node_js
 
 node_js:
-  - "8"
-  - "10"
   - "12"
   - "node"
 
@@ -10,6 +8,11 @@ sudo: false
 
 install:
   - "npm install"
+  - "npm install @hapi/hapi@$HAPI_VERSION"
+
+env:
+  - HAPI_VERSION="18"
+  - HAPI_VERSION="19"
 
 os:
   - "linux"
