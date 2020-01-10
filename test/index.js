@@ -345,7 +345,7 @@ describe('Bell', () => {
         const server = Hapi.server({ host: 'localhost', port: 8080 });
         await server.register(Bell);
 
-        expect(server.plugins.bell.oauth.Client).to.be.function();
+        expect(server.plugins['@hapi/bell'].oauth.Client).to.be.function();
     });
 
     describe('simulate()', () => {

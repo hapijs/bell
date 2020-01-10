@@ -11,7 +11,7 @@ const internals = {};
 internals.start = async function () {
 
     const server = Hapi.server({ port: 8000 });
-    await server.register([require('hapi-auth-cookie'), Bell]);
+    await server.register([require('@hapi/cookie'), Bell]);
 
     server.auth.strategy('session', 'cookie', {
         password: 'secret_cookie_encryption_password',      // Use something more secure in production
