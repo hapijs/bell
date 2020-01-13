@@ -842,6 +842,7 @@ credentials.profile = {
 - `scope`: Defaults to `['openid', 'email', 'offline_access']`
 - `config`:
   - `uri`: Point to your Okta enterprise uri.  Intentionally no default as Okta is organization specific.
+  - `authorizationServerId`: If you are using a [custom authorization server](https://support.okta.com/help/s/article/Difference-Between-Okta-as-An-Authorization-Server-vs-Custom-Authorization-Server) you need to pass the alphanumeric ID here.
 - `auth`: https://your-organization.okta.com/oauth2/v1/authorize
 - `token`: https://your-organization.okta.com/oauth2/v1/token
 
