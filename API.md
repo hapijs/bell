@@ -11,7 +11,7 @@ and `Yahoo`.
 It also supports any compliant `OAuth 1.0a` and `OAuth 2.0` based login services with a simple
 configuration object.
 
-[**Providers Documentation**](https://github.com/hapijs/bell/blob/master/Providers.md)
+[**Providers Documentation**](https://hapi.dev/family/bell/providers)
 
 ### Tutorials
 
