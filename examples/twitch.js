@@ -27,7 +27,10 @@ internals.start = async function () {
         method: ['GET', 'POST'],
         path: '/bell/door',
         options: {
-            auth: 'twitch',
+            auth: {
+                strategy: 'twitch',
+                mode: 'try'
+            },
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
