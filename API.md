@@ -177,6 +177,7 @@ The `server.auth.strategy()` method requires the following strategy options:
   `'nest'`, `'phabricator'`, `'pinterest'`) or an object containing a custom
   provider with the following:
 
+    - `name` - the custom provider name. Defaults to `custom`.
     - `protocol` - the authorization protocol used. Must be one of:
         - `'oauth'` - OAuth 1.0a
         - `'oauth2'` - OAuth 2.0
@@ -231,7 +232,7 @@ The `server.auth.strategy()` method requires the following strategy options:
 Each strategy accepts the following optional settings:
 
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to
-  `'bell-provider'` where 'provider' is the provider name (or `'custom'` for custom providers). For
+  `'bell-provider'` where 'provider' is the provider name. For
   example, the Twitter cookie name defaults to `'bell-twitter'`.
 - `isSameSite` - sets the cookie same site option. Defaults to `Strict`.
 - `isSecure` - sets the cookie secure flag. Defaults to `true`.
@@ -272,6 +273,50 @@ Each strategy accepts the following optional settings:
 - `runtimeStateCallback` - allows passing additional OAuth state from initial request. This must be
   a function returning a string, which will be appended to the **bell** internal `state` parameter
   for OAuth code flow.
+
+### Authentication information
+On route handlers, the [authentication object](https://hapi.dev/api/#request.auth) may contain one or more of the following properties depending on your route configuration and whether the authentication process was completed successfully or not:
+
+#### Always present
+
+```javascript
+auth.credentials = {
+  provider: String, // provider name
+};
+```
+
+#### Present on successful authentication
+
+##### OAuth protocol
+
+```javascript
+auth.credentials = {
+  token: String,
+  secret: String,
+  query: Object // sign-in request query params
+};
+```
+
+##### OAuth2 protocol
+
+```javascript
+auth.credentials = {
+  token: String,
+  refrehsToken: String,
+  expiresIn: Number,
+  query: Object // sign-in request query params
+};
+
+auth.artifacts = Object; // OAuth token payload response
+```
+
+##### Present on failed authentication (route.auth.mode=try)
+
+```javascript
+auth.credentials = {
+  query: Object // sign-in request query params
+};
+```
 
 ### Advanced Usage
 
