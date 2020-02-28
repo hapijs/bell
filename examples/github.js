@@ -30,7 +30,10 @@ internals.start = async function () {
         method: ['GET', 'POST'],
         path: '/login',
         options: {
-            auth: 'github',
+            auth: {
+                strategy: 'github',
+                mode: 'try'
+            },
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {

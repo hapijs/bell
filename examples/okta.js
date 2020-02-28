@@ -33,7 +33,10 @@ internals.start = async function () {
         method: 'GET',
         path: '/auth/okta',
         options: {
-            auth: 'okta',
+            auth: {
+                strategy: 'okta',
+                mode: 'try'
+            },
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {

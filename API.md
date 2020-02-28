@@ -65,7 +65,10 @@ internals.start = async function () {
         method: ['GET', 'POST'],    // Must handle both GET and POST
         path: '/login',             // The callback endpoint registered with the provider
         options: {
-            auth: 'twitter',
+            auth: {
+              mode: 'try',
+              strategy: 'twitter'
+            },
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
@@ -143,7 +146,10 @@ internals.start = async function () {
         method: ['GET', 'POST'],    // Must handle both GET and POST
         path: '/login',             // The callback endpoint registered with the provider
         options: {
-            auth: 'twitter',
+            auth: {
+              mode: 'try',
+              strategy: 'twitter'
+            },
             handler: function (request, h) {
 
                 if (!request.auth.isAuthenticated) {
