@@ -308,7 +308,7 @@ auth.credentials = {
 ```javascript
 auth.credentials = {
   token: String,
-  refrehsToken: String,
+  refreshToken: String,
   expiresIn: Number,
   query: Object // sign-in request query params
 };
