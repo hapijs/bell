@@ -4,6 +4,9 @@
   "version": "12.0.0",
   "repository": "git://github.com/hapijs/bell",
   "main": "lib/index.js",
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "files": [
     "lib"
   ],
@@ -43,7 +46,7 @@
   "dependencies": {
     "@hapi/boom": "9.x.x",
     "@hapi/bounce": "2.x.x",
-    "@hapi/cryptiles": "5.x.x",
+    "@hapi/cryptiles": "^5.1.0",
     "@hapi/hoek": "9.x.x",
     "@hapi/joi": "17.x.x",
     "@hapi/wreck": "17.x.x"
