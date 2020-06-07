@@ -191,10 +191,13 @@ The `server.auth.strategy()` method requires the following strategy options:
         - `'HMAC-SHA1'` - default
         - `'RSA-SHA1'` - in that case, the `clientSecret` is your RSA private key
     - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only).
+      It may be passed either a string, or a function which takes the client's `request` and returns a string.
     - `useParamsAuth` - boolean that determines if OAuth client id and client secret will be sent
       as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to `false`.
     - `auth` - the authorization endpoint URI.
+      It may be passed either a string, or a function which takes the client's `request` and returns a string.
     - `token` - the access token endpoint URI.
+      It may be passed either a string, or a function which takes the client's `request` and returns a string.
     - `scope` - an array of scope strings (OAuth 2.0 only).
     - `scopeSeparator` - the scope separator character (OAuth 2.0 only). Only required when a
       provider has a broken OAuth 2.0 implementation. Defaults to space (Facebook and GitHub
