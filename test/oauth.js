@@ -2235,6 +2235,12 @@ describe('Bell', () => {
                 expect(OAuth.Client.baseUri('http://example.com:8080/x')).to.equal('http://example.com:8080/x');
                 expect(OAuth.Client.baseUri('https://example.com:8080/x')).to.equal('https://example.com:8080/x');
             });
+
+            it('passes through without port', () => {
+
+                expect(OAuth.Client.baseUri('http://example.com/x')).to.equal('http://example.com/x');
+                expect(OAuth.Client.baseUri('https://example.com/x')).to.equal('https://example.com/x');
+            });
         });
 
         describe('signature()', () => {
