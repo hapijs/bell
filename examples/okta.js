@@ -14,9 +14,12 @@ internals.start = async function () {
     await server.register([require('@hapi/cookie'), Bell]);
 
     server.auth.strategy('session', 'cookie', {
-        password: 'secret_cookie_encryption_password',      // Use something more secure in production
-        redirectTo: '/auth/okta',                           // If there is no session, redirect here
-        isSecure: false                                     // Should be set to true (which is the default) in production
+        cookie: {
+            name: 'sid-okta-example',                            // Cookie name
+            password: 'password-should-be-32-characters',   // Use something more secure in production
+            isSecure: false                                  // Should be set to true (which is the default) in production
+        },
+        redirectTo: '/auth/okta'                           // If there is no session, redirect here
     });
 
     server.auth.strategy('okta', 'bell', {
