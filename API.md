@@ -226,6 +226,8 @@ The `server.auth.strategy()` method requires the following strategy options:
   object will be merged with the Wreck request object used to call the token endpoint. Such an
   object can contain custom HTTP headers or TLS options (e.g.
   `{ agent: new Https.Agent({ cert: myClientCert, key: myClientKey}) }`).
+  To allow dynamically updating secret, this option can be passed as a *function* returning string
+  to be used as `clientSecret`.
 - `forceHttps` - A boolean indicating whether or not you want the redirect_uri to be forced to
   https. Useful if your hapi application runs as http, but is accessed through https.
 - `location` - Set the base redirect_uri manually if it cannot be inferred properly from server
