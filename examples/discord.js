@@ -12,7 +12,7 @@ internals.start = async function () {
     const server = Hapi.server({ port: 8000 });
     await server.register(Bell);
 
-    // Fill in your clientId and clientSecret: https://discordapp.com/developers/applications/me
+    // Fill in your clientId and clientSecret: https://discord.com/developers/applications/me
 
     server.auth.strategy('discord', 'bell', {
         provider: 'discord',
