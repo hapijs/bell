@@ -136,12 +136,12 @@ credentials.profile = {
 
 ### Discord
 
-[Provider Documentation](https://discordapp.com/developers/docs/topics/oauth2)
+[Provider Documentation](https://discord.com/developers/docs/topics/oauth2)
 
 - `scope`: Defaults to `['email', 'identify']`
 - `config`: not applicable
-- `auth`: https://discordapp.com/api/oauth2/authorize
-- `token`: https://discordapp.com/api/oauth2/token
+- `auth`: https://discord.com/api/oauth2/authorize
+- `token`: https://discord.com/api/oauth2/token
 
 The default profile response will look like this:
 
@@ -155,7 +155,7 @@ credentials.profile = {
     verified: profile.verified,
     avatar: {
         id: profile.avatar,
-        url: 'https://discordapp.com/api/users/' + profile.id + '/avatars/' + profile.avatar + '.jpg'
+        url: 'https://discord.com/api/users/' + profile.id + '/avatars/' + profile.avatar + '.jpg'
     },
     raw: profile
 };

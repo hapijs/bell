@@ -27,14 +27,14 @@ describe('discord', () => {
         const custom = Bell.providers.discord();
         Hoek.merge(custom, mock.provider);
 
-        Mock.override('https://discordapp.com/api/users/@me', {
+        Mock.override('https://discord.com/api/users/@me', {
             id: '80351110224678912',
             username: 'Nelly',
             discriminator: '1337',
             mfa_enabled: false,
             avatar: '8342729096ea3675442027381ff50dfe',
             verified: true,
-            email: 'nelly@discordapp.com'
+            email: 'nelly@discord.com'
         });
 
         server.auth.strategy('custom', 'bell', {
@@ -79,7 +79,7 @@ describe('discord', () => {
                     url: 'https://cdn.discordapp.com/avatars/80351110224678912/8342729096ea3675442027381ff50dfe.png'
                 },
                 verified: true,
-                email: 'nelly@discordapp.com',
+                email: 'nelly@discord.com',
                 raw: {
                     id: '80351110224678912',
                     username: 'Nelly',
@@ -87,7 +87,7 @@ describe('discord', () => {
                     mfa_enabled: false,
                     avatar: '8342729096ea3675442027381ff50dfe',
                     verified: true,
-                    email: 'nelly@discordapp.com'
+                    email: 'nelly@discord.com'
                 }
             }
         });
