@@ -2150,6 +2150,12 @@ describe('Bell', () => {
             expect(client.settings.clientSecret).to.equal('&');
         });
 
+        it('supports wreck options', async () => {
+
+            const client = new OAuth.Client({ provider: Bell.providers.twitter(), wreck: { baseUrl: 'http://hapi.dev/' } });
+            await expect(client._request('get', '/', null, { oauth_token: 'xcv' }, { secret: 'secret', desc: 'type', stream: true })).to.not.reject();
+        });
+
         describe('_request()', () => {
 
             it('errors on failed request', async () => {
