@@ -5,7 +5,7 @@
   "repository": "git://github.com/hapijs/bell",
   "main": "lib/index.js",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "files": [
     "lib"
@@ -49,20 +49,20 @@
     ]
   },
   "dependencies": {
-    "@hapi/boom": "9.x.x",
-    "@hapi/bounce": "2.x.x",
-    "@hapi/cryptiles": "^5.1.0",
-    "@hapi/hoek": "9.x.x",
-    "@hapi/wreck": "17.x.x",
-    "joi": "17.x.x"
+    "@hapi/boom": "^10.0.0",
+    "@hapi/bounce": "^3.0.0",
+    "@hapi/cryptiles": "^6.0.0",
+    "@hapi/hoek": "^10.0.0",
+    "@hapi/wreck": "^18.0.0",
+    "joi": "^17.0.0"
   },
   "devDependencies": {
-    "@hapi/code": "8.x.x",
-    "@hapi/eslint-plugin": "*",
-    "@hapi/hapi": "20.x.x",
-    "@hapi/hawk": "8.x.x",
-    "@hapi/lab": "24.x.x",
-    "@hapi/teamwork": "5.x.x"
+    "@hapi/code": "^9.0.0",
+    "@hapi/eslint-plugin": "^6.0.0",
+    "@hapi/hapi": "^21.0.0-beta.1",
+    "@hapi/hawk": "^8.0.0",
+    "@hapi/lab": "^25.0.1",
+    "@hapi/teamwork": "^6.0.0"
   },
   "scripts": {
     "test": "lab -a @hapi/code -t 100 -L -m 3000",

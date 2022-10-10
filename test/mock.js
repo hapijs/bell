@@ -31,7 +31,7 @@ exports.v1 = async function (flags, options = {}) {
         server: Hapi.server({ host: 'localhost' })
     };
 
-    mock.options.signatureMethod = mock.options.signatureMethod || 'HMAC-SHA1';
+    mock.options.signatureMethod = mock.options.signatureMethod ?? 'HMAC-SHA1';
 
     mock.server.route([
         {
@@ -226,7 +226,7 @@ exports.v2 = async function (flags, options = {}) {
                         payload.id = 'https://login.salesforce.com/id/foo/bar';
                     }
 
-                    return h.response(payload).code(options.code || 200);
+                    return h.response(payload).code(options.code ?? 200);
                 }
             }
         }
@@ -273,7 +273,7 @@ exports.override = function (uri, payload) {
                 }
 
                 if (payload instanceof Error) {
-                    const statusCode = (payload && payload.output ? payload.output.statusCode : 400);
+                    const statusCode = (payload?.output?.statusCode ?? 400);
                     return { res: { statusCode }, payload: JSON.stringify({ message: payload.message }) };
                 }
 
