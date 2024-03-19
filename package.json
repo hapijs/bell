@@ -4,6 +4,7 @@
   "version": "13.0.1",
   "repository": "git://github.com/hapijs/bell",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "engines": {
     "node": ">=14.0.0"
   },
@@ -62,7 +63,8 @@
     "@hapi/hapi": "^21.2.1",
     "@hapi/hawk": "^8.0.0",
     "@hapi/lab": "^25.0.1",
-    "@hapi/teamwork": "^6.0.0"
+    "@hapi/teamwork": "^6.0.0",
+    "typescript": "^5.4.2"
   },
   "scripts": {
     "test": "lab -a @hapi/code -t 100 -L -m 3000",
