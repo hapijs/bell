@@ -1,13 +1,9 @@
-import lab from '@hapi/lab';
-
 import * as Bell from '../..';
 import { Server } from '@hapi/hapi';
 
 async function run() {
     const server = new Server({ port: 8000 });
     await server.register(Bell);
-
-
 
     Bell.simulate(async () => ({}));
     Bell.simulate(() => ({}));
