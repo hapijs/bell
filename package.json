@@ -64,10 +64,11 @@
     "@hapi/hawk": "^8.0.0",
     "@hapi/lab": "^25.0.1",
     "@hapi/teamwork": "^6.0.0",
+    "@types/node": "^20.11.30",
     "typescript": "^5.4.2"
   },
   "scripts": {
-    "test": "lab -a @hapi/code -t 100 -L -m 3000",
+    "test": "lab -a @hapi/code -t 100 -L -m 3000 -Y",
     "test-cov-html": "lab -a @hapi/code -r html -o coverage.html -m 3000"
   },
   "license": "BSD-3-Clause"
