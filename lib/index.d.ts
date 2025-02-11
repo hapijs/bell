@@ -30,7 +30,6 @@ export type Provider =
     | 'live'
     | 'medium'
     | 'meetup'
-    | 'mixer'
     | 'nest'
     | 'okta'
     | 'phabricator'
