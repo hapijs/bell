@@ -126,6 +126,12 @@ export interface OptionalOptions {
         | { uri?: string | undefined }
         | undefined;
     /**
+     * provider-specific query parameters for the token endpoint.
+     * It may be passed either as an object to merge into the query string,
+     * or a function which takes the client's request and returns an object.
+    */
+    tokenParams?: StringLikeMap | ((request: Request) => StringLikeMap) | undefined;
+    /**
      * an object of key-value pairs that specify additional
      * URL query parameters to send with the profile request to the provider.
      * The built-in facebook provider,

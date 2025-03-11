@@ -226,6 +226,10 @@ exports.v2 = async function (flags, options = {}) {
                         payload.id = 'https://login.salesforce.com/id/foo/bar';
                     }
 
+                    if (code.client_id === 'endpoint') {
+                        payload.endpoint = request.payload.endpoint;
+                    }
+
                     return h.response(payload).code(options.code ?? 200);
                 }
             }

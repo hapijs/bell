@@ -37,11 +37,22 @@ credentials.profile = {
 
 [Provider Documentation](https://auth0.com/docs/protocols#oauth-server-side)
 
-- `scope`: not applicable
+- `scope`: Defaults to `['openid', 'email', 'profile']`
 - `config`:
   - `domain`: Your Auth0 domain name, such as `example.auth0.com` or `example.eu.auth0.com`
 - `auth`: [/authorize](https://auth0.com/docs/auth-api#!#get--authorize_social)
 - `token`: [/oauth/token](https://auth0.com/docs/protocols#3-getting-the-access-token)
+
+To create a token for a specific endpoint, add it to the `providerParams` and `tokenParams` options, eg.:
+
+```js
+providerParams: {
+    endpoint: 'https://api.service.com'
+},
+tokenParams: {
+    endpoint: 'https://api.service.com'
+}
+```
 
 To authenticate a user with a specific identity provider directly, use `providerParams`. For example:
 

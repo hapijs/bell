@@ -274,6 +274,10 @@ Each strategy accepts the following optional settings:
         - `uri` - allows pointing to a private enterprise installation (e.g.
           `'https://vpn.example.com'`). See [Providers documentation](https://github.com/hapijs/bell/blob/master/Providers.md) for more
           information.
+- `tokenParams` - provider-specific query parameters for the token endpoint. It may be
+  passed either as an object to merge into the query string, or a function which takes the client's
+  `request` and returns an object. Each provider supports its own set of parameters which customize
+  the user's login experience.
 - `profileParams` - an object of key-value pairs that specify additional URL query parameters to
   send with the profile request to the provider. The built-in `facebook` provider, for example,
   could have `fields` specified to determine the fields returned from the user's graph, which would
