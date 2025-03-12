@@ -344,6 +344,47 @@ describe('Bell', () => {
             expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1&runtime=true');
         });
 
+        it('authenticates an endpoint via oauth with auth provider (function)', async (flags) => {
+
+            const mock = await Mock.v1(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const provider = Hoek.merge(mock.provider, {
+                temporary: (request) => request.query.host + '/temporary',
+                auth: (request) => request.query.host + '/auth',
+                token: (request) => request.query.host + '/token'
+            });
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?host=' + mock.uri);
+
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+            const res2 = await mock.server.inject(res1.headers.location + '&host=' + mock.uri);
+
+            const res3 = await server.inject({ url: res2.headers.location + '&host=' + mock.uri, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+        });
+
         it('authenticates an endpoint via oauth with auth provider parameters', async (flags) => {
 
             const mock = await Mock.v1(flags);
@@ -896,6 +937,46 @@ describe('Bell', () => {
     });
 
     describe('v2()', () => {
+
+        it('authenticates an endpoint with provider (function)', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const provider = Hoek.merge(mock.provider, {
+                auth: (request) => request.query.host + '/auth',
+                token: (request) => request.query.host + '/token'
+            });
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?host=' + mock.uri);
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location + '&host=' + mock.uri);
+
+            const res3 = await server.inject({ url: res2.headers.location + '&host=' + mock.uri, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+        });
 
         it('authenticates an endpoint with provider parameters', async (flags) => {
 
@@ -2238,6 +2319,12 @@ describe('Bell', () => {
 
                 expect(OAuth.Client.baseUri('http://example.com:8080/x')).to.equal('http://example.com:8080/x');
                 expect(OAuth.Client.baseUri('https://example.com:8080/x')).to.equal('https://example.com:8080/x');
+            });
+
+            it('passes through without port', () => {
+
+                expect(OAuth.Client.baseUri('http://example.com/x')).to.equal('http://example.com/x');
+                expect(OAuth.Client.baseUri('https://example.com/x')).to.equal('https://example.com/x');
             });
         });
 
