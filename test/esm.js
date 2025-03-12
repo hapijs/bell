@@ -21,6 +21,7 @@ describe('import()', () => {
 
         expect(Object.keys(Bell)).to.equal([
             'default',
+            ...(process.version.match(/^v(\d+)/)[1] >= 23 ? ['module.exports'] : []),
             'oauth',
             'plugin',
             'providers',
