@@ -1307,6 +1307,84 @@ describe('Bell', () => {
             expect(res3.result).to.include({ endpoint: 'https://test.com' });
         });
 
+        it('authenticates an endpoint token provider parameters as a sync function', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'endpoint',
+                clientSecret: 'secret',
+                provider: mock.provider,
+                tokenParams: (_request) => ({ endpoint: 'https://sync.example.com' })
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.artifacts;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result).to.include({ endpoint: 'https://sync.example.com' });
+        });
+
+        it('authenticates an endpoint token provider parameters as an async function', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'endpoint',
+                clientSecret: 'secret',
+                provider: mock.provider,
+                tokenParams: async (_request) => {
+
+                    await new Promise((resolve) => setTimeout(resolve, 1));
+                    return { endpoint: 'https://async.example.com' };
+                }
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.artifacts;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result).to.include({ endpoint: 'https://async.example.com' });
+        });
+
         it('authenticates an endpoint via oauth with plain PKCE', async (flags) => {
 
             const mock = await Mock.v2(flags);

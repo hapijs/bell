@@ -88,7 +88,7 @@ export interface OptionalOptions {
      * * Twitter supports `force_login`, `screen_name`.
      * * Linkedin supports `fields`.
      */
-    providerParams?: StringLikeMap | ((request: Request) => StringLikeMap) | undefined;
+    providerParams?: StringLikeMap | ((request: Request) => StringLikeMap | Promise<StringLikeMap>) | undefined;
     /**
      * allows passing query parameters from a bell protected endpoint to the auth request.
      * It will merge the query params you pass along with the providerParams and any other predefined ones.
@@ -129,7 +129,7 @@ export interface OptionalOptions {
      * It may be passed either as an object to merge into the query string,
      * or a function which takes the client's request and returns an object.
     */
-    tokenParams?: StringLikeMap | ((request: Request) => StringLikeMap) | undefined;
+    tokenParams?: StringLikeMap | ((request: Request) => StringLikeMap | Promise<StringLikeMap>) | undefined;
     /**
      * an object of key-value pairs that specify additional
      * URL query parameters to send with the profile request to the provider.
