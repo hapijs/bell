@@ -500,6 +500,49 @@ describe('Bell', () => {
             expect(res3.statusCode).to.equal(500);
         });
 
+        it('passes the request to the profile function', async (flags) => {
+
+            const mock = await Mock.v1(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const custom = {
+                ...mock.provider,
+                profile: function (credentials, params, get, request) {
+
+                    credentials.profile = { extra: request.query.extra };
+                }
+            };
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'twitter',
+                clientSecret: 'secret',
+                provider: custom
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            const res3 = await server.inject({ url: res2.headers.location + '&extra=true', headers: { cookie } });
+            expect(res3.result.profile).to.equal({ extra: 'true' });
+        });
+
         it('authenticates with mock Twitter with skip profile', async (flags) => {
 
             const mock = await Mock.v1(flags);
@@ -2207,6 +2250,52 @@ describe('Bell', () => {
             await server.inject({ url: res2.headers.location, headers: { cookie } });
 
             await override;
+        });
+
+        it('passes the request to the profile function', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            const custom = {
+                ...mock.provider,
+                profile: function (credentials, params, get, request) {
+
+                    credentials.profile = JSON.parse(request.query.user);
+                }
+            };
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'custom',
+                clientSecret: 'secret',
+                provider: custom
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login');
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            // Apple only returns the user in the callback query, not from the profile endpoint
+
+            const user = encodeURIComponent(JSON.stringify({ name: 'steve' }));
+            const res3 = await server.inject({ url: res2.headers.location + '&user=' + user, headers: { cookie } });
+            expect(res3.result.profile).to.equal({ name: 'steve' });
         });
 
         it('passes profileParams', async (flags) => {
