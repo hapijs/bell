@@ -190,11 +190,16 @@ The `server.auth.strategy()` method requires the following strategy options:
     - `signatureMethod` - the OAuth signature method (OAuth 1.0a only). Must be one of:
         - `'HMAC-SHA1'` - default
         - `'RSA-SHA1'` - in that case, the `clientSecret` is your RSA private key
-    - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only).
+    - `temporary` - the temporary credentials (request token) endpoint (OAuth 1.0a only). Either a
+      string, or a function taking the request and returning the endpoint (possibly a promise).
     - `useParamsAuth` - boolean that determines if OAuth client id and client secret will be sent
       as parameters as opposed to an Authorization header (OAuth 2.0 only). Defaults to `false`.
-    - `auth` - the authorization endpoint URI.
-    - `token` - the access token endpoint URI.
+    - `auth` - the authorization endpoint URI. Either a string, or a function taking the request
+      and returning the endpoint (possibly a promise).
+    - `token` - the access token endpoint URI. Either a string, or a function taking the request
+      and returning the endpoint (possibly a promise). Note that with `'oauth'`, the function is
+      called on both the sign-in and the callback request, where the query comes from the provider,
+      not from the original sign-in.
     - `scope` - an array of scope strings (OAuth 2.0 only).
     - `scopeSeparator` - the scope separator character (OAuth 2.0 only). Only required when a
       provider has a broken OAuth 2.0 implementation. Defaults to space (Facebook and GitHub

@@ -204,6 +204,12 @@ export interface Credentials2 extends Credentials {
     expiresIn?: number | undefined;
 }
 
+/**
+ * an endpoint URI, or a function of the request returning one.
+ * @param request the hapi request object being authenticated.
+ */
+export type ProviderUri = string | ((request: Request) => string | Promise<string>);
+
 export interface CustomProtocol {
     /**
      * The name of the protocol.
@@ -213,11 +219,11 @@ export interface CustomProtocol {
     /**
      * the authorization endpoint URI.
      */
-    auth: string;
+    auth: ProviderUri;
     /**
      * the access token endpoint URI.
      */
-    token: string;
+    token: ProviderUri;
     /**
      * a headers object with additional headers required by the provider
      * (e.g. GitHub required the 'User-Agent' header which is set by default).
@@ -258,7 +264,7 @@ export interface CustomProtocol1 extends CustomProtocol {
     /**
      * the temporary credentials (request token) endpoint).
      */
-    temporary?: string | undefined;
+    temporary?: ProviderUri | undefined;
 
     profile: ProfileGetter<Credentials1>;
 }

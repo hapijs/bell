@@ -344,6 +344,50 @@ describe('Bell', () => {
             expect(res.headers.location).to.equal(mock.uri + '/auth?oauth_token=1&runtime=true');
         });
 
+        it('authenticates an endpoint via oauth with endpoint functions', async (flags) => {
+
+            const mock = await Mock.v1(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: {
+                    ...mock.provider,
+                    temporary: (request) => request.query.host + '/temporary',
+                    auth: (request) => request.query.host + '/auth',
+                    token: (request) => Promise.resolve(request.query.host + '/token')
+                }
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?host=' + mock.uri);
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res1.headers.location).to.equal(mock.uri + '/auth?oauth_token=1');
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            // The callback query comes from the provider, so the host has to be carried over
+
+            const res3 = await server.inject({ url: res2.headers.location + '&host=' + mock.uri, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result.token).to.equal('final');
+        });
+
         it('authenticates an endpoint via oauth with auth provider parameters', async (flags) => {
 
             const mock = await Mock.v1(flags);
@@ -939,6 +983,49 @@ describe('Bell', () => {
     });
 
     describe('v2()', () => {
+
+        it('authenticates an endpoint with endpoint functions', async (flags) => {
+
+            const mock = await Mock.v2(flags);
+            const server = Hapi.server({ host: 'localhost', port: 8080 });
+            await server.register(Bell);
+
+            server.auth.strategy('custom', 'bell', {
+                password: 'cookie_encryption_password_secure',
+                isSecure: false,
+                clientId: 'test',
+                clientSecret: 'secret',
+                provider: {
+                    ...mock.provider,
+                    auth: (request) => request.query.host + '/auth',
+                    token: (request) => Promise.resolve(request.query.host + '/token')
+                }
+            });
+
+            server.route({
+                method: '*',
+                path: '/login',
+                options: {
+                    auth: 'custom',
+                    handler: function (request, h) {
+
+                        return request.auth.credentials;
+                    }
+                }
+            });
+
+            const res1 = await server.inject('/login?host=' + mock.uri);
+            const cookie = res1.headers['set-cookie'][0].split(';')[0] + ';';
+            expect(res1.headers.location).to.contain(mock.uri + '/auth?client_id=test&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin&state=');
+
+            const res2 = await mock.server.inject(res1.headers.location);
+
+            // The callback query comes from the provider, so the host has to be carried over
+
+            const res3 = await server.inject({ url: res2.headers.location + '&host=' + mock.uri, headers: { cookie } });
+            expect(res3.statusCode).to.equal(200);
+            expect(res3.result.token).to.equal('456');
+        });
 
         it('authenticates an endpoint with provider parameters', async (flags) => {
 
