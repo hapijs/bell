@@ -233,12 +233,14 @@ export interface CustomProtocol {
  * Change the object directly within the function (profile information is typically stored under credentials.profile).
  * @param params the parsed information received from the provider (e.g. token, secret, and other custom fields).
  * @param get an OAuth helper function to make authenticated requests using the credentials received.
+ * @param request the hapi request object of the authorization callback.
  */
 export type ProfileGetter<C extends Credentials> = (
     this: CustomProviderOptions,
     credentials: C,
     params: { [key: string]: string },
     get: AuthedRequest,
+    request: Request,
 ) => Promise<void>;
 
 export interface CustomProtocol1 extends CustomProtocol {

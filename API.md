@@ -204,7 +204,7 @@ The `server.auth.strategy()` method requires the following strategy options:
     - `profileMethod` - `get` or `post` for obtaining user profile by `profile` function. Default
       is `get`.
     - `profile` - a function used to obtain user profile information and normalize it. The function
-      signature is `async function(credentials, params, get)` where:
+      signature is `async function(credentials, params, get, request)` where:
         - `credentials` - the credentials object. Change the object directly within the function
           (profile information is typically stored under `credentials.profile`).
         - `params` - the parsed information received from the provider (e.g. token, secret, and
@@ -216,6 +216,9 @@ The `server.auth.strategy()` method requires the following strategy options:
             - `params` - any URI query parameters (cannot include them in the URI due to signature
               requirements).
             - returns the parsed profile response object.
+        - `request` - the hapi request object of the authorization callback. Useful for providers
+          which return extra data in the callback query (e.g. Apple returns `user` there on the
+          first authorization), as `credentials.query` only contains the sign-in request query.
 
 - `password` - the cookie encryption password. Used to encrypt the temporary state cookie used by
   the module in between the authorization protocol steps.
