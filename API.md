@@ -250,6 +250,9 @@ Each strategy accepts the following optional settings:
 - `cookie` - the name of the cookie used to manage the temporary state. Defaults to
   `'bell-provider'` where 'provider' is the provider name. For
   example, the Twitter cookie name defaults to `'bell-twitter'`.
+  When `isSecure` is `true` and `domain` isn't set, prefixing the name with `'__Host-'` (e.g.
+  `'__Host-bell-twitter'`) prevents sibling subdomains from overwriting the state cookie, see
+  https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#cookie_prefixes
 - `isSameSite` - sets the cookie same site option. Defaults to `Strict`.
 - `isSecure` - sets the cookie secure flag. Defaults to `true`.
 - `isHttpOnly` - sets the cookie HTTP only flag. Defaults to `true`.
